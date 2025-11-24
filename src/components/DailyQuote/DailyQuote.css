@@ -1,0 +1,238 @@
+.daily-quote {
+  margin: 25px 0;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s ease;
+}
+
+.daily-quote.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.quote-container {
+  position: relative;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.quote-container:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+}
+
+.quote-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.quote-icon {
+  position: absolute;
+  top: -10px;
+  right: 20px;
+  font-size: 28px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.1));
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+.quote-content {
+  position: relative;
+  z-index: 2;
+}
+
+.quote-text {
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0 0 15px 0;
+  font-weight: 400;
+  color: white;
+  font-style: italic;
+  text-align: center;
+  position: relative;
+  padding: 0 20px;
+}
+
+.quote-text::before,
+.quote-text::after {
+  content: '"';
+  font-size: 24px;
+  font-weight: 600;
+  opacity: 0.3;
+  position: absolute;
+  top: -5px;
+}
+
+.quote-text::before {
+  left: 0;
+}
+
+.quote-text::after {
+  right: 0;
+}
+
+.quote-author {
+  display: block;
+  text-align: center;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  font-style: normal;
+  margin-top: 10px;
+}
+
+.quote-decoration {
+  position: absolute;
+  bottom: -15px;
+  left: 20px;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.quote-marks {
+  font-size: 80px;
+  font-weight: bold;
+  color: white;
+  line-height: 1;
+}
+
+.quote-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 15px;
+  padding: 0 5px;
+}
+
+.quote-label {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.quote-sparkles {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.quote-sparkles span {
+  animation: sparkle 2s infinite;
+  animation-delay: calc(var(--i) * 0.3s);
+}
+
+.quote-sparkles span:nth-child(1) { --i: 0; }
+.quote-sparkles span:nth-child(2) { --i: 1; }
+.quote-sparkles span:nth-child(3) { --i: 2; }
+
+@keyframes sparkle {
+  0%, 100% { 
+    opacity: 0.3; 
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 1; 
+    transform: scale(1.2);
+  }
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .quote-container {
+    padding: 20px;
+    margin: 0 5px;
+  }
+  
+  .quote-text {
+    font-size: 15px;
+    padding: 0 15px;
+  }
+  
+  .quote-icon {
+    top: -8px;
+    right: 15px;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+  
+  .quote-author {
+    font-size: 13px;
+  }
+  
+  .quote-marks {
+    font-size: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .daily-quote {
+    margin: 20px -5px;
+  }
+  
+  .quote-container {
+    padding: 18px;
+    border-radius: 16px;
+  }
+  
+  .quote-text {
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 0 10px;
+  }
+  
+  .quote-footer {
+    margin-top: 12px;
+  }
+  
+  .quote-label {
+    font-size: 11px;
+  }
+  
+  .quote-sparkles {
+    font-size: 10px;
+    gap: 6px;
+  }
+}
+
+/* Темная тема поддержка */
+@media (prefers-color-scheme: dark) {
+  .quote-container {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  }
+  
+  .quote-container:hover {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+  }
+}

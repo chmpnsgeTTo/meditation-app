@@ -1,0 +1,264 @@
+.meditation-timer {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="1" fill="white" opacity="0.1"/><circle cx="80" cy="30" r="0.5" fill="white" opacity="0.2"/><circle cx="60" cy="70" r="0.8" fill="white" opacity="0.15"/><circle cx="30" cy="80" r="1.2" fill="white" opacity="0.1"/></svg>');
+}
+
+.timer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  padding-top: 20px;
+}
+
+.timer-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.back-btn, .close-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover, .close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.timer-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.lesson-info {
+  margin-bottom: 40px;
+}
+
+.lesson-info h1 {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.lesson-info p {
+  font-size: 18px;
+  opacity: 0.8;
+}
+
+.timer-circle {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  margin-bottom: 40px;
+}
+
+.progress-ring {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.progress-circle {
+  transition: stroke-dashoffset 1s ease;
+}
+
+.timer-display {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.time-text {
+  font-size: 48px;
+  font-weight: 300;
+  letter-spacing: 2px;
+}
+
+.timer-controls {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 30px;
+}
+
+.control-btn {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.control-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+.play-pause-btn {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  color: #333;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.play-pause-btn:hover {
+  background: white;
+  transform: scale(1.1);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+.current-time {
+  font-size: 24px;
+  font-weight: 300;
+  margin-bottom: 20px;
+  opacity: 0.8;
+}
+
+.sound-info {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 15px 25px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sound-info p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.sound-info p:first-child {
+  opacity: 0.7;
+  margin-bottom: 5px;
+}
+
+.reset-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  padding: 12px 30px;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.reset-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .lesson-info h1 {
+    font-size: 28px;
+  }
+  
+  .lesson-info p {
+    font-size: 16px;
+  }
+  
+  .timer-circle {
+    width: 240px;
+    height: 240px;
+  }
+  
+  .timer-display {
+    width: 160px;
+    height: 160px;
+  }
+  
+  .time-text {
+    font-size: 36px;
+  }
+  
+  .timer-controls {
+    gap: 20px;
+  }
+  
+  .control-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 14px;
+  }
+  
+  .play-pause-btn {
+    width: 70px;
+    height: 70px;
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .meditation-timer {
+    padding: 15px;
+  }
+  
+  .lesson-info h1 {
+    font-size: 24px;
+  }
+  
+  .timer-circle {
+    width: 200px;
+    height: 200px;
+  }
+  
+  .timer-display {
+    width: 140px;
+    height: 140px;
+  }
+  
+  .time-text {
+    font-size: 30px;
+  }
+}

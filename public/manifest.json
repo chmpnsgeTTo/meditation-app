@@ -1,0 +1,30 @@
+{
+  "short_name": "Медитация",
+  "name": "Приложение для медитации",
+  "description": "Красивое приложение для медитации с таймером и звуками природы",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "48x48 32x32 24x24 16x16",
+      "type": "image/x-icon",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "favicon.ico",
+      "type": "image/x-icon",
+      "sizes": "192x192"
+    },
+    {
+      "src": "favicon.ico",
+      "type": "image/x-icon", 
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#667eea",
+  "background_color": "#667eea",
+  "orientation": "portrait",
+  "categories": ["health", "lifestyle", "wellness"],
+  "lang": "ru"
+}

@@ -1,0 +1,49 @@
+{
+  "name": "meditation-app",
+  "version": "0.1.0",
+  "private": true,
+  "homepage": "https://chmpnsgeTTo.github.io/Meditation-app",
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.16.4",
+    "@testing-library/react": "^13.3.0",
+    "@testing-library/user-event": "^13.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
+  },
+  "description": "Как это работает изнутри\r Техническая кухня:\r • Интерфейс: Собран на современном React, что обеспечивает плавность и отзывчивость.\r • Звук: Уникальная система генерации звуков на лету, без предзаписанных файлов, через мощный Web Audio API.\r • Данные: Вся твоя статистика и настройки надежно хранятся локально на устройстве.\r • Архитектура: Четкая структура компонентов и продуманная система управления состоянием делают приложение стабильным и удобным для развития.\r Структура проекта логична и проста:\r Все компоненты (авторизация, таймер, профиль, упражнения) лежат в своих папках, утилиты для работы со звуком — в своих, что позволяет легко ориентироваться в коде.",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
