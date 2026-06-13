@@ -1,0 +1,2636 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ============================================ */
+/* 1. ФОНОВОЕ ВИДЕО И БАЗОВЫЕ СЛОИ */
+/* ============================================ */
+.video-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  overflow: hidden;
+}
+
+.video-background video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: -1;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
+  background: transparent;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* ============================================ */
+/* 2. НАВИГАЦИЯ (СКРУГЛЁННАЯ) */
+/* ============================================ */
+.navbar {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 0.8rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 60px;
+  margin: 1rem 2rem;
+  width: calc(100% - 4rem);
+  position: sticky;
+  top: 0.5rem;
+  z-index: 100;
+  transition: all 0.3s ease;
+}
+
+.nav-brand {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #667eea;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #333;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.3s;
+  cursor: pointer;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: #667eea;
+}
+
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.5rem;
+  border-radius: 50px;
+  transition: all 0.3s;
+  font-size: 1rem;
+}
+
+.theme-toggle:hover {
+  background: rgba(0, 0, 0, 0.05);
+  transform: scale(1.05);
+}
+
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* ============================================ */
+/* 3. КОНТЕЙНЕРЫ */
+/* ============================================ */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* ============================================ */
+/* 4. ПРИВЕТСТВЕННАЯ СТРАНИЦА */
+/* ============================================ */
+.welcome-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.welcome-content {
+  text-align: center;
+  color: white;
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 30px;
+  backdrop-filter: blur(10px);
+  max-width: 90%;
+  animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.logo-icon {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+}
+
+.welcome-content h1 {
+  font-size: 3rem;
+  margin-top: 0.5rem;
+}
+
+.tagline {
+  font-size: 1.2rem;
+  margin-bottom: 3rem;
+  opacity: 0.9;
+}
+
+.features {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+}
+
+.feature {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  backdrop-filter: blur(5px);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ============================================ */
+/* 5. КНОПКИ (ОБЩИЕ СТИЛИ) */
+/* ============================================ */
+.btn-primary,
+.btn-secondary {
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-primary {
+  background: white;
+  color: #667eea;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: white;
+  border: 2px solid white;
+}
+
+.btn-primary:hover,
+.btn-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-danger {
+  background: #e53e3e;
+  color: white;
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+/* ============================================ */
+/* 6. СТРАНИЦЫ АВТОРИЗАЦИИ (ВХОД/РЕГИСТРАЦИЯ) */
+/* ============================================ */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+.auth-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.auth-card .logo {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-card .logo h1 {
+  color: #667eea;
+  margin-top: 0.5rem;
+  font-size: 1.8rem;
+}
+
+.auth-card h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.auth-card form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.auth-card .btn-primary {
+  width: 100%;
+  max-width: 250px;
+  padding: 0.8rem;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.input-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 18px;
+  pointer-events: none;
+  z-index: 1;
+  transition: color 0.2s;
+}
+
+.input-wrapper input {
+  width: 100%;
+  padding: 12px 16px 12px 44px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.2s;
+  background: white;
+  box-sizing: border-box;
+}
+
+.input-wrapper input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.input-wrapper input:focus+.input-icon {
+  color: #667eea;
+}
+
+.auth-link {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: #718096;
+}
+
+.auth-link a {
+  color: #667eea;
+  text-decoration: none;
+}
+
+.back-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 1rem;
+  color: #667eea;
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.error-message {
+  color: #e53e3e;
+  text-align: center;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+/* ============================================ */
+/* 7. МОДАЛЬНЫЕ ОКНА */
+/* ============================================ */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  align-items: center;
+  justify-content: center;
+}
+
+.modal.show {
+  display: flex;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.modal-content h3 {
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.modal-content p {
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.modal-buttons button {
+  min-width: 120px;
+  padding: 0.8rem 1.2rem;
+  border-radius: 50px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-weight: 500;
+}
+
+.modal-buttons .btn-danger {
+  background: #e53e3e;
+  color: white;
+  border: none;
+}
+
+.modal-buttons .btn-danger:hover {
+  background: #c53030;
+  transform: translateY(-2px);
+}
+
+.modal-buttons .btn-secondary {
+  background: #e2e8f0;
+  color: #333;
+  border: 1px solid #cbd5e0;
+}
+
+.modal-buttons .btn-secondary:hover {
+  background: #cbd5e0;
+  transform: translateY(-2px);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+}
+
+/* ============================================ */
+/* 8. СТРАНИЦА МЕДИТАЦИИ (КРУГОВОЙ ТАЙМЕР) */
+/* ============================================ */
+.meditation-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.meditation-title {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 1.8rem;
+}
+
+.timer-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  border-radius: 60px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 500px;
+}
+
+.pulse-circles {
+  position: absolute;
+  top: 32%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  max-width: 280px;
+  max-height: 280px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.pulse-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 2px solid rgba(102, 126, 234, 0.6);
+  width: 100px;
+  height: 100px;
+  animation: pulse 3s ease-out infinite;
+}
+
+.delay-1 {
+  animation-delay: 0s;
+}
+
+.delay-2 {
+  animation-delay: 1s;
+}
+
+.delay-3 {
+  animation-delay: 2s;
+}
+
+@keyframes pulse {
+  0% {
+    width: 100px;
+    height: 100px;
+    opacity: 0.6;
+  }
+  100% {
+    width: 300px;
+    height: 300px;
+    opacity: 0;
+  }
+}
+
+.beautiful-timer {
+  position: relative;
+  width: 280px;
+  height: 280px;
+  margin: 1rem auto;
+  z-index: 1;
+}
+
+.timer-ring {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  position: relative;
+  z-index: 2;
+}
+
+.timer-progress {
+  transition: stroke-dashoffset 0.3s linear;
+  filter: drop-shadow(0 0 8px rgba(102, 126, 234, 0.5));
+}
+
+.timer-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: 100%;
+  z-index: 3;
+}
+
+.timer-digits {
+  font-size: 3rem;
+  font-weight: bold;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+  color: #667eea;
+  text-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+  letter-spacing: 2px;
+}
+
+.timer-status {
+  font-size: 0.8rem;
+  color: #48bb78;
+  margin-top: 0.5rem;
+  animation: softPulse 2s ease infinite;
+}
+
+@keyframes softPulse {
+  0%, 100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.timer-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(102, 126, 234, 0.15), transparent);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.meditation-icon {
+  animation: floatIcon 4s ease-in-out infinite;
+}
+
+@keyframes floatIcon {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.time-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin: 1.5rem 0 1rem;
+}
+
+.time-btn {
+  background: rgba(102, 126, 234, 0.2);
+  border: 2px solid rgba(102, 126, 234, 0.5);
+  backdrop-filter: blur(4px);
+  padding: 12px 20px;
+  border-radius: 60px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 70px;
+}
+
+.time-btn .time-number {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #667eea;
+}
+
+.time-btn .time-unit {
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+.time-btn:hover:not(.disabled) {
+  background: rgba(102, 126, 234, 0.4);
+  border-color: #667eea;
+  transform: translateY(-3px);
+}
+
+.time-btn.disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.stop-meditation-btn {
+  background: rgba(229, 62, 62, 0.2);
+  border: 2px solid rgba(229, 62, 62, 0.5);
+  backdrop-filter: blur(4px);
+  padding: 10px 24px;
+  border-radius: 60px;
+  color: #ef4444;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.stop-meditation-btn:hover {
+  background: rgba(229, 62, 62, 0.4);
+  border-color: #ef4444;
+  transform: translateY(-2px);
+}
+
+.meditation-status {
+  margin-top: 1rem;
+  padding: 8px 16px;
+  border-radius: 40px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  backdrop-filter: blur(4px);
+}
+
+.meditation-status.active {
+  background: rgba(72, 187, 120, 0.2);
+  color: #48bb78;
+  animation: softPulse 2s ease infinite;
+}
+
+.meditation-status.completed {
+  background: rgba(102, 126, 234, 0.2);
+  color: #667eea;
+}
+
+.meditation-tips {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 28px;
+  padding: 1.5rem;
+  margin-top: 1rem;
+  width: 100%;
+  max-width: 500px;
+}
+
+.meditation-tips h3 {
+  font-size: 1rem;
+  color: #667eea;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.meditation-tips ul {
+  margin-top: 0.5rem;
+  padding-left: 1.5rem;
+}
+
+.meditation-tips li {
+  margin: 0.5rem 0;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  .beautiful-timer {
+    width: 220px;
+    height: 220px;
+  }
+
+  .pulse-circles {
+    max-width: 220px;
+    max-height: 220px;
+  }
+
+  .timer-digits {
+    font-size: 2rem;
+  }
+
+  @keyframes pulse {
+    0% {
+      width: 80px;
+      height: 80px;
+    }
+    100% {
+      width: 240px;
+      height: 240px;
+    }
+  }
+}
+
+/* ============================================ */
+/* 9. СТРАНИЦА ПРОФИЛЯ */
+/* ============================================ */
+.profile-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 28px;
+  padding: 2rem;
+  transition: all 0.3s ease;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.avatar-section {
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #667eea;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.avatar:hover {
+  transform: scale(1.05);
+}
+
+.change-avatar-btn {
+  margin-top: 0.5rem;
+  background: #f0f0f0;
+  border: none;
+  padding: 0.3rem 0.8rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.user-info {
+  flex: 1;
+}
+
+.user-info h2 {
+  margin-bottom: 0.5rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-info p {
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+.settings-gear-btn {
+  background: #f0f0f0;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-gear-btn:hover {
+  background: #667eea;
+  color: white;
+}
+
+.settings-gear-btn.active {
+  background: #667eea;
+  color: white;
+}
+
+.stats-filters {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  background: #f0f0f0;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.filter-btn.active {
+  background: #667eea;
+  color: white;
+}
+
+.stats-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.stats-metric-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s;
+}
+
+.stats-metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.metric-icon {
+  width: 48px;
+  height: 48px;
+  background: #f0f4ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.metric-info {
+  flex: 1;
+}
+
+.metric-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.metric-title {
+  font-size: 0.8rem;
+  color: #718096;
+}
+
+.stats-chart-card {
+  background: white;
+  border-radius: 20px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.stats-chart-card h3 {
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.meditation-dates {
+  background: rgba(247, 250, 252, 0.95);
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 2rem;
+}
+
+.meditation-dates p {
+  margin: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #333;
+}
+
+.settings-section {
+  background: #f7fafc;
+  padding: 1.5rem;
+  border-radius: 15px;
+  margin-bottom: 1.5rem;
+}
+
+.settings-section h3 {
+  margin-bottom: 1rem;
+  color: #333;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.settings-section input {
+  width: 100%;
+  padding: 0.8rem;
+  margin-bottom: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  background: white;
+  color: #333;
+}
+
+.message {
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+/* ========== ВКЛАДКИ В ПРОФИЛЕ (ОБЩИЙ БЛОК) ========== */
+.profile-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 0.5rem;
+}
+
+.profile-tab {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #718096;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 50px;
+}
+
+.profile-tab:hover {
+  background: #f1f5f9;
+  color: #667eea;
+}
+
+.profile-tab.active {
+  color: #667eea;
+  background: #e0e7ff;
+  border-bottom: none;
+}
+
+/* ========== ДОСТИЖЕНИЯ (ЗАВЕРШЁННЫЕ КУРСЫ) В ПРОФИЛЕ ========== */
+.user-courses-section h3 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.achievement-card {
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 1rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.achievement-icon {
+  width: 60px;
+  height: 60px;
+  background: #e0e7ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.achievement-info {
+  flex: 1;
+}
+
+.achievement-info h4 {
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
+  color: #333;
+}
+
+.achievement-info p {
+  font-size: 0.7rem;
+  color: #888;
+  margin-bottom: 0.5rem;
+}
+
+.achievement-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.progress-bar-small {
+  flex: 1;
+  height: 4px;
+  background: #e2e8f0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill-small {
+  height: 100%;
+  background: #667eea;
+  border-radius: 2px;
+}
+
+.no-courses {
+  text-align: center;
+  padding: 3rem;
+  color: #718096;
+}
+
+.no-courses .btn-primary {
+  margin-top: 1rem;
+  display: inline-block;
+}
+
+/* ============================================ */
+/* 10. СТРАНИЦЫ ОБУЧЕНИЯ, КАТАЛОГА АСАН И КУРСОВ (ОБЩИЕ СТИЛИ) */
+/* ============================================ */
+.learning-container,
+.direction-detail,
+.catalog-container,
+.asana-detail-container,
+.courses-container,
+.course-detail-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 28px;
+  padding: 2rem;
+  transition: all 0.3s ease;
+}
+
+.learning-container h1,
+.catalog-container h1,
+.courses-container h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.learning-subtitle,
+.catalog-subtitle,
+.courses-subtitle {
+  text-align: center;
+  color: #718096;
+  margin-bottom: 2rem;
+}
+
+.directions-grid,
+.asanas-grid,
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.direction-card,
+.asana-card,
+.course-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  text-decoration: none;
+  color: #333;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e0e0e0;
+}
+
+.direction-card:hover,
+.asana-card:hover,
+.course-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.direction-icon {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.direction-card h3,
+.asana-card h3,
+.course-card h3 {
+  font-size: 1.4rem;
+  margin-bottom: 0.75rem;
+  color: #667eea;
+  text-align: center;
+}
+
+.direction-card p,
+.asana-card p,
+.course-card p {
+  color: #555;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.read-more {
+  display: inline-block;
+  color: #667eea;
+  font-weight: 500;
+  text-align: center;
+  width: 100%;
+  transition: color 0.2s;
+}
+
+.direction-card:hover .read-more,
+.course-card:hover .read-more {
+  color: #764ba2;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 1.5rem;
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+/* ========== ОСНОВНЫЕ НАПРАВЛЕНИЯ (ДЕТАЛЬНАЯ СТРАНИЦА) ========== */
+.direction-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.direction-header h1 {
+  color: #667eea;
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.direction-short {
+  font-size: 1.1rem;
+  color: #555;
+  font-style: italic;
+}
+
+.direction-section {
+  margin-bottom: 2rem;
+}
+
+.direction-section h2 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1.6rem;
+  border-left: 4px solid #667eea;
+  padding-left: 1rem;
+}
+
+.direction-section p {
+  line-height: 1.6;
+  color: #555;
+}
+
+.direction-section ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.direction-section li {
+  padding: 0.5rem 0 0.5rem 1.5rem;
+  position: relative;
+  color: #555;
+}
+
+.direction-section li:before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  top: 0.5rem;
+  font-size: 1rem;
+  color: #667eea;
+}
+
+.direction-note {
+  background: rgba(102, 126, 234, 0.1);
+  padding: 1rem;
+  border-radius: 12px;
+  margin-top: 1rem;
+  text-align: center;
+  font-style: italic;
+  color: #667eea;
+}
+
+/* ========== КАТАЛОГ АСАН (ФИЛЬТРЫ) ========== */
+.filters-wrapper,
+.courses-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.filter-chip,
+.filter-btn {
+  background: #f0f0f0;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 40px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #333;
+}
+
+.filter-chip.active,
+.filter-btn.active {
+  background: #667eea;
+  color: white;
+}
+
+.filter-chip:hover,
+.filter-btn:hover {
+  background: #5a67d8;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.asana-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.asana-card {
+  overflow: hidden;
+  padding: 0;
+}
+
+.asana-card-content {
+  padding: 1.2rem;
+}
+
+.asana-card h3 {
+  text-align: left;
+  font-size: 1.2rem;
+  margin-bottom: 0.3rem;
+}
+
+.asana-sanskrit {
+  font-style: italic;
+  color: #889;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.asana-category {
+  display: inline-block;
+  background: #e2e8f0;
+  padding: 0.2rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: #4a5568;
+  margin-bottom: 0.75rem;
+}
+
+.asana-description {
+  font-size: 0.9rem;
+  color: #4a5568;
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.no-results {
+  text-align: center;
+  padding: 2rem;
+  color: #718096;
+}
+
+/* ========== ДЕТАЛЬНАЯ СТРАНИЦА АСАНЫ ========== */
+.asana-detail-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.asana-detail-header h1 {
+  color: #667eea;
+  font-size: 2.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.sanskrit {
+  font-style: italic;
+  color: #889;
+  font-size: 1.1rem;
+}
+
+.asana-detail-image {
+  text-align: center;
+  margin: 1.5rem auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.asana-detail-image img {
+  max-width: 80%;
+  max-height: 350px;
+  width: auto;
+  height: auto;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .asana-detail-image img {
+    max-width: 90%;
+    max-height: 250px;
+  }
+}
+
+.asana-detail-section {
+  margin-bottom: 1.8rem;
+}
+
+.asana-detail-section h2 {
+  color: #333;
+  font-size: 1.5rem;
+  margin-bottom: 0.8rem;
+  border-left: 4px solid #667eea;
+  padding-left: 1rem;
+}
+
+.asana-detail-section p {
+  line-height: 1.6;
+  color: #444;
+}
+
+.asana-detail-section ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.asana-detail-section li {
+  padding: 0.3rem 0 0.3rem 1.5rem;
+  position: relative;
+  color: #555;
+}
+
+.asana-detail-section li:before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  top: 0.3rem;
+  font-size: 1rem;
+}
+
+.asana-detail-tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 1rem;
+}
+
+.tag {
+  background: #e2e8f0;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  color: #4a5568;
+}
+
+/* ========== КУРСЫ (ДОПОЛНИТЕЛЬНЫЕ СТИЛИ) ========== */
+.course-image-placeholder {
+  height: 160px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.course-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.75rem;
+  color: #888;
+  margin-bottom: 0.8rem;
+}
+
+.difficulty {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Прогресс-бар (общий для страниц и карточек) */
+.course-progress-mini,
+.course-progress-section {
+  margin-top: 0.5rem;
+}
+
+.progress-bar-mini,
+.progress-bar-large,
+.progress-bar-small {
+  background: #e2e8f0;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-bar-mini {
+  height: 4px;
+  margin-bottom: 4px;
+}
+
+.progress-bar-large {
+  height: 10px;
+  border-radius: 5px;
+}
+
+.progress-bar-small {
+  height: 4px;
+  border-radius: 2px;
+}
+
+.progress-fill-mini,
+.progress-fill-large,
+.progress-fill-small {
+  background: #667eea;
+  border-radius: inherit;
+  transition: width 0.3s ease;
+}
+
+.progress-fill-large {
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  height: 100%;
+}
+
+/* Детальная страница курса */
+.course-detail-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.course-detail-header h1 {
+  font-size: 2rem;
+  color: #667eea;
+  margin-bottom: 1.2rem;
+}
+
+.course-detail-meta {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.difficulty-badge,
+.duration-badge,
+.lessons-badge {
+  padding: 0.3rem 1rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  background: #f0f0f0;
+  display: inline-flex;
+  align-items: center;
+}
+
+.course-full-description {
+  max-width: 700px;
+  margin: 0 auto 2rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+/* Информационные карточки на странице курса */
+.course-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.info-card {
+  background: #f8fafc;
+  border-radius: 20px;
+  padding: 1.5rem;
+  transition: transform 0.3s;
+}
+
+.info-card:hover {
+  transform: translateY(-4px);
+}
+
+.info-card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.info-card p {
+  font-size: 0.95rem;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 0;
+}
+
+/* Прогресс-бар на странице курса */
+.course-progress-section {
+  background: #f8fafc;
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+/* Прогресс-бар в карточках курсов */
+.course-progress-mini {
+  margin-top: 0.8rem;
+}
+
+.progress-bar-mini {
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.progress-fill-mini {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.course-progress-mini span {
+  font-size: 0.7rem;
+  color: #667eea;
+  font-weight: 500;
+}
+
+.course-completed-badge {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  color: #48bb78;
+}
+
+/* Тёмная тема */
+body.dark-mode .progress-bar-mini {
+  background: #334155;
+}
+
+body.dark-mode .course-progress-mini span {
+  color: #818cf8;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: #4a5568;
+}
+
+.completion-badge {
+  margin-top: 1rem;
+  text-align: center;
+  color: #48bb78;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Список уроков */
+.lessons-list {
+  margin-top: 1rem;
+}
+
+.lessons-list h2 {
+  font-size: 1.3rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.lesson-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1.2rem;
+  background: #f8fafc;
+  border-radius: 16px;
+  margin-bottom: 1.2rem;
+  transition: all 0.3s;
+}
+
+.lesson-item.completed {
+  background: #e8f5e9;
+  opacity: 0.9;
+}
+
+.lesson-number {
+  width: 40px;
+  height: 40px;
+  background: #667eea;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.lesson-info {
+  flex: 1;
+}
+
+.lesson-info h3 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.lesson-content {
+  font-size: 0.8rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.lesson-duration {
+  font-size: 0.7rem;
+  color: #888;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.complete-btn {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  align-self: center;
+}
+
+.complete-btn:hover {
+  background: #5a67d8;
+  transform: translateY(-2px);
+}
+
+.completed-check {
+  color: #48bb78;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+/* ============================================ */
+/* 11. ЛЕНТА (FEED) */
+/* ============================================ */
+.feed-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 28px;
+  padding: 1.5rem;
+}
+
+.feed-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.create-post-btn {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+}
+
+.create-post-btn:hover {
+  background: #5a67d8;
+  transform: translateY(-2px);
+}
+
+.user-achievements {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+}
+
+.achievement-badge {
+  background: #f0f4ff;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #667eea;
+}
+
+.feed-posts {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.feed-post {
+  background: white;
+  border-radius: 20px;
+  padding: 1.2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s;
+}
+
+.feed-post:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.post-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.post-author {
+  flex: 1;
+}
+
+.post-username {
+  font-weight: bold;
+  color: #333;
+  display: block;
+}
+
+.post-date {
+  font-size: 0.7rem;
+  color: #94a3b8;
+}
+
+.post-delete {
+  background: none;
+  border: none;
+  color: #cbd5e0;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.post-delete:hover {
+  color: #e53e3e;
+}
+
+.post-content p {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #4a5568;
+  margin-bottom: 0.8rem;
+}
+
+.post-meditation-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #f0f4ff;
+  padding: 0.3rem 0.8rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  color: #667eea;
+}
+
+.post-actions {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  color: #64748b;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.action-btn:hover {
+  color: #667eea;
+}
+
+.post-comments {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.comments-list {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 0.8rem;
+}
+
+.comment-item {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+  padding: 0.5rem;
+  background: #f8fafc;
+  border-radius: 12px;
+}
+
+.comment-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.comment-content {
+  flex: 1;
+}
+
+.comment-username {
+  font-weight: bold;
+  font-size: 0.8rem;
+  color: #333;
+  margin-right: 0.5rem;
+}
+
+.comment-text {
+  font-size: 0.85rem;
+  color: #4a5568;
+}
+
+.comment-date {
+  font-size: 0.65rem;
+  color: #94a3b8;
+  margin-left: 0.5rem;
+}
+
+.comment-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.comment-form input {
+  flex: 1;
+  padding: 0.6rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 50px;
+  font-size: 0.85rem;
+}
+
+.comment-form button {
+  background: #667eea;
+  border: none;
+  border-radius: 50px;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  color: white;
+  display: inline-flex;
+  align-items: center;
+}
+
+.load-more {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.load-more button {
+  background: none;
+  border: 1px solid #cbd5e0;
+  padding: 0.6rem 1.5rem;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.load-more button:hover {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.no-posts {
+  text-align: center;
+  padding: 3rem;
+  color: #64748b;
+}
+
+/* ============================================ */
+/* 12. АДМИН-ПАНЕЛЬ */
+/* ============================================ */
+.admin-container {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 28px;
+  padding: 2rem;
+}
+
+.admin-container h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-access-denied {
+  text-align: center;
+  padding: 3rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 28px;
+}
+
+.admin-access-denied h2 {
+  margin: 1rem 0;
+  color: #333;
+}
+
+.admin-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.admin-tab {
+  background: none;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  border-radius: 50px;
+  transition: all 0.3s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #718096;
+}
+
+.admin-tab:hover {
+  background: #f1f5f9;
+  color: #667eea;
+}
+
+.admin-tab.active {
+  background: #667eea;
+  color: white;
+}
+
+.admin-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.admin-stat-card {
+  background: white;
+  border-radius: 20px;
+  padding: 1.5rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s;
+}
+
+.admin-stat-card:hover {
+  transform: translateY(-3px);
+}
+
+.admin-stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #667eea;
+}
+
+.admin-stat-label {
+  color: #718096;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.admin-table-wrapper {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.admin-table th {
+  background: #f8fafc;
+  font-weight: 600;
+  color: #333;
+}
+
+.admin-delete-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  transition: all 0.2s;
+}
+
+.admin-delete-btn:hover {
+  background: #dc2626;
+  transform: scale(1.02);
+}
+
+/* Просмотр поста в админ-панели */
+.view-post-btn {
+  background: none;
+  border: none;
+  color: #667eea;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.view-post-btn:hover {
+  background: #e0e7ff;
+  color: #5a67d8;
+}
+
+.post-preview {
+  max-width: 250px;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+.post-action-cell {
+  white-space: nowrap;
+}
+
+/* Модальное окно просмотра поста */
+.post-view-modal {
+  max-width: 600px;
+  width: 90%;
+}
+
+.post-full-content {
+  margin: 1rem 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.post-full-text {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #333;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.post-meditation-info {
+  background: #e0e7ff;
+  padding: 0.5rem 1rem;
+  border-radius: 50px;
+  display: inline-block;
+  font-size: 0.8rem;
+  color: #667eea;
+  margin-bottom: 1rem;
+}
+
+.post-stats-info {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: #718096;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+/* ============================================ */
+/* 13. ТЁМНАЯ ТЕМА (ГЛОБАЛЬНЫЕ ПЕРЕОПРЕДЕЛЕНИЯ) */
+/* ============================================ */
+body.dark-mode {
+  background: #0f172a;
+}
+
+body.dark-mode .video-background::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: -1;
+}
+
+body.dark-mode .navbar {
+  background: rgba(30, 30, 46, 0.98);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .nav-brand,
+body.dark-mode .nav-links a,
+body.dark-mode .theme-toggle {
+  color: #cbd5e0;
+}
+
+body.dark-mode .nav-links a:hover,
+body.dark-mode .nav-links a.active {
+  color: #818cf8;
+}
+
+body.dark-mode .profile-container,
+body.dark-mode .learning-container,
+body.dark-mode .direction-detail,
+body.dark-mode .catalog-container,
+body.dark-mode .asana-detail-container,
+body.dark-mode .courses-container,
+body.dark-mode .course-detail-container,
+body.dark-mode .feed-container,
+body.dark-mode .admin-container,
+body.dark-mode .admin-access-denied {
+  background: rgba(30, 30, 46, 0.95);
+  color: #e2e8f0;
+}
+
+body.dark-mode .direction-card,
+body.dark-mode .asana-card,
+body.dark-mode .feed-post,
+body.dark-mode .stats-metric-card,
+body.dark-mode .stats-chart-card,
+body.dark-mode .course-card,
+body.dark-mode .admin-stat-card,
+body.dark-mode .achievement-card,
+body.dark-mode .info-card {
+  background: #1e1e2e;
+  border-color: #334155;
+}
+
+body.dark-mode .direction-card h3,
+body.dark-mode .asana-card h3,
+body.dark-mode .course-card h3,
+body.dark-mode .stats-chart-card h3,
+body.dark-mode .admin-stat-value,
+body.dark-mode .achievement-info h4,
+body.dark-mode .info-card h3,
+body.dark-mode .course-detail-header h1,
+body.dark-mode .lessons-list h2,
+body.dark-mode .lesson-info h3 {
+  color: #e2e8f0;
+}
+
+body.dark-mode .direction-card p,
+body.dark-mode .asana-card p,
+body.dark-mode .course-card p,
+body.dark-mode .stats-metric-card .metric-value,
+body.dark-mode .course-full-description,
+body.dark-mode .info-card p,
+body.dark-mode .lesson-content,
+body.dark-mode .lesson-duration,
+body.dark-mode .admin-table td {
+  color: #cbd5e0;
+}
+
+body.dark-mode .filter-chip,
+body.dark-mode .filter-btn,
+body.dark-mode .difficulty-badge,
+body.dark-mode .duration-badge,
+body.dark-mode .lessons-badge,
+body.dark-mode .admin-tab {
+  background: #334155;
+  color: #cbd5e0;
+}
+
+body.dark-mode .filter-chip.active,
+body.dark-mode .filter-btn.active,
+body.dark-mode .admin-tab.active {
+  background: #818cf8;
+  color: white;
+}
+
+body.dark-mode .admin-tab:hover {
+  background: #1e293b;
+  color: #818cf8;
+}
+
+body.dark-mode .time-btn {
+  background: rgba(129, 140, 248, 0.15);
+  border-color: rgba(129, 140, 248, 0.3);
+}
+
+body.dark-mode .auth-card,
+body.dark-mode .modal-content {
+  background: #1e1e2e;
+}
+
+body.dark-mode .auth-card h2,
+body.dark-mode .auth-card .logo h1,
+body.dark-mode .modal-content h3 {
+  color: #e2e8f0;
+}
+
+body.dark-mode .modal-content p {
+  color: #94a3b8;
+}
+
+body.dark-mode .input-wrapper input,
+body.dark-mode .settings-section input {
+  background: #1a1a2e;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+body.dark-mode .input-wrapper input::placeholder {
+  color: #64748b;
+}
+
+body.dark-mode .comment-item,
+body.dark-mode .lesson-item {
+  background: #1a1a2e;
+}
+
+body.dark-mode .comment-username,
+body.dark-mode .post-username {
+  color: #818cf8;
+}
+
+body.dark-mode .comment-text,
+body.dark-mode .post-content p {
+  color: #cbd5e0;
+}
+
+body.dark-mode .post-meditation-badge,
+body.dark-mode .achievement-badge {
+  background: #1a1a2e;
+  color: #818cf8;
+}
+
+body.dark-mode .meditation-tips {
+  background: rgba(30, 30, 46, 0.95);
+}
+
+body.dark-mode .meditation-tips li {
+  color: #cbd5e0;
+}
+
+body.dark-mode .progress-ring__background {
+  stroke: #334155;
+}
+
+body.dark-mode .welcome-content {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+body.dark-mode .feature {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .settings-section,
+body.dark-mode .meditation-dates {
+  background: #1a1a2e;
+}
+
+body.dark-mode .settings-section h3,
+body.dark-mode .meditation-dates p {
+  color: #e2e8f0;
+}
+
+body.dark-mode .metric-icon {
+  background: #1a1a2e;
+}
+
+body.dark-mode .metric-title,
+body.dark-mode .post-stats-info {
+  color: #94a3b8;
+}
+
+body.dark-mode .modal-buttons .btn-secondary {
+  background: #334155;
+  color: #e2e8f0;
+  border-color: #475569;
+}
+
+body.dark-mode .modal-buttons .btn-secondary:hover {
+  background: #475569;
+}
+
+body.dark-mode .view-post-btn {
+  color: #818cf8;
+}
+
+body.dark-mode .view-post-btn:hover {
+  background: #1e293b;
+}
+
+body.dark-mode .post-full-text {
+  background: #1a1a2e;
+  color: #cbd5e0;
+}
+
+body.dark-mode .post-meditation-info {
+  background: #1e293b;
+}
+
+body.dark-mode .post-stats-info {
+  border-top-color: #334155;
+}
+
+/* ============================================ */
+/* 14. АДАПТИВНОСТЬ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ */
+/* ============================================ */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column;
+    border-radius: 30px;
+    margin: 0.5rem 1rem;
+    width: calc(100% - 2rem);
+  }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    text-align: center;
+  }
+
+  .nav-links.show {
+    display: flex;
+  }
+
+  .mobile-menu-btn {
+    display: block;
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+  }
+
+  .theme-toggle {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .container {
+    padding: 1rem;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .stats-metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .directions-grid,
+  .asanas-grid,
+  .courses-grid,
+  .course-info-grid,
+  .achievements-grid,
+  .admin-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .direction-header h1,
+  .asana-detail-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .direction-section h2,
+  .asana-detail-section h2 {
+    font-size: 1.3rem;
+  }
+
+  .feed-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .create-post-btn {
+    justify-content: center;
+  }
+
+  .course-detail-container {
+    padding: 1rem;
+  }
+
+  .course-detail-header h1 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .course-detail-meta {
+    gap: 0.8rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .course-full-description {
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .course-info-grid,
+  .course-progress-section {
+    margin-bottom: 2rem;
+  }
+
+  .lesson-item {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .lesson-number {
+    margin: 0 auto;
+  }
+
+  .complete-btn,
+  .completed-check {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .admin-table th,
+  .admin-table td {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .post-preview {
+    max-width: 150px;
+  }
+
+  .view-post-btn span {
+    display: none;
+  }
+
+  .view-post-btn {
+    padding: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-card .btn-primary {
+    max-width: 100%;
+  }
+
+  .time-buttons {
+    gap: 8px;
+  }
+
+  .time-btn {
+    min-width: 55px;
+  }
+}
+
+/* ============================================ */
+/* 15. ВСПОМОГАТЕЛЬНЫЕ КЛАССЫ */
+/* ============================================ */
+.hidden {
+  display: none;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  font-size: 1.2rem;
+  color: white;
+}
