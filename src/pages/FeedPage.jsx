@@ -7,7 +7,7 @@ import { MdSend, MdClose } from 'react-icons/md';
 import { GiMeditation, GiLotus } from 'react-icons/gi';
 import { IoMdMedal } from 'react-icons/io';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://chmpnsgetto-meditation-app-5f61.twc1.net';
 
 const FeedPage = () => {
   const { user } = useAuth();

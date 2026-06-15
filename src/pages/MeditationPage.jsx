@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import { GiMeditation } from 'react-icons/gi';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://chmpnsgetto-meditation-app-5f61.twc1.net';
 
 const MeditationPage = () => {
   const [duration, setDuration] = useState(0);

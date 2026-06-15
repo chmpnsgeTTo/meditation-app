@@ -16,7 +16,7 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://chmpnsgetto-meditation-app-5f61.twc1.net';
 
 const ProfilePage = () => {
   const { user } = useAuth();

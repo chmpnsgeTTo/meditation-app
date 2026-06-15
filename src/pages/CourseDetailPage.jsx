@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { GiDuration } from 'react-icons/gi';
 import { FaPlay, FaCheckCircle, FaClock, FaLeaf, FaStar, FaFire, FaAward } from 'react-icons/fa';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'https://chmpnsgetto-meditation-app-5f61.twc1.net';
 
 const CourseDetailPage = () => {
   const { id } = useParams();
