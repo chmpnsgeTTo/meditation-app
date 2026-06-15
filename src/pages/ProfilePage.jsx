@@ -77,25 +77,22 @@ const ProfilePage = () => {
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
     const formData = new FormData();
     formData.append('avatar', file);
-    
     try {
       const response = await axios.post(`${API_URL}/api/upload-avatar`, formData, {
-        headers: { 
-          Authorization: `Bearer ${user.token}`,
-          'Content-Type': 'multipart/form-data'
-        }
+        headers: { Authorization: `Bearer ${user.token}`, 'Content-Type': 'multipart/form-data' }
       });
-      
       if (response.data.avatarUrl) {
-        setUserData({ ...userData, avatar: response.data.avatarUrl });
+        // Обновляем локальное состояние
+        setUserData(prev => ({ ...prev, avatar: response.data.avatarUrl }));
+        // И перезагружаем с сервера для синхронизации
+        await loadUserData();
         setMessage('Аватар успешно обновлен!');
         setTimeout(() => setMessage(''), 3000);
       }
     } catch (error) {
-      setMessage(error.response?.data?.error || 'Ошибка загрузки');
+      setMessage('Ошибка загрузки');
     }
   };
 
@@ -211,9 +208,9 @@ const ProfilePage = () => {
           <div className="profile-header">
             <div className="avatar-section">
               <img 
-                className="avatar" 
-                src={getAvatarUrl()} 
+                src={`${userData?.avatar || '/uploads/default-avatar.png'}?t=${Date.now()}`}
                 alt="Avatar"
+                className="avatar"
                 onError={(e) => {
                   e.target.src = '/uploads/default-avatar.png';
                 }}

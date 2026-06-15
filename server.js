@@ -288,18 +288,20 @@ app.get('/api/courses/:id/progress', authMiddleware, async (req, res) => {
   }
 });
 
-// Отметить урок как пройденный
+// Отметить урок как пройденный (исправленная версия)
 app.post('/api/courses/:courseId/lessons/:lessonId/complete', authMiddleware, async (req, res) => {
   const { courseId, lessonId } = req.params;
   const userId = req.user.userId;
   
   try {
+    // 1. Добавляем запись о завершении урока
     await pool.query(`
       INSERT INTO user_lesson_completions (user_id, lesson_id)
       VALUES ($1, $2)
       ON CONFLICT (user_id, lesson_id) DO NOTHING
     `, [userId, lessonId]);
     
+    // 2. Получаем количество завершённых уроков
     const completedCountRes = await pool.query(`
       SELECT COUNT(*) as count 
       FROM user_lesson_completions 
@@ -308,22 +310,40 @@ app.post('/api/courses/:courseId/lessons/:lessonId/complete', authMiddleware, as
     `, [userId, courseId]);
     
     const completedCount = parseInt(completedCountRes.rows[0].count);
-    const totalLessonsRes = await pool.query('SELECT COUNT(*) as count FROM lessons WHERE course_id = $1', [courseId]);
+    
+    // 3. Получаем общее количество уроков в курсе
+    const totalLessonsRes = await pool.query(`
+      SELECT COUNT(*) as count 
+      FROM lessons 
+      WHERE course_id = $1
+    `, [courseId]);
+    
     const totalLessons = parseInt(totalLessonsRes.rows[0].count);
     const isCompleted = completedCount >= totalLessons;
     
-    await pool.query(`
-      INSERT INTO user_course_progress (user_id, course_id, completed_lessons, is_completed, completed_at)
-      VALUES ($1, $2, $3, $4, CASE WHEN $4 THEN NOW() ELSE NULL END)
-      ON CONFLICT (user_id, course_id) DO UPDATE SET
-        completed_lessons = EXCLUDED.completed_lessons,
-        is_completed = EXCLUDED.is_completed,
-        completed_at = CASE WHEN EXCLUDED.is_completed THEN NOW() ELSE completed_at END
-    `, [userId, courseId, completedCount, isCompleted]);
+    // 4. Обновляем прогресс — раздельно для INSERT и UPDATE, без двусмысленности
+    if (isCompleted) {
+      await pool.query(`
+        INSERT INTO user_course_progress (user_id, course_id, completed_lessons, is_completed, completed_at)
+        VALUES ($1, $2, $3, $4, NOW())
+        ON CONFLICT (user_id, course_id) DO UPDATE SET
+          completed_lessons = EXCLUDED.completed_lessons,
+          is_completed = EXCLUDED.is_completed,
+          completed_at = NOW()
+      `, [userId, courseId, completedCount, isCompleted]);
+    } else {
+      await pool.query(`
+        INSERT INTO user_course_progress (user_id, course_id, completed_lessons, is_completed)
+        VALUES ($1, $2, $3, $4)
+        ON CONFLICT (user_id, course_id) DO UPDATE SET
+          completed_lessons = EXCLUDED.completed_lessons,
+          is_completed = EXCLUDED.is_completed
+      `, [userId, courseId, completedCount, isCompleted]);
+    }
     
     res.json({ completedCount, totalLessons, isCompleted });
   } catch (err) {
-    console.error(err);
+    console.error('Ошибка отметки урока:', err);
     res.status(500).json({ error: 'Ошибка сохранения прогресса' });
   }
 });
