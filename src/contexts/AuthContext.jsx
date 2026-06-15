@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 
-const API_URL = 'http://chmpnsgetto-meditation-app-6dfa.twc1.net';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
