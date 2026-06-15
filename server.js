@@ -38,9 +38,9 @@ const upload = multer({
   }
 });
 
-// Middleware
+// Middleware - ВРЕМЕННО разрешаем все источники для отладки
 app.use(cors({
-  origin: '*', // временно разрешаем все источники для теста
+  origin: '*',
   credentials: true,
 }));
 app.use(express.json());
@@ -64,7 +64,7 @@ app.post('/api/register', async (req, res) => {
     res.json({ message: 'Регистрация успешна', userId: result.rows[0].id });
   } catch (err) {
     if (err.code === '23505') return res.status(400).json({ error: 'Пользователь уже существует' });
-    console.error(err);
+    console.error('Ошибка регистрации:', err);
     res.status(500).json({ error: 'Ошибка сервера' });
   }
 });
@@ -83,7 +83,7 @@ app.post('/api/login', async (req, res) => {
     const token = jwt.sign({ userId: user.id, username: user.username, role: user.role || 'user' }, SECRET_KEY);
     res.json({ token, username: user.username, userId: user.id, role: user.role || 'user' });
   } catch (err) {
-    console.error(err);
+    console.error('Ошибка логина:', err);
     res.status(500).json({ error: 'Ошибка сервера' });
   }
 });
@@ -207,7 +207,7 @@ app.get('/api/statistics', authMiddleware, async (req, res) => {
   }
 });
 
-// Получить все курсы
+// Получить все курсы (открытый маршрут)
 app.get('/api/courses', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM courses ORDER BY id');
@@ -218,7 +218,7 @@ app.get('/api/courses', async (req, res) => {
   }
 });
 
-// Получить один курс с уроками
+// Получить один курс с уроками (защищённый маршрут)
 app.get('/api/courses/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
   try {
