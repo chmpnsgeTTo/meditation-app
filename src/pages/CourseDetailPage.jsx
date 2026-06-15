@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { GiDuration } from 'react-icons/gi';
 import { FaPlay, FaCheckCircle, FaClock, FaLeaf, FaStar, FaFire, FaAward } from 'react-icons/fa';
 
-const API_URL = `http://${import.meta.env.VITE_API_URL}`;
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const CourseDetailPage = () => {
   const { id } = useParams();
