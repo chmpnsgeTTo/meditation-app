@@ -38,16 +38,21 @@ const upload = multer({
   }
 });
 
-// Middleware - ВРЕМЕННО разрешаем все источники для отладки
+// Middleware
 app.use(cors({
-  origin: '*',
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://chmpnsgetto-meditation-app-6dfa.twc1.net',
+    'https://meditation-app.tw1.ru'
+  ],
   credentials: true,
 }));
 app.use(express.json());
 app.use(express.static('public'));
 app.use('/uploads', express.static(uploadDir));
 
-// ==================== API МАРШРУТЫ ====================
+// ==================== АВТОРИЗАЦИЯ ====================
 
 // Регистрация
 app.post('/api/register', async (req, res) => {
@@ -64,7 +69,7 @@ app.post('/api/register', async (req, res) => {
     res.json({ message: 'Регистрация успешна', userId: result.rows[0].id });
   } catch (err) {
     if (err.code === '23505') return res.status(400).json({ error: 'Пользователь уже существует' });
-    console.error('Ошибка регистрации:', err);
+    console.error(err);
     res.status(500).json({ error: 'Ошибка сервера' });
   }
 });
@@ -83,7 +88,7 @@ app.post('/api/login', async (req, res) => {
     const token = jwt.sign({ userId: user.id, username: user.username, role: user.role || 'user' }, SECRET_KEY);
     res.json({ token, username: user.username, userId: user.id, role: user.role || 'user' });
   } catch (err) {
-    console.error('Ошибка логина:', err);
+    console.error(err);
     res.status(500).json({ error: 'Ошибка сервера' });
   }
 });
@@ -207,7 +212,9 @@ app.get('/api/statistics', authMiddleware, async (req, res) => {
   }
 });
 
-// Получить все курсы (открытый маршрут)
+// ==================== КУРСЫ ====================
+
+// Получить все курсы
 app.get('/api/courses', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM courses ORDER BY id');
@@ -218,7 +225,7 @@ app.get('/api/courses', async (req, res) => {
   }
 });
 
-// Получить один курс с уроками (защищённый маршрут)
+// Получить один курс с уроками
 app.get('/api/courses/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
   try {
@@ -234,6 +241,125 @@ app.get('/api/courses/:id', authMiddleware, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Ошибка получения курса' });
+  }
+});
+
+// ==================== СОЦИАЛЬНАЯ ЛЕНТА ====================
+
+// Получить ленту постов
+app.get('/api/feed', authMiddleware, async (req, res) => {
+  const { page = 1, limit = 10 } = req.query;
+  const offset = (page - 1) * limit;
+  
+  try {
+    const result = await pool.query(`
+      SELECT p.*, u.username, u.avatar,
+        EXISTS(SELECT 1 FROM likes WHERE post_id = p.id AND user_id = $1) as is_liked
+      FROM posts p
+      JOIN users u ON u.id = p.user_id
+      ORDER BY p.created_at DESC
+      LIMIT $2 OFFSET $3
+    `, [req.user.userId, limit, offset]);
+    
+    const countResult = await pool.query('SELECT COUNT(*) FROM posts');
+    
+    res.json({
+      posts: result.rows,
+      total: parseInt(countResult.rows[0].count),
+      page: parseInt(page),
+      totalPages: Math.ceil(countResult.rows[0].count / limit)
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Ошибка получения ленты' });
+  }
+});
+
+// Создать пост
+app.post('/api/posts', authMiddleware, async (req, res) => {
+  const { content, meditation_duration } = req.body;
+  if (!content) return res.status(400).json({ error: 'Введите текст поста' });
+  
+  try {
+    const result = await pool.query(
+      'INSERT INTO posts (user_id, content, meditation_duration) VALUES ($1, $2, $3) RETURNING *',
+      [req.user.userId, content, meditation_duration || null]
+    );
+    res.json({ post: result.rows[0], message: 'Пост опубликован' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Ошибка создания поста' });
+  }
+});
+
+// Удалить пост
+app.delete('/api/posts/:id', authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const post = await pool.query('SELECT user_id FROM posts WHERE id = $1', [id]);
+    if (post.rows.length === 0) return res.status(404).json({ error: 'Пост не найден' });
+    if (post.rows[0].user_id !== req.user.userId) return res.status(403).json({ error: 'Нет прав' });
+    
+    await pool.query('DELETE FROM posts WHERE id = $1', [id]);
+    res.json({ message: 'Пост удалён' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Ошибка удаления' });
+  }
+});
+
+// Лайкнуть/убрать лайк с поста
+app.post('/api/posts/:id/like', authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const existing = await pool.query('SELECT id FROM likes WHERE post_id = $1 AND user_id = $2', [id, req.user.userId]);
+    
+    if (existing.rows.length > 0) {
+      await pool.query('DELETE FROM likes WHERE post_id = $1 AND user_id = $2', [id, req.user.userId]);
+      await pool.query('UPDATE posts SET likes_count = likes_count - 1 WHERE id = $1', [id]);
+      res.json({ liked: false });
+    } else {
+      await pool.query('INSERT INTO likes (post_id, user_id) VALUES ($1, $2)', [id, req.user.userId]);
+      await pool.query('UPDATE posts SET likes_count = likes_count + 1 WHERE id = $1', [id]);
+      res.json({ liked: true });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Ошибка' });
+  }
+});
+
+// Получить комментарии к посту
+app.get('/api/posts/:id/comments', authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(`
+      SELECT c.*, u.username, u.avatar
+      FROM comments c
+      JOIN users u ON u.id = c.user_id
+      WHERE c.post_id = $1
+      ORDER BY c.created_at ASC
+    `, [id]);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Ошибка получения комментариев' });
+  }
+});
+
+// Добавить комментарий
+app.post('/api/posts/:id/comments', authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  const { content } = req.body;
+  if (!content) return res.status(400).json({ error: 'Введите текст комментария' });
+  
+  try {
+    await pool.query('INSERT INTO comments (post_id, user_id, content) VALUES ($1, $2, $3)', [id, req.user.userId, content]);
+    await pool.query('UPDATE posts SET comments_count = comments_count + 1 WHERE id = $1', [id]);
+    res.json({ message: 'Комментарий добавлен' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Ошибка добавления комментария' });
   }
 });
 
