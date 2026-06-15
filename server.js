@@ -38,7 +38,14 @@ const upload = multer({
 });
 
 // Middleware
-app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:3000'], credentials: true }));
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'https://chmpnsgetto-meditation-app-frontend.tw1.net'  // <-- добавить эту строку
+  ],
+  credentials: true,
+}));
 app.use(express.json());
 app.use(express.static('public'));
 app.use('/uploads', express.static(uploadDir));
