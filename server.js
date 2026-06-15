@@ -43,7 +43,8 @@ app.use(cors({
   origin: [
     'http://localhost:5173',
     'http://localhost:3000',
-    'https://chmpnsgetto-meditation-app-6dfa.twc1.net'
+    'https://chmpnsgetto-meditation-app-6dfa.twc1.net',
+    'https://chmpnsgetto-meditation-app-6618.twc1.net',
   ],
   credentials: true,
 }));
