@@ -6,7 +6,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { GiMeditation } from 'react-icons/gi';
 import { FaStar, FaFire, FaLeaf } from 'react-icons/fa';
 
-const API_URL = 'https://chmpnsgetto-meditation-app-5f61.twc1.net';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const CoursesPage = () => {
   const { user } = useAuth();
