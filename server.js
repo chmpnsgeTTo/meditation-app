@@ -104,7 +104,10 @@ app.post('/api/login', async (req, res) => {
 // Получение пользователя
 app.get('/api/user', authMiddleware, async (req, res) => {
   try {
-    const result = await pool.query('SELECT id, username, avatar, created_at FROM users WHERE id = $1', [req.user.userId]);
+    const result = await pool.query(
+      'SELECT id, username, avatar, created_at FROM users WHERE id = $1',
+      [req.user.userId]
+    );
     if (result.rows.length === 0) return res.status(404).json({ error: 'Пользователь не найден' });
     res.json(result.rows[0]);
   } catch (err) {
@@ -288,7 +291,7 @@ app.get('/api/courses/:id/progress', authMiddleware, async (req, res) => {
   }
 });
 
-// Отметить урок как пройденный (исправленная версия)
+// Отметить урок как пройденный (исправленная версия без ambiguous column)
 app.post('/api/courses/:courseId/lessons/:lessonId/complete', authMiddleware, async (req, res) => {
   const { courseId, lessonId } = req.params;
   const userId = req.user.userId;
@@ -321,24 +324,38 @@ app.post('/api/courses/:courseId/lessons/:lessonId/complete', authMiddleware, as
     const totalLessons = parseInt(totalLessonsRes.rows[0].count);
     const isCompleted = completedCount >= totalLessons;
     
-    // 4. Обновляем прогресс — раздельно для INSERT и UPDATE, без двусмысленности
-    if (isCompleted) {
-      await pool.query(`
-        INSERT INTO user_course_progress (user_id, course_id, completed_lessons, is_completed, completed_at)
-        VALUES ($1, $2, $3, $4, NOW())
-        ON CONFLICT (user_id, course_id) DO UPDATE SET
-          completed_lessons = EXCLUDED.completed_lessons,
-          is_completed = EXCLUDED.is_completed,
-          completed_at = NOW()
-      `, [userId, courseId, completedCount, isCompleted]);
+    // 4. Проверяем, есть ли запись о прогрессе
+    const existingProgress = await pool.query(
+      'SELECT id FROM user_course_progress WHERE user_id = $1 AND course_id = $2',
+      [userId, courseId]
+    );
+    
+    if (existingProgress.rows.length === 0) {
+      // Запись не существует — создаём новую
+      if (isCompleted) {
+        await pool.query(
+          'INSERT INTO user_course_progress (user_id, course_id, completed_lessons, is_completed, completed_at) VALUES ($1, $2, $3, $4, NOW())',
+          [userId, courseId, completedCount, isCompleted]
+        );
+      } else {
+        await pool.query(
+          'INSERT INTO user_course_progress (user_id, course_id, completed_lessons, is_completed) VALUES ($1, $2, $3, $4)',
+          [userId, courseId, completedCount, isCompleted]
+        );
+      }
     } else {
-      await pool.query(`
-        INSERT INTO user_course_progress (user_id, course_id, completed_lessons, is_completed)
-        VALUES ($1, $2, $3, $4)
-        ON CONFLICT (user_id, course_id) DO UPDATE SET
-          completed_lessons = EXCLUDED.completed_lessons,
-          is_completed = EXCLUDED.is_completed
-      `, [userId, courseId, completedCount, isCompleted]);
+      // Запись существует — обновляем
+      if (isCompleted) {
+        await pool.query(
+          'UPDATE user_course_progress SET completed_lessons = $1, is_completed = $2, completed_at = NOW() WHERE user_id = $3 AND course_id = $4',
+          [completedCount, isCompleted, userId, courseId]
+        );
+      } else {
+        await pool.query(
+          'UPDATE user_course_progress SET completed_lessons = $1, is_completed = $2 WHERE user_id = $3 AND course_id = $4',
+          [completedCount, isCompleted, userId, courseId]
+        );
+      }
     }
     
     res.json({ completedCount, totalLessons, isCompleted });
