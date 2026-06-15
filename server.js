@@ -212,7 +212,7 @@ app.get('/api/statistics', authMiddleware, async (req, res) => {
 });
 
 // Получить все курсы
-app.get('/api/courses', authMiddleware, async (req, res) => {
+app.get('/api/courses', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM courses ORDER BY id');
     res.json(result.rows);
