@@ -15,10 +15,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const SECRET_KEY = process.env.SECRET_KEY;
 
-// Настройка загрузки файлов
+// Папка для загрузок
 const uploadDir = path.join(__dirname, 'public/uploads');
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
+// Multer настройки
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, uploadDir),
   filename: (req, file, cb) => {
@@ -41,7 +42,8 @@ const upload = multer({
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    'http://localhost:3000'
+    'http://localhost:3000',
+    'https://chmpnsgetto-meditation-app-6dfa.twc1.net'
   ],
   credentials: true,
 }));
@@ -49,7 +51,7 @@ app.use(express.json());
 app.use(express.static('public'));
 app.use('/uploads', express.static(uploadDir));
 
-// ==================== API ЭНДПОЙНТЫ ====================
+// ==================== API МАРШРУТЫ ====================
 
 // Регистрация
 app.post('/api/register', async (req, res) => {
@@ -206,6 +208,36 @@ app.get('/api/statistics', authMiddleware, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Ошибка получения статистики' });
+  }
+});
+
+// Получить все курсы
+app.get('/api/courses', authMiddleware, async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM courses ORDER BY id');
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Ошибка получения курсов' });
+  }
+});
+
+// Получить один курс с уроками
+app.get('/api/courses/:id', authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  try {
+    const courseRes = await pool.query('SELECT * FROM courses WHERE id = $1', [id]);
+    if (courseRes.rows.length === 0) return res.status(404).json({ error: 'Курс не найден' });
+    
+    const lessonsRes = await pool.query('SELECT * FROM lessons WHERE course_id = $1 ORDER BY order_num', [id]);
+    
+    res.json({
+      ...courseRes.rows[0],
+      lessons: lessonsRes.rows
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Ошибка получения курса' });
   }
 });
 
