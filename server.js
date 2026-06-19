@@ -214,7 +214,7 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// ---------- ЛОГИН С ПРОВЕРКОЙ БЛОКИРОВКИ И ПОДРОБНЫМ ЛОГИРОВАНИЕМ ----------
+// ---------- ЛОГИН С ПРОВЕРКОЙ БЛОКИРОВКИ ----------
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   
@@ -285,7 +285,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// ---------- ПОЛУЧЕНИЕ ПОЛЬЗОВАТЕЛЯ С ПРОВЕРКОЙ БЛОКИРОВКИ ----------
+// ---------- ПОЛУЧЕНИЕ ПОЛЬЗОВАТЕЛЯ ----------
 app.get('/api/user', authMiddleware, async (req, res) => {
   try {
     const result = await pool.query(
@@ -1053,7 +1053,6 @@ app.get('/api/admin/comments', authMiddleware, adminMiddleware, async (req, res)
 // 7. ОБРАТНАЯ СВЯЗЬ (ЗАПРОСЫ НА РАЗБЛОКИРОВКУ)
 // ============================================================
 
-// ---------- ОТПРАВКА ЗАПРОСА НА РАЗБЛОКИРОВКУ ----------
 app.post('/api/unblock-request', async (req, res) => {
   const { userId, username, email, message } = req.body;
   
@@ -1062,7 +1061,6 @@ app.post('/api/unblock-request', async (req, res) => {
   }
   
   try {
-    // Проверяем, не отправлял ли пользователь уже запрос
     const existingRequest = await pool.query(
       'SELECT id FROM unblock_requests WHERE user_id = $1 AND status = $2',
       [userId, 'pending']
@@ -1093,7 +1091,6 @@ app.post('/api/unblock-request', async (req, res) => {
   }
 });
 
-// ---------- ПОЛУЧЕНИЕ ВСЕХ ЗАПРОСОВ ----------
 app.get('/api/admin/unblock-requests', authMiddleware, adminMiddleware, async (req, res) => {
   const { status = 'all' } = req.query;
   
@@ -1137,7 +1134,6 @@ app.get('/api/admin/unblock-requests', authMiddleware, adminMiddleware, async (r
   }
 });
 
-// ---------- ОБНОВЛЕНИЕ СТАТУСА ЗАПРОСА ----------
 app.put('/api/admin/unblock-requests/:id', authMiddleware, adminMiddleware, async (req, res) => {
   const { id } = req.params;
   const { status, admin_comment } = req.body;
@@ -1188,7 +1184,6 @@ app.put('/api/admin/unblock-requests/:id', authMiddleware, adminMiddleware, asyn
   }
 });
 
-// ---------- УДАЛЕНИЕ ЗАПРОСА ----------
 app.delete('/api/admin/unblock-requests/:id', authMiddleware, adminMiddleware, async (req, res) => {
   const { id } = req.params;
   
@@ -1205,7 +1200,6 @@ app.delete('/api/admin/unblock-requests/:id', authMiddleware, adminMiddleware, a
   }
 });
 
-// ---------- СТАТИСТИКА ПО ЗАПРОСАМ ----------
 app.get('/api/admin/unblock-requests/stats', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const result = await pool.query(`
@@ -1225,12 +1219,10 @@ app.get('/api/admin/unblock-requests/stats', authMiddleware, adminMiddleware, as
   }
 });
 
-
 // ============================================================
-// 10. КАТАЛОГ АСАН
+// 8. КАТАЛОГ АСАН
 // ============================================================
 
-// ---------- ПОЛУЧИТЬ ВСЕ АСАНЫ ----------
 app.get('/api/asanas', authMiddleware, async (req, res) => {
   try {
     const result = await pool.query(`
@@ -1259,7 +1251,6 @@ app.get('/api/asanas', authMiddleware, async (req, res) => {
   }
 });
 
-// ---------- ПОЛУЧИТЬ ОДНУ АСАНУ ПО ID ----------
 app.get('/api/asanas/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
   
@@ -1295,7 +1286,6 @@ app.get('/api/asanas/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// ---------- ПОЛУЧИТЬ КАТЕГОРИИ АСАН ----------
 app.get('/api/asanas/categories', authMiddleware, async (req, res) => {
   try {
     const result = await pool.query(`
@@ -1312,11 +1302,10 @@ app.get('/api/asanas/categories', authMiddleware, async (req, res) => {
 });
 
 // ============================================================
-// 11. ОБРАБОТКА ЗАПРОСОВ НА ФРОНТЕНД (SPA)
+// 9. ОБРАБОТКА ЗАПРОСОВ НА ФРОНТЕНД (SPA)
 // ============================================================
 // ВАЖНО: ЭТО ДОЛЖНО БЫТЬ ПОСЛЕ ВСЕХ API-ЭНДПОИНТОВ!
 
-// Проверяем наличие index.html
 const indexPaths = [
   path.join(appRoot, 'public', 'index.html'),
   path.join(appRoot, 'dist', 'index.html'),
@@ -1342,20 +1331,9 @@ if (!indexHtmlPath) {
   console.log('✅ Создан fallback index.html:', fallbackPath);
 }
 
-// Все запросы, которые не начинаются с /api и не ведут к существующим файлам,
-// отправляем на index.html
+// ВАЖНО: СНАЧАЛА проверяем файлы, ПОТОМ /api, ПОТОМ /uploads, ПОТОМ index.html
 app.get('*', (req, res) => {
-  // Пропускаем API-запросы
-  if (req.path.startsWith('/api')) {
-    return res.status(404).json({ error: 'API endpoint not found' });
-  }
-  
-  // Пропускаем запросы к статике
-  if (req.path.startsWith('/uploads')) {
-    return res.status(404).json({ error: 'File not found' });
-  }
-  
-  // Проверяем, не запрос ли это к существующему файлу
+  // 1. Проверяем, не запрос ли это к существующему файлу
   const possiblePaths = [
     path.join(appRoot, 'public', req.path),
     path.join(appRoot, 'dist', req.path),
@@ -1368,12 +1346,22 @@ app.get('*', (req, res) => {
     }
   }
   
-  // Иначе отдаем index.html
+  // 2. Если запрос на /api — возвращаем 404 (эндпоинт не найден)
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
+  }
+  
+  // 3. Если запрос на /uploads — файл не найден
+  if (req.path.startsWith('/uploads')) {
+    return res.status(404).json({ error: 'File not found' });
+  }
+  
+  // 4. Иначе отдаём index.html для SPA
   res.sendFile(indexHtmlPath);
 });
 
 // ============================================================
-// 12. ГЛОБАЛЬНЫЙ ОБРАБОТЧИК ОШИБОК (должен быть последним)
+// 10. ГЛОБАЛЬНЫЙ ОБРАБОТЧИК ОШИБОК (должен быть последним)
 // ============================================================
 app.use((err, req, res, next) => {
   console.error('❌ Глобальная ошибка:', err);
@@ -1384,7 +1372,7 @@ app.use((err, req, res, next) => {
 });
 
 // ============================================================
-// 13. ЗАПУСК СЕРВЕРА
+// 11. ЗАПУСК СЕРВЕРА
 // ============================================================
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Сервер запущен на порту ${PORT}`);
