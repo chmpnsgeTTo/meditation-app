@@ -35,7 +35,7 @@ const LoginPage = () => {
         navigate('/meditation');
       }
     } catch (err) {
-      console.error('Ошибка входа:', err);
+      console.error('❌ Ошибка входа:', err);
       
       if (err.response?.status === 403 && err.response?.data?.isBlocked) {
         setBlockReason(err.response.data.blockReason || 'Причина не указана');
