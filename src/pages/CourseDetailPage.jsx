@@ -372,7 +372,7 @@ const CourseDetailPage = () => {
                 fontWeight: '500'
               }}>
                 <FaAward size={20} />
-                Курс успешно завершён! 🎉
+                Курс успешно завершён!
               </div>
             )}
           </div>

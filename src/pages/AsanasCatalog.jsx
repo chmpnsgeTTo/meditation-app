@@ -1,69 +1,243 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';          // ← добавить импорт
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 import Navbar from '../components/Navbar';
-import { asanas } from '../data/asanasData';
+import { useAuth } from '../contexts/AuthContext';
+import { 
+  FiSearch, 
+  FiFilter, 
+  FiGrid, 
+  FiList, 
+  FiStar,
+  FiClock,
+  FiAward,
+  FiTag,
+  FiChevronRight,
+  FiBookOpen,
+  FiActivity,
+  FiUsers,
+  FiHeart,
+  FiEye
+} from 'react-icons/fi';
+import { GiLotus, GiMeditation, GiSittingDog } from 'react-icons/gi';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const AsanasCatalog = () => {
-  const [activeFilter, setActiveFilter] = useState('все');
+  const { user } = useAuth();
+  const [asanas, setAsanas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' или 'list'
 
-  // Уникальные категории для фильтрации
   const categories = [
-    'все',
-    ...new Set(asanas.map(a => a.category)),
+    'Все',
+    'Балансы',
+    'Асаны сидя',
+    'Асаны стоя',
+    'Упоры',
+    'Балансы на руках',
+    'Прогибы',
+    'Наклоны',
+    'Асаны лёжа',
+    'Балансы на ногах',
+    'Скручивания',
+    'Перевёрнутые позы'
   ];
 
-  const filteredAsanas = activeFilter === 'все'
-    ? asanas
-    : asanas.filter(a => a.category === activeFilter);
+  useEffect(() => {
+    fetchAsanas();
+  }, []);
+
+  const fetchAsanas = async () => {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(`${API_URL}/api/asanas`, {
+        headers: { Authorization: `Bearer ${user.token}` }
+      });
+      setAsanas(data);
+    } catch (err) {
+      console.error('Ошибка загрузки асан:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getCategoryIcon = (category) => {
+    const iconMap = {
+      'балансы': <FiActivity size={18} />,
+      'асаны сидя': <GiSittingDog size={18} />,
+      'асаны стоя': <GiMeditation size={18} />,
+      'упоры': <FiBookOpen size={18} />,
+      'балансы на руках': <FiUsers size={18} />,
+      'прогибы': <FiStar size={18} />,
+      'наклоны': <FiChevronRight size={18} />,
+      'асаны лёжа': <GiLotus size={18} />,
+      'балансы на ногах': <FiActivity size={18} />,
+      'скручивания': <FiGrid size={18} />,
+      'перевёрнутые позы': <FiEye size={18} />
+    };
+    return iconMap[category.toLowerCase()] || <FiTag size={18} />;
+  };
+
+  const getCategoryColor = (category) => {
+    const colorMap = {
+      'балансы': '#667eea',
+      'асаны сидя': '#48bb78',
+      'асаны стоя': '#ed8936',
+      'упоры': '#9f7aea',
+      'балансы на руках': '#fc8181',
+      'прогибы': '#f6ad55',
+      'наклоны': '#4299e1',
+      'асаны лёжа': '#68d391',
+      'балансы на ногах': '#ed64a6',
+      'скручивания': '#38b2ac',
+      'перевёрнутые позы': '#805ad5'
+    };
+    return colorMap[category.toLowerCase()] || '#667eea';
+  };
+
+  const filteredAsanas = asanas.filter(asana => {
+    const matchesSearch = asana.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          asana.sanskrit?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          asana.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || 
+                          asana.category?.toLowerCase() === selectedCategory.toLowerCase();
+    return matchesSearch && matchesCategory;
+  });
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <div className="container">
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p>Загрузка асан...</p>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
       <Navbar />
       <div className="container">
         <div className="catalog-container">
-          <h1>Каталог асан</h1>
-          <p className="catalog-subtitle">Выбери категорию, чтобы найти подходящую позу</p>
+          <div className="catalog-header">
+            <h1>
+              <FiBookOpen size={28} />
+              Каталог асан
+            </h1>
+            <p className="catalog-subtitle">
+              Выбери категорию, чтобы найти подходящую позу
+            </p>
+          </div>
 
-          {/* Фильтры */}
-          <div className="filters-wrapper">
-            {categories.map(cat => (
+          {/* Поиск и фильтры */}
+          <div className="catalog-controls">
+            <div className="catalog-search">
+              <FiSearch className="catalog-search-icon" />
+              <input
+                type="text"
+                placeholder="Поиск асан по названию..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="catalog-search-input"
+              />
+            </div>
+
+            <div className="catalog-view-toggle">
               <button
-                key={cat}
-                className={`filter-chip ${activeFilter === cat ? 'active' : ''}`}
-                onClick={() => setActiveFilter(cat)}
+                className={`catalog-view-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                onClick={() => setViewMode('grid')}
+                title="Сетка"
               >
-                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                <FiGrid size={18} />
+              </button>
+              <button
+                className={`catalog-view-btn ${viewMode === 'list' ? 'active' : ''}`}
+                onClick={() => setViewMode('list')}
+                title="Список"
+              >
+                <FiList size={18} />
+              </button>
+            </div>
+          </div>
+
+          {/* Категории */}
+          <div className="catalog-categories">
+            {categories.map(category => (
+              <button
+                key={category}
+                className={`catalog-category-btn ${selectedCategory === category.toLowerCase() || (category === 'Все' && selectedCategory === 'all') ? 'active' : ''}`}
+                onClick={() => setSelectedCategory(category === 'Все' ? 'all' : category.toLowerCase())}
+              >
+                {category}
               </button>
             ))}
           </div>
 
-          {/* Сетка асан – теперь каждая карточка – ссылка */}
-          <div className="asanas-grid">
-            {filteredAsanas.map(asana => (
-              <Link 
-                to={`/catalog/${asana.id}`} 
-                key={asana.id} 
-                className="asana-card-link"
-              >
-                <div className="asana-card">
-                  <div className="asana-card-content">
-                    <h3>{asana.name}</h3>
-                    <p className="asana-sanskrit">{asana.sanskrit}</p>
-                    <p className="asana-category">{asana.category}</p>
-                    <p className="asana-description">
-                      {asana.shortDescription || asana.description}
-                    </p>
-                    {asana.subcategory && (
-                      <span className="asana-subcategory">{asana.subcategory}</span>
-                    )}
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          {/* Результаты */}
+          {filteredAsanas.length === 0 ? (
+            <div className="catalog-empty">
+              <FiSearch size={48} />
+              <h3>Ничего не найдено</h3>
+              <p>Попробуйте изменить параметры поиска или выберите другую категорию</p>
+            </div>
+          ) : (
+            <div className={`catalog-${viewMode}`}>
+              {filteredAsanas.map(asana => (
+                <Link
+                  to={`/catalog/${asana.id}`}
+                  key={asana.id}
+                  className={`catalog-item catalog-item-${viewMode}`}
+                >
+                  <div className="catalog-item-content">
+                    <div className="catalog-item-header">
+                      <h3>{asana.name}</h3>
+                      <span className="catalog-item-sanskrit">{asana.sanskrit}</span>
+                    </div>
+                    
+                    <div className="catalog-item-meta">
+                      <span 
+                        className="catalog-item-category"
+                        style={{
+                          backgroundColor: getCategoryColor(asana.category) + '20',
+                          color: getCategoryColor(asana.category)
+                        }}
+                      >
+                        {getCategoryIcon(asana.category)}
+                        {asana.category}
+                      </span>
+                      {asana.difficulty && (
+                        <span className="catalog-item-difficulty">
+                          <FiStar size={14} />
+                          {asana.difficulty}
+                        </span>
+                      )}
+                      {asana.duration && (
+                        <span className="catalog-item-duration">
+                          <FiClock size={14} />
+                          {asana.duration} мин
+                        </span>
+                      )}
+                    </div>
 
-          {filteredAsanas.length === 0 && (
-            <div className="no-results">Нет асан в этой категории</div>
+                    <p className="catalog-item-description">{asana.description}</p>
+
+                    <div className="catalog-item-footer">
+                      <span className="catalog-item-read-more">
+                        Подробнее
+                        <FiChevronRight size={16} />
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
           )}
         </div>
       </div>
