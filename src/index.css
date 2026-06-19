@@ -3456,6 +3456,14 @@ body.dark-mode .nav-links .logout-btn:hover {
 /* 34. ДЕТАЛЬНАЯ СТРАНИЦА КУРСА */
 /* ============================================ */
 
+.course-detail-header h1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 2rem;
+  color: #333;
+}
+
 .course-detail-loading {
   text-align: center;
   padding: 40px;
@@ -3677,6 +3685,11 @@ body.dark-mode .lesson-completed-badge {
 /* ============================================ */
 /* 38. СТРАНИЦА КУРСОВ (ДОПОЛНИТЕЛЬНЫЕ СТИЛИ) */
 /* ============================================ */
+
+.courses-filters .filter-btn.active {
+  background: #667eea;
+  color: white;
+}
 
 .courses-error {
   text-align: center;

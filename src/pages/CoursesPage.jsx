@@ -16,7 +16,7 @@ import {
   FiCheckCircle,
   FiCalendar,
   FiTarget,
-  FiFeather,
+  FiFeather,    // ← ЗАМЕНИЛИ FiLeaf НА FiFeather
   FiLayers,
   FiZap
 } from 'react-icons/fi';
@@ -61,7 +61,7 @@ const CoursesPage = () => {
 
   const getDifficultyIcon = (difficulty) => {
     const iconMap = {
-      'Начинающий': <FiLeaf size={14} color="#48bb78" />,
+      'Начинающий': <FiFeather size={14} color="#48bb78" />,  // ← ЗДЕСЬ ТОЖЕ
       'Средний': <FiLayers size={14} color="#f6ad55" />,
       'Продвинутый': <FiZap size={14} color="#fc8181" />
     };
@@ -142,7 +142,7 @@ const CoursesPage = () => {
               className={`filter-btn ${filter === 'Начинающий' ? 'active' : ''}`}
               onClick={() => setFilter('Начинающий')}
             >
-              <FiLeaf size={14} />
+              <FiFeather size={14} />  {/* ← И ЗДЕСЬ */}
               Начинающий
             </button>
             <button
