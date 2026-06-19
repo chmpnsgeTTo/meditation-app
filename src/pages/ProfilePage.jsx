@@ -31,6 +31,7 @@ const ProfilePage = () => {
   const [activeTab, setActiveTab] = useState('stats');
   const [userCourses, setUserCourses] = useState([]);
   const [loadingCourses, setLoadingCourses] = useState(false);
+  const [avatarTimestamp, setAvatarTimestamp] = useState(Date.now());
 
   useEffect(() => {
     loadUserData();
@@ -43,6 +44,8 @@ const ProfilePage = () => {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setUserData(response.data);
+      // Обновляем таймштамп аватара при загрузке данных
+      setAvatarTimestamp(Date.now());
     } catch (error) {
       console.error('Ошибка загрузки данных:', error);
     }
@@ -77,22 +80,43 @@ const ProfilePage = () => {
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    
+    // Проверка типа файла
+    if (!file.type.match('image.*')) {
+      setMessage('Пожалуйста, выберите изображение');
+      return;
+    }
+    
+    // Проверка размера (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setMessage('Файл слишком большой. Максимум 5MB');
+      return;
+    }
+    
     const formData = new FormData();
     formData.append('avatar', file);
+    
     try {
       const response = await axios.post(`${API_URL}/api/upload-avatar`, formData, {
-        headers: { Authorization: `Bearer ${user.token}`, 'Content-Type': 'multipart/form-data' }
+        headers: { 
+          Authorization: `Bearer ${user.token}`, 
+          'Content-Type': 'multipart/form-data' 
+        }
       });
+      
       if (response.data.avatarUrl) {
         // Обновляем локальное состояние
         setUserData(prev => ({ ...prev, avatar: response.data.avatarUrl }));
-        // И перезагружаем с сервера для синхронизации
+        // Обновляем таймштамп для сброса кэша
+        setAvatarTimestamp(Date.now());
+        // Перезагружаем данные с сервера для синхронизации
         await loadUserData();
         setMessage('Аватар успешно обновлен!');
         setTimeout(() => setMessage(''), 3000);
       }
     } catch (error) {
-      setMessage('Ошибка загрузки');
+      console.error('Ошибка загрузки:', error);
+      setMessage(error.response?.data?.error || 'Ошибка загрузки');
     }
   };
 
@@ -149,10 +173,10 @@ const ProfilePage = () => {
   };
 
   const getAvatarUrl = () => {
-    if (userData?.avatar) {
-      return userData.avatar;
+    if (userData?.avatar && userData.avatar !== '/uploads/default-avatar.png') {
+      return `${userData.avatar}?t=${avatarTimestamp}`;
     }
-    return '/uploads/default-avatar.png';
+    return `/uploads/default-avatar.png?t=${avatarTimestamp}`;
   };
 
   const prepareChartData = () => {
@@ -208,11 +232,11 @@ const ProfilePage = () => {
           <div className="profile-header">
             <div className="avatar-section">
               <img 
-                src={`${userData?.avatar || '/uploads/default-avatar.png'}?t=${Date.now()}`}
+                src={getAvatarUrl()}
                 alt="Avatar"
                 className="avatar"
                 onError={(e) => {
-                  e.target.src = '/uploads/default-avatar.png';
+                  e.target.src = `/uploads/default-avatar.png?t=${avatarTimestamp}`;
                 }}
               />
               <div>

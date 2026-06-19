@@ -15,30 +15,73 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const SECRET_KEY = process.env.SECRET_KEY;
 
-// Папка для загрузок
-const uploadDir = path.join(__dirname, 'public/uploads');
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
+// ============================================================
+// 1. НАСТРОЙКА ПУТЕЙ ДЛЯ TIMEWEB CLOUD
+// ============================================================
+const appRoot = process.cwd();
+console.log('📁 App root:', appRoot);
 
-// Multer настройки для аватаров
+// Папка для загрузок (внутри public)
+const uploadDir = path.join(appRoot, 'public', 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+  console.log('📁 Создана папка uploads:', uploadDir);
+} else {
+  console.log('📁 Папка uploads существует:', uploadDir);
+}
+
+// Создаем default-avatar.png если его нет
+const defaultAvatarPath = path.join(uploadDir, 'default-avatar.png');
+if (!fs.existsSync(defaultAvatarPath)) {
+  console.log('⚠️ default-avatar.png не найден, создаю заглушку...');
+  const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><circle cx="50" cy="50" r="50" fill="#667eea"/><text x="50" y="65" font-size="40" text-anchor="middle" fill="white" font-family="Arial">👤</text></svg>`;
+  fs.writeFileSync(defaultAvatarPath, svgContent);
+  console.log('✅ Создан default-avatar.png');
+}
+
+// ============================================================
+// 2. НАСТРОЙКА MULTER
+// ============================================================
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
   filename: (req, file, cb) => {
     const unique = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, req.user.userId + '-' + unique + path.extname(file.originalname));
+    const filename = unique + path.extname(file.originalname);
+    cb(null, filename);
   }
 });
 
 const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { 
+    fileSize: 5 * 1024 * 1024 // 5MB
+  },
   fileFilter: (req, file, cb) => {
-    const allowed = /jpeg|jpg|png|gif/;
-    const isValid = allowed.test(file.mimetype) && allowed.test(path.extname(file.originalname).toLowerCase());
-    cb(null, isValid);
+    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const isValidType = allowedTypes.test(file.mimetype);
+    const isValidExt = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    
+    if (isValidType && isValidExt) {
+      cb(null, true);
+    } else {
+      cb(new Error('Только изображения (jpeg, jpg, png, gif, webp)'), false);
+    }
   }
 });
 
-// Middleware
+// ============================================================
+// 3. MIDDLEWARE
+// ============================================================
+
+// Логирование всех запросов
+app.use((req, res, next) => {
+  console.log(`📥 [${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
+// CORS
 app.use(cors({
   origin: [
     'http://localhost:5173',
@@ -48,25 +91,58 @@ app.use(cors({
   ],
   credentials: true,
 }));
+
 app.use(express.json());
-app.use(express.static('public'));
+app.use(express.urlencoded({ extended: true }));
+
+// ============================================================
+// 4. РАЗДАЧА СТАТИКИ (ВАЖНО ДЛЯ TIMEWEB)
+// ============================================================
+// Раздаем всю папку public
+app.use(express.static(path.join(appRoot, 'public')));
+
+// Раздаем папку uploads по пути /uploads
 app.use('/uploads', express.static(uploadDir));
 
-// Middleware для проверки прав администратора
-const adminMiddleware = (req, res, next) => {
-  if (req.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Доступ запрещён. Требуются права администратора.' });
+// Логируем запросы к аватарам
+app.use('/uploads', (req, res, next) => {
+  console.log('🖼️ Запрос аватара:', req.url);
+  next();
+});
+
+// ============================================================
+// 5. ГЛОБАЛЬНЫЙ ОБРАБОТЧИК ОШИБОК MULTER
+// ============================================================
+app.use((err, req, res, next) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'FILE_TOO_LARGE') {
+      return res.status(400).json({ error: 'Файл слишком большой. Максимум 5MB' });
+    }
+    return res.status(400).json({ error: err.message });
+  }
+  if (err) {
+    return res.status(400).json({ error: err.message });
   }
   next();
-};
+});
 
-// ==================== АВТОРИЗАЦИЯ ====================
+// ============================================================
+// 6. ЭНДПОИНТЫ АВТОРИЗАЦИИ
+// ============================================================
 
 // Регистрация
 app.post('/api/register', async (req, res) => {
   const { username, password } = req.body;
-  if (!username || !password) return res.status(400).json({ error: 'Заполните все поля' });
-  if (password.length < 6) return res.status(400).json({ error: 'Пароль минимум 6 символов' });
+  
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Заполните все поля' });
+  }
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'Пароль минимум 6 символов' });
+  }
+  if (username.length < 3) {
+    return res.status(400).json({ error: 'Имя пользователя минимум 3 символа' });
+  }
 
   try {
     const hashed = await bcrypt.hash(password, 10);
@@ -76,28 +152,50 @@ app.post('/api/register', async (req, res) => {
     );
     res.json({ message: 'Регистрация успешна', userId: result.rows[0].id });
   } catch (err) {
-    if (err.code === '23505') return res.status(400).json({ error: 'Пользователь уже существует' });
-    console.error(err);
-    res.status(500).json({ error: 'Ошибка сервера' });
+    if (err.code === '23505') {
+      return res.status(400).json({ error: 'Пользователь уже существует' });
+    }
+    console.error('❌ Ошибка регистрации:', err);
+    res.status(500).json({ error: 'Ошибка сервера при регистрации' });
   }
 });
 
 // Логин
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
+  
+  if (!username || !password) {
+    return res.status(400).json({ error: 'Заполните все поля' });
+  }
+
   try {
     const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
     const user = result.rows[0];
-    if (!user) return res.status(401).json({ error: 'Неверные учетные данные' });
+    
+    if (!user) {
+      return res.status(401).json({ error: 'Неверные учетные данные' });
+    }
     
     const isValid = await bcrypt.compare(password, user.password);
-    if (!isValid) return res.status(401).json({ error: 'Неверные учетные данные' });
+    if (!isValid) {
+      return res.status(401).json({ error: 'Неверные учетные данные' });
+    }
     
-    const token = jwt.sign({ userId: user.id, username: user.username, role: user.role || 'user' }, SECRET_KEY);
-    res.json({ token, username: user.username, userId: user.id, role: user.role || 'user' });
+    const token = jwt.sign(
+      { userId: user.id, username: user.username, role: user.role || 'user' },
+      SECRET_KEY,
+      { expiresIn: '7d' }
+    );
+    
+    res.json({ 
+      token, 
+      username: user.username, 
+      userId: user.id, 
+      role: user.role || 'user' 
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Ошибка сервера' });
+    console.error('❌ Ошибка логина:', err);
+    res.status(500).json({ error: 'Ошибка сервера при входе' });
   }
 });
 
@@ -108,10 +206,14 @@ app.get('/api/user', authMiddleware, async (req, res) => {
       'SELECT id, username, avatar, created_at FROM users WHERE id = $1',
       [req.user.userId]
     );
-    if (result.rows.length === 0) return res.status(404).json({ error: 'Пользователь не найден' });
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Пользователь не найден' });
+    }
+    
     res.json(result.rows[0]);
   } catch (err) {
-    console.error(err);
+    console.error('❌ Ошибка получения пользователя:', err);
     res.status(500).json({ error: 'Ошибка сервера' });
   }
 });
@@ -119,21 +221,30 @@ app.get('/api/user', authMiddleware, async (req, res) => {
 // Смена пароля
 app.post('/api/change-password', authMiddleware, async (req, res) => {
   const { oldPassword, newPassword } = req.body;
-  if (!newPassword || newPassword.length < 6) return res.status(400).json({ error: 'Новый пароль минимум 6 символов' });
+  
+  if (!newPassword || newPassword.length < 6) {
+    return res.status(400).json({ error: 'Новый пароль минимум 6 символов' });
+  }
   
   try {
     const userRes = await pool.query('SELECT * FROM users WHERE id = $1', [req.user.userId]);
     const user = userRes.rows[0];
-    if (!user) return res.status(404).json({ error: 'Пользователь не найден' });
+    
+    if (!user) {
+      return res.status(404).json({ error: 'Пользователь не найден' });
+    }
     
     const isValid = await bcrypt.compare(oldPassword, user.password);
-    if (!isValid) return res.status(401).json({ error: 'Неверный старый пароль' });
+    if (!isValid) {
+      return res.status(401).json({ error: 'Неверный старый пароль' });
+    }
     
     const hashed = await bcrypt.hash(newPassword, 10);
     await pool.query('UPDATE users SET password = $1 WHERE id = $2', [hashed, req.user.userId]);
+    
     res.json({ message: 'Пароль изменен' });
   } catch (err) {
-    console.error(err);
+    console.error('❌ Ошибка смены пароля:', err);
     res.status(500).json({ error: 'Ошибка сервера' });
   }
 });
@@ -141,39 +252,96 @@ app.post('/api/change-password', authMiddleware, async (req, res) => {
 // Смена имени
 app.post('/api/change-username', authMiddleware, async (req, res) => {
   const { newUsername, password } = req.body;
-  if (!newUsername) return res.status(400).json({ error: 'Введите новое имя' });
+  
+  if (!newUsername) {
+    return res.status(400).json({ error: 'Введите новое имя' });
+  }
+  if (newUsername.length < 3) {
+    return res.status(400).json({ error: 'Имя пользователя минимум 3 символа' });
+  }
   
   try {
     const userRes = await pool.query('SELECT * FROM users WHERE id = $1', [req.user.userId]);
     const user = userRes.rows[0];
-    if (!user) return res.status(404).json({ error: 'Пользователь не найден' });
+    
+    if (!user) {
+      return res.status(404).json({ error: 'Пользователь не найден' });
+    }
     
     const isValid = await bcrypt.compare(password, user.password);
-    if (!isValid) return res.status(401).json({ error: 'Неверный пароль' });
+    if (!isValid) {
+      return res.status(401).json({ error: 'Неверный пароль' });
+    }
     
     await pool.query('UPDATE users SET username = $1 WHERE id = $2', [newUsername, req.user.userId]);
-    res.json({ message: 'Имя изменено', username: newUsername });
+    
+    // Обновляем токен с новым именем
+    const token = jwt.sign(
+      { userId: req.user.userId, username: newUsername, role: user.role || 'user' },
+      SECRET_KEY,
+      { expiresIn: '7d' }
+    );
+    
+    res.json({ message: 'Имя изменено', username: newUsername, token });
   } catch (err) {
-    if (err.code === '23505') return res.status(400).json({ error: 'Имя уже занято' });
-    console.error(err);
+    if (err.code === '23505') {
+      return res.status(400).json({ error: 'Имя уже занято' });
+    }
+    console.error('❌ Ошибка смены имени:', err);
     res.status(500).json({ error: 'Ошибка сервера' });
   }
 });
 
-// Загрузка аватара
+// ============================================================
+// 7. ЗАГРУЗКА АВАТАРА
+// ============================================================
 app.post('/api/upload-avatar', authMiddleware, upload.single('avatar'), async (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'Файл не загружен' });
+  console.log('📥 Запрос на загрузку аватара от пользователя:', req.user.userId);
+  
+  if (!req.file) {
+    console.log('❌ Файл не загружен');
+    return res.status(400).json({ error: 'Файл не загружен' });
+  }
+  
   const avatarUrl = `/uploads/${req.file.filename}`;
-  await pool.query('UPDATE users SET avatar = $1 WHERE id = $2', [avatarUrl, req.user.userId]);
-  res.json({ avatarUrl });
+  console.log('✅ Аватар сохранен:', avatarUrl);
+  console.log('📂 Полный путь:', req.file.path);
+  
+  try {
+    await pool.query('UPDATE users SET avatar = $1 WHERE id = $2', [avatarUrl, req.user.userId]);
+    console.log('✅ БД обновлена для пользователя:', req.user.userId);
+    res.json({ avatarUrl });
+  } catch (err) {
+    console.error('❌ Ошибка обновления БД:', err);
+    res.status(500).json({ error: 'Ошибка сохранения аватара' });
+  }
 });
+
+// ============================================================
+// 8. МЕДИТАЦИИ И СТАТИСТИКА
+// ============================================================
 
 // Сохранение сессии медитации
 app.post('/api/sessions', authMiddleware, async (req, res) => {
   const { duration, completed } = req.body;
-  if (!completed) return res.status(400).json({ error: 'Медитация не завершена' });
-  await pool.query('INSERT INTO meditation_sessions (user_id, duration) VALUES ($1, $2)', [req.user.userId, duration]);
-  res.json({ message: 'Сессия сохранена' });
+  
+  if (!completed) {
+    return res.status(400).json({ error: 'Медитация не завершена' });
+  }
+  if (!duration || duration < 1) {
+    return res.status(400).json({ error: 'Некорректная длительность' });
+  }
+  
+  try {
+    await pool.query(
+      'INSERT INTO meditation_sessions (user_id, duration) VALUES ($1, $2)',
+      [req.user.userId, duration]
+    );
+    res.json({ message: 'Сессия сохранена' });
+  } catch (err) {
+    console.error('❌ Ошибка сохранения сессии:', err);
+    res.status(500).json({ error: 'Ошибка сохранения сессии' });
+  }
 });
 
 // Получение статистики
@@ -218,12 +386,14 @@ app.get('/api/statistics', authMiddleware, async (req, res) => {
       daily_data: dailyRes.rows
     });
   } catch (err) {
-    console.error(err);
+    console.error('❌ Ошибка получения статистики:', err);
     res.status(500).json({ error: 'Ошибка получения статистики' });
   }
 });
 
-// ==================== КУРСЫ ====================
+// ============================================================
+// 9. КУРСЫ
+// ============================================================
 
 // Получить все курсы
 app.get('/api/courses', async (req, res) => {
@@ -231,7 +401,7 @@ app.get('/api/courses', async (req, res) => {
     const result = await pool.query('SELECT * FROM courses ORDER BY id');
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
+    console.error('❌ Ошибка получения курсов:', err);
     res.status(500).json({ error: 'Ошибка получения курсов' });
   }
 });
@@ -239,23 +409,29 @@ app.get('/api/courses', async (req, res) => {
 // Получить один курс с уроками
 app.get('/api/courses/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
+  
   try {
     const courseRes = await pool.query('SELECT * FROM courses WHERE id = $1', [id]);
-    if (courseRes.rows.length === 0) return res.status(404).json({ error: 'Курс не найден' });
+    if (courseRes.rows.length === 0) {
+      return res.status(404).json({ error: 'Курс не найден' });
+    }
     
-    const lessonsRes = await pool.query('SELECT * FROM lessons WHERE course_id = $1 ORDER BY order_num', [id]);
+    const lessonsRes = await pool.query(
+      'SELECT * FROM lessons WHERE course_id = $1 ORDER BY order_num',
+      [id]
+    );
     
     res.json({
       ...courseRes.rows[0],
       lessons: lessonsRes.rows
     });
   } catch (err) {
-    console.error(err);
+    console.error('❌ Ошибка получения курса:', err);
     res.status(500).json({ error: 'Ошибка получения курса' });
   }
 });
 
-// Получить достижения пользователя (завершённые курсы)
+// Получить достижения пользователя
 app.get('/api/user/courses', authMiddleware, async (req, res) => {
   try {
     const result = await pool.query(`
@@ -269,14 +445,15 @@ app.get('/api/user/courses', authMiddleware, async (req, res) => {
     
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
+    console.error('❌ Ошибка получения достижений:', err);
     res.status(500).json({ error: 'Ошибка получения достижений' });
   }
 });
 
-// Получить прогресс пользователя по конкретному курсу
+// Получить прогресс по курсу
 app.get('/api/courses/:id/progress', authMiddleware, async (req, res) => {
   const { id } = req.params;
+  
   try {
     const result = await pool.query(`
       SELECT completed_lessons, is_completed 
@@ -286,25 +463,31 @@ app.get('/api/courses/:id/progress', authMiddleware, async (req, res) => {
     
     res.json(result.rows[0] || { completed_lessons: 0, is_completed: false });
   } catch (err) {
-    console.error(err);
+    console.error('❌ Ошибка получения прогресса:', err);
     res.status(500).json({ error: 'Ошибка получения прогресса' });
   }
 });
 
-// Отметить урок как пройденный (исправленная версия без ambiguous column)
+// Отметить урок как пройденный
 app.post('/api/courses/:courseId/lessons/:lessonId/complete', authMiddleware, async (req, res) => {
   const { courseId, lessonId } = req.params;
   const userId = req.user.userId;
   
   try {
-    // 1. Добавляем запись о завершении урока
+    // Проверяем, существует ли урок
+    const lessonCheck = await pool.query('SELECT id FROM lessons WHERE id = $1 AND course_id = $2', [lessonId, courseId]);
+    if (lessonCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Урок не найден' });
+    }
+    
+    // Добавляем запись о завершении урока
     await pool.query(`
       INSERT INTO user_lesson_completions (user_id, lesson_id)
       VALUES ($1, $2)
       ON CONFLICT (user_id, lesson_id) DO NOTHING
     `, [userId, lessonId]);
     
-    // 2. Получаем количество завершённых уроков
+    // Получаем количество завершённых уроков
     const completedCountRes = await pool.query(`
       SELECT COUNT(*) as count 
       FROM user_lesson_completions 
@@ -314,7 +497,7 @@ app.post('/api/courses/:courseId/lessons/:lessonId/complete', authMiddleware, as
     
     const completedCount = parseInt(completedCountRes.rows[0].count);
     
-    // 3. Получаем общее количество уроков в курсе
+    // Получаем общее количество уроков
     const totalLessonsRes = await pool.query(`
       SELECT COUNT(*) as count 
       FROM lessons 
@@ -324,48 +507,37 @@ app.post('/api/courses/:courseId/lessons/:lessonId/complete', authMiddleware, as
     const totalLessons = parseInt(totalLessonsRes.rows[0].count);
     const isCompleted = completedCount >= totalLessons;
     
-    // 4. Проверяем, есть ли запись о прогрессе
+    // Обновляем прогресс
     const existingProgress = await pool.query(
       'SELECT id FROM user_course_progress WHERE user_id = $1 AND course_id = $2',
       [userId, courseId]
     );
     
     if (existingProgress.rows.length === 0) {
-      // Запись не существует — создаём новую
-      if (isCompleted) {
-        await pool.query(
-          'INSERT INTO user_course_progress (user_id, course_id, completed_lessons, is_completed, completed_at) VALUES ($1, $2, $3, $4, NOW())',
-          [userId, courseId, completedCount, isCompleted]
-        );
-      } else {
-        await pool.query(
-          'INSERT INTO user_course_progress (user_id, course_id, completed_lessons, is_completed) VALUES ($1, $2, $3, $4)',
-          [userId, courseId, completedCount, isCompleted]
-        );
-      }
+      await pool.query(
+        `INSERT INTO user_course_progress (user_id, course_id, completed_lessons, is_completed, completed_at) 
+         VALUES ($1, $2, $3, $4, ${isCompleted ? 'NOW()' : 'NULL'})`,
+        [userId, courseId, completedCount, isCompleted]
+      );
     } else {
-      // Запись существует — обновляем
-      if (isCompleted) {
-        await pool.query(
-          'UPDATE user_course_progress SET completed_lessons = $1, is_completed = $2, completed_at = NOW() WHERE user_id = $3 AND course_id = $4',
-          [completedCount, isCompleted, userId, courseId]
-        );
-      } else {
-        await pool.query(
-          'UPDATE user_course_progress SET completed_lessons = $1, is_completed = $2 WHERE user_id = $3 AND course_id = $4',
-          [completedCount, isCompleted, userId, courseId]
-        );
-      }
+      await pool.query(
+        `UPDATE user_course_progress 
+         SET completed_lessons = $1, is_completed = $2, completed_at = ${isCompleted ? 'NOW()' : 'NULL'}
+         WHERE user_id = $3 AND course_id = $4`,
+        [completedCount, isCompleted, userId, courseId]
+      );
     }
     
     res.json({ completedCount, totalLessons, isCompleted });
   } catch (err) {
-    console.error('Ошибка отметки урока:', err);
+    console.error('❌ Ошибка отметки урока:', err);
     res.status(500).json({ error: 'Ошибка сохранения прогресса' });
   }
 });
 
-// ==================== СОЦИАЛЬНАЯ ЛЕНТА ====================
+// ============================================================
+// 10. СОЦИАЛЬНАЯ ЛЕНТА
+// ============================================================
 
 // Получить ленту постов
 app.get('/api/feed', authMiddleware, async (req, res) => {
@@ -391,7 +563,7 @@ app.get('/api/feed', authMiddleware, async (req, res) => {
       totalPages: Math.ceil(countResult.rows[0].count / limit)
     });
   } catch (err) {
-    console.error(err);
+    console.error('❌ Ошибка получения ленты:', err);
     res.status(500).json({ error: 'Ошибка получения ленты' });
   }
 });
@@ -399,16 +571,19 @@ app.get('/api/feed', authMiddleware, async (req, res) => {
 // Создать пост
 app.post('/api/posts', authMiddleware, async (req, res) => {
   const { content, meditation_duration } = req.body;
-  if (!content) return res.status(400).json({ error: 'Введите текст поста' });
+  
+  if (!content || content.trim().length === 0) {
+    return res.status(400).json({ error: 'Введите текст поста' });
+  }
   
   try {
     const result = await pool.query(
       'INSERT INTO posts (user_id, content, meditation_duration) VALUES ($1, $2, $3) RETURNING *',
-      [req.user.userId, content, meditation_duration || null]
+      [req.user.userId, content.trim(), meditation_duration || null]
     );
     res.json({ post: result.rows[0], message: 'Пост опубликован' });
   } catch (err) {
-    console.error(err);
+    console.error('❌ Ошибка создания поста:', err);
     res.status(500).json({ error: 'Ошибка создания поста' });
   }
 });
@@ -416,24 +591,33 @@ app.post('/api/posts', authMiddleware, async (req, res) => {
 // Удалить пост
 app.delete('/api/posts/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
+  
   try {
     const post = await pool.query('SELECT user_id FROM posts WHERE id = $1', [id]);
-    if (post.rows.length === 0) return res.status(404).json({ error: 'Пост не найден' });
-    if (post.rows[0].user_id !== req.user.userId) return res.status(403).json({ error: 'Нет прав' });
+    if (post.rows.length === 0) {
+      return res.status(404).json({ error: 'Пост не найден' });
+    }
+    if (post.rows[0].user_id !== req.user.userId) {
+      return res.status(403).json({ error: 'Нет прав на удаление' });
+    }
     
     await pool.query('DELETE FROM posts WHERE id = $1', [id]);
     res.json({ message: 'Пост удалён' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Ошибка удаления' });
+    console.error('❌ Ошибка удаления поста:', err);
+    res.status(500).json({ error: 'Ошибка удаления поста' });
   }
 });
 
-// Лайкнуть/убрать лайк с поста
+// Лайкнуть/убрать лайк
 app.post('/api/posts/:id/like', authMiddleware, async (req, res) => {
   const { id } = req.params;
+  
   try {
-    const existing = await pool.query('SELECT id FROM likes WHERE post_id = $1 AND user_id = $2', [id, req.user.userId]);
+    const existing = await pool.query(
+      'SELECT id FROM likes WHERE post_id = $1 AND user_id = $2',
+      [id, req.user.userId]
+    );
     
     if (existing.rows.length > 0) {
       await pool.query('DELETE FROM likes WHERE post_id = $1 AND user_id = $2', [id, req.user.userId]);
@@ -445,14 +629,15 @@ app.post('/api/posts/:id/like', authMiddleware, async (req, res) => {
       res.json({ liked: true });
     }
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Ошибка' });
+    console.error('❌ Ошибка лайка:', err);
+    res.status(500).json({ error: 'Ошибка обработки лайка' });
   }
 });
 
-// Получить комментарии к посту
+// Получить комментарии
 app.get('/api/posts/:id/comments', authMiddleware, async (req, res) => {
   const { id } = req.params;
+  
   try {
     const result = await pool.query(`
       SELECT c.*, u.username, u.avatar
@@ -463,7 +648,7 @@ app.get('/api/posts/:id/comments', authMiddleware, async (req, res) => {
     `, [id]);
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
+    console.error('❌ Ошибка получения комментариев:', err);
     res.status(500).json({ error: 'Ошибка получения комментариев' });
   }
 });
@@ -472,19 +657,34 @@ app.get('/api/posts/:id/comments', authMiddleware, async (req, res) => {
 app.post('/api/posts/:id/comments', authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { content } = req.body;
-  if (!content) return res.status(400).json({ error: 'Введите текст комментария' });
+  
+  if (!content || content.trim().length === 0) {
+    return res.status(400).json({ error: 'Введите текст комментария' });
+  }
   
   try {
-    await pool.query('INSERT INTO comments (post_id, user_id, content) VALUES ($1, $2, $3)', [id, req.user.userId, content]);
+    await pool.query(
+      'INSERT INTO comments (post_id, user_id, content) VALUES ($1, $2, $3)',
+      [id, req.user.userId, content.trim()]
+    );
     await pool.query('UPDATE posts SET comments_count = comments_count + 1 WHERE id = $1', [id]);
     res.json({ message: 'Комментарий добавлен' });
   } catch (err) {
-    console.error(err);
+    console.error('❌ Ошибка добавления комментария:', err);
     res.status(500).json({ error: 'Ошибка добавления комментария' });
   }
 });
 
-// ==================== АДМИН ПАНЕЛЬ ====================
+// ============================================================
+// 11. АДМИН ПАНЕЛЬ
+// ============================================================
+
+const adminMiddleware = (req, res, next) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Доступ запрещён. Требуются права администратора.' });
+  }
+  next();
+};
 
 // Статистика для админа
 app.get('/api/admin/stats', authMiddleware, adminMiddleware, async (req, res) => {
@@ -501,12 +701,12 @@ app.get('/api/admin/stats', authMiddleware, adminMiddleware, async (req, res) =>
       total_minutes: parseInt(totalMinutes.rows[0].sum) || 0
     });
   } catch (err) {
-    console.error(err);
+    console.error('❌ Ошибка получения статистики админа:', err);
     res.status(500).json({ error: 'Ошибка получения статистики' });
   }
 });
 
-// Список всех пользователей для админа
+// Список всех пользователей
 app.get('/api/admin/users', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const result = await pool.query(`
@@ -518,12 +718,12 @@ app.get('/api/admin/users', authMiddleware, adminMiddleware, async (req, res) =>
     `);
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
+    console.error('❌ Ошибка получения пользователей:', err);
     res.status(500).json({ error: 'Ошибка получения пользователей' });
   }
 });
 
-// Список всех постов для админа
+// Список всех постов
 app.get('/api/admin/posts', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const result = await pool.query(`
@@ -535,7 +735,7 @@ app.get('/api/admin/posts', authMiddleware, adminMiddleware, async (req, res) =>
     `);
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
+    console.error('❌ Ошибка получения постов:', err);
     res.status(500).json({ error: 'Ошибка получения постов' });
   }
 });
@@ -543,31 +743,51 @@ app.get('/api/admin/posts', authMiddleware, adminMiddleware, async (req, res) =>
 // Удалить пользователя (админ)
 app.delete('/api/admin/users/:id', authMiddleware, adminMiddleware, async (req, res) => {
   const { id } = req.params;
+  
   if (parseInt(id) === req.user.userId) {
     return res.status(400).json({ error: 'Нельзя удалить самого себя' });
   }
+  
   try {
     await pool.query('DELETE FROM users WHERE id = $1', [id]);
     res.json({ message: 'Пользователь удалён' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Ошибка удаления' });
+    console.error('❌ Ошибка удаления пользователя:', err);
+    res.status(500).json({ error: 'Ошибка удаления пользователя' });
   }
 });
 
 // Удалить пост (админ)
 app.delete('/api/admin/posts/:id', authMiddleware, adminMiddleware, async (req, res) => {
   const { id } = req.params;
+  
   try {
     await pool.query('DELETE FROM posts WHERE id = $1', [id]);
     res.json({ message: 'Пост удалён' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Ошибка удаления' });
+    console.error('❌ Ошибка удаления поста:', err);
+    res.status(500).json({ error: 'Ошибка удаления поста' });
   }
 });
 
-// Запуск сервера
+// ============================================================
+// 12. ГЛОБАЛЬНЫЙ ОБРАБОТЧИК ОШИБОК (должен быть последним)
+// ============================================================
+app.use((err, req, res, next) => {
+  console.error('❌ Глобальная ошибка:', err);
+  res.status(500).json({ 
+    error: 'Внутренняя ошибка сервера',
+    message: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
+});
+
+// ============================================================
+// 13. ЗАПУСК СЕРВЕРА
+// ============================================================
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Сервер запущен на порту ${PORT}`);
+  console.log(`📁 Рабочая директория: ${appRoot}`);
+  console.log(`📁 Папка uploads: ${uploadDir}`);
+  console.log(`🌐 Режим: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`🖼️ Аватары доступны по: /uploads/`);
 });
