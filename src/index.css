@@ -45,7 +45,7 @@ body {
 }
 
 /* ============================================ */
-/* 2. НАВИГАЦИЯ */
+/* 2. НАВИГАЦИЯ (ОБНОВЛЁННАЯ) */
 /* ============================================ */
 .navbar {
   background: rgba(255, 255, 255, 0.95);
@@ -75,8 +75,9 @@ body {
 
 .nav-links {
   display: flex;
-  gap: 2rem;
+  gap: 1.5rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .nav-links a {
@@ -87,11 +88,34 @@ body {
   gap: 6px;
   transition: color 0.3s;
   cursor: pointer;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
 }
 
 .nav-links a:hover,
 .nav-links a.active {
   color: #667eea;
+  background: rgba(102, 126, 234, 0.08);
+}
+
+.nav-links .logout-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #e53e3e;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.3s;
+}
+
+.nav-links .logout-btn:hover {
+  background: rgba(229, 62, 62, 0.1);
+  color: #c53030;
 }
 
 .theme-toggle {
@@ -102,23 +126,31 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 0.5rem;
-  border-radius: 50px;
+  padding: 0.4rem 0.6rem;
+  border-radius: 8px;
   transition: all 0.3s;
   font-size: 1rem;
 }
 
 .theme-toggle:hover {
   background: rgba(0, 0, 0, 0.05);
-  transform: scale(1.05);
 }
 
 .mobile-menu-btn {
   display: none;
   background: none;
   border: none;
-  font-size: 1.5rem;
   cursor: pointer;
+  color: #333;
+  padding: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.mobile-menu-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
 }
 
 /* ============================================ */
@@ -732,24 +764,6 @@ body {
   margin: 0.5rem 0;
   color: #555;
   font-size: 0.9rem;
-}
-
-@media (max-width: 768px) {
-  .beautiful-timer {
-    width: 220px;
-    height: 220px;
-  }
-  .pulse-circles {
-    max-width: 220px;
-    max-height: 220px;
-  }
-  .timer-digits {
-    font-size: 2rem;
-  }
-  @keyframes pulse {
-    0% { width: 80px; height: 80px; }
-    100% { width: 240px; height: 240px; }
-  }
 }
 
 /* ============================================ */
@@ -2545,6 +2559,16 @@ body.dark-mode .theme-toggle {
 body.dark-mode .nav-links a:hover,
 body.dark-mode .nav-links a.active {
   color: #818cf8;
+  background: rgba(129, 140, 248, 0.1);
+}
+
+body.dark-mode .nav-links .logout-btn {
+  color: #fc8181;
+}
+
+body.dark-mode .nav-links .logout-btn:hover {
+  background: rgba(229, 62, 62, 0.2);
+  color: #f56565;
 }
 
 body.dark-mode .profile-container,
@@ -2815,49 +2839,220 @@ body.dark-mode .block-reason-text {
 }
 
 /* ============================================ */
-/* 20. АДАПТИВНОСТЬ */
+/* 31. МОБИЛЬНАЯ АДАПТАЦИЯ НАВИГАЦИИ */
 /* ============================================ */
+
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333;
+  padding: 8px;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.mobile-menu-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
 @media (max-width: 768px) {
+  .mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   .navbar {
-    flex-direction: column;
-    border-radius: 30px;
+    padding: 0.6rem 1rem;
     margin: 0.5rem 1rem;
     width: calc(100% - 2rem);
-    padding: 0.8rem 1rem;
+    border-radius: 16px;
+    flex-wrap: wrap;
+    position: relative;
+  }
+
+  .nav-brand {
+    font-size: 1.1rem;
+    padding: 4px 0;
   }
 
   .nav-links {
     display: none;
     flex-direction: column;
     width: 100%;
-    text-align: center;
-    gap: 0.5rem;
-    padding-top: 0.5rem;
+    padding: 12px 0;
+    gap: 4px;
+    animation: slideDown 0.3s ease;
   }
 
   .nav-links.show {
     display: flex;
   }
 
-  .mobile-menu-btn {
-    display: block;
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    position: absolute;
-    right: 1rem;
-    top: 0.8rem;
+  .nav-links a,
+  .nav-links .logout-btn,
+  .nav-links .theme-toggle {
+    width: 100%;
+    padding: 10px 16px;
+    justify-content: center;
+    font-size: 15px;
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  .nav-links a.active {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
   }
 
   .theme-toggle {
     justify-content: center;
     width: 100%;
+    padding: 10px 16px;
+    background: none;
+    border: none;
+    color: #333;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s;
   }
 
-  .container { padding: 1rem; }
-  .profile-header { flex-direction: column; text-align: center; }
-  .stats-metrics-grid { grid-template-columns: repeat(2, 1fr); }
+  .theme-toggle:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  .nav-links .logout-btn {
+    color: #e53e3e;
+  }
+
+  .nav-links .logout-btn:hover {
+    background: rgba(229, 62, 62, 0.1);
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar {
+    padding: 0.4rem 0.8rem;
+    margin: 0.4rem 0.6rem;
+    width: calc(100% - 1.2rem);
+    border-radius: 12px;
+  }
+
+  .nav-brand {
+    font-size: 0.95rem;
+  }
+
+  .nav-brand svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .nav-links a,
+  .nav-links .logout-btn,
+  .nav-links .theme-toggle {
+    padding: 8px 12px;
+    font-size: 14px;
+  }
+
+  .mobile-menu-btn {
+    padding: 6px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================ */
+/* 32. ТЁМНАЯ ТЕМА ДЛЯ МОБИЛЬНОЙ НАВИГАЦИИ */
+/* ============================================ */
+
+body.dark-mode .mobile-menu-btn {
+  color: #cbd5e0;
+}
+
+body.dark-mode .mobile-menu-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .nav-links a.active {
+  background: rgba(129, 140, 248, 0.2);
+  color: #818cf8;
+}
+
+body.dark-mode .theme-toggle {
+  color: #cbd5e0;
+}
+
+body.dark-mode .theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .nav-links .logout-btn {
+  color: #fc8181;
+}
+
+body.dark-mode .nav-links .logout-btn:hover {
+  background: rgba(229, 62, 62, 0.2);
+}
+
+/* ============================================ */
+/* 33. МОБИЛЬНАЯ АДАПТАЦИЯ ОБЩИХ ЭЛЕМЕНТОВ */
+/* ============================================ */
+
+/* Улучшенные цели для пальцев */
+@media (max-width: 768px) {
+  button, 
+  a, 
+  input, 
+  select, 
+  textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .container {
+    padding: 12px;
+  }
+
+  .profile-container,
+  .learning-container,
+  .catalog-container,
+  .courses-container,
+  .feed-container,
+  .admin-container {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    padding: 14px 24px;
+    font-size: 16px;
+    width: 100%;
+    border-radius: 12px;
+  }
+
+  .stats-metrics-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 
   .directions-grid,
   .asanas-grid,
@@ -2868,620 +3063,96 @@ body.dark-mode .block-reason-text {
     grid-template-columns: 1fr;
   }
 
-  .direction-header h1,
-  .asana-detail-header h1 {
-    font-size: 1.8rem;
-  }
-  .direction-section h2,
-  .asana-detail-section h2 {
-    font-size: 1.3rem;
-  }
-
-  .feed-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .create-post-btn { justify-content: center; }
-
-  .course-detail-container { padding: 1rem; }
-  .course-detail-header h1 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-  }
-  .course-detail-meta {
-    gap: 0.8rem;
-    margin-bottom: 1.2rem;
-  }
-  .course-full-description {
-    font-size: 0.95rem;
-    margin-bottom: 1.5rem;
-  }
-  .course-info-grid,
-  .course-progress-section { margin-bottom: 2rem; }
-
-  .lesson-item {
+  .profile-header {
     flex-direction: column;
     text-align: center;
   }
-  .lesson-number { margin: 0 auto; }
-  .complete-btn,
-  .completed-check {
-    width: 100%;
+
+  .admin-tabs {
+    flex-direction: column;
+  }
+
+  .admin-tab {
     justify-content: center;
+    padding: 12px;
+  }
+
+  .admin-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .admin-table {
+    font-size: 12px;
+    min-width: 600px;
   }
 
   .admin-table th,
   .admin-table td {
-    padding: 0.5rem;
-    font-size: 0.75rem;
+    padding: 8px 10px;
+    white-space: nowrap;
   }
-  .post-preview { max-width: 150px; }
+
   .admin-btn {
-    font-size: 0.7rem;
-    padding: 3px 8px;
+    font-size: 11px;
+    padding: 6px 10px;
   }
+
   .admin-btn-group {
     flex-direction: column;
-    gap: 3px;
+    gap: 4px;
   }
 
   .modal-overlay .modal-content {
     margin: 10px;
     padding: 1rem;
   }
+
   .blocked-modal-content {
     padding: 20px;
     margin: 10px;
   }
-}
 
-@media (max-width: 480px) {
-  .stats-metrics-grid { grid-template-columns: 1fr; }
-  .auth-card .btn-primary { max-width: 100%; }
-  .time-buttons { gap: 8px; }
-  .time-btn {
-    min-width: 55px;
-    padding: 8px 12px;
+  .feed-header {
+    flex-direction: column;
+    gap: 12px;
   }
-  .admin-stats-grid { grid-template-columns: 1fr 1fr; }
-  .admin-tabs { flex-direction: column; }
-  .admin-tab { justify-content: center; }
-}
 
-/* ============================================ */
-/* 21. ДЕТАЛЬНАЯ СТРАНИЦА АСАНЫ */
-/* ============================================ */
+  .create-post-btn {
+    width: 100%;
+    justify-content: center;
+  }
 
-.asana-detail-container {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 28px;
-  padding: 2rem;
-  transition: all 0.3s ease;
-}
+  .comment-form {
+    flex-direction: column;
+    gap: 8px;
+  }
 
-.asana-detail-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
+  .comment-form button {
+    width: 100%;
+    justify-content: center;
+  }
 
-.asana-detail-header h1 {
-  color: #667eea;
-  font-size: 2.2rem;
-  margin-bottom: 0.5rem;
-}
-
-.asana-sanskrit {
-  font-style: italic;
-  color: #889;
-  font-size: 1.1rem;
-}
-
-.asana-detail-image {
-  text-align: center;
-  margin: 1.5rem auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.asana-detail-image img {
-  max-width: 80%;
-  max-height: 350px;
-  width: auto;
-  height: auto;
-  border-radius: 20px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  object-fit: contain;
-  display: block;
-  margin: 0 auto;
-}
-
-.asana-detail-section {
-  margin-bottom: 1.8rem;
-}
-
-.asana-detail-section h2 {
-  color: #333;
-  font-size: 1.5rem;
-  margin-bottom: 0.8rem;
-  border-left: 4px solid #667eea;
-  padding-left: 1rem;
-}
-
-.asana-detail-section p {
-  line-height: 1.6;
-  color: #444;
-}
-
-.asana-detail-section ul {
-  list-style: none;
-  padding-left: 0;
-}
-
-.asana-detail-section li {
-  padding: 0.3rem 0 0.3rem 1.5rem;
-  position: relative;
-  color: #555;
-}
-
-.asana-detail-section li:before {
-  content: "•";
-  position: absolute;
-  left: 0;
-  top: 0.3rem;
-  font-size: 1rem;
-  color: #667eea;
-}
-
-.asana-detail-tags {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-top: 1rem;
-}
-
-.asana-tag {
-  background: #e2e8f0;
-  padding: 0.3rem 0.8rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  color: #4a5568;
-}
-
-/* Тёмная тема для детальной страницы асаны */
-body.dark-mode .asana-detail-container {
-  background: rgba(30, 30, 46, 0.95);
-  color: #e2e8f0;
-}
-
-body.dark-mode .asana-detail-header h1 {
-  color: #818cf8;
-}
-
-body.dark-mode .asana-detail-section h2 {
-  color: #e2e8f0;
-  border-left-color: #818cf8;
-}
-
-body.dark-mode .asana-detail-section p,
-body.dark-mode .asana-detail-section li {
-  color: #cbd5e0;
-}
-
-body.dark-mode .asana-tag {
-  background: #334155;
-  color: #cbd5e0;
-}
-
-/* ============================================ */
-/* 21. КАТАЛОГ АСАН */
-/* ============================================ */
-
-.catalog-container {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 28px;
-  padding: 2rem;
-  transition: all 0.3s ease;
-}
-
-.catalog-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.catalog-header h1 {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  color: #333;
-  font-size: 2rem;
-}
-
-.catalog-subtitle {
-  color: #718096;
-  font-size: 1.1rem;
-  margin-top: 0.5rem;
-}
-
-/* Контролы */
-.catalog-controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-}
-
-.catalog-search {
-  position: relative;
-  flex: 1;
-  min-width: 200px;
-}
-
-.catalog-search-icon {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #94a3b8;
-  font-size: 18px;
-}
-
-.catalog-search-input {
-  width: 100%;
-  padding: 10px 16px 10px 44px;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  font-size: 1rem;
-  background: white;
-  transition: all 0.2s;
-}
-
-.catalog-search-input:focus {
-  outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.catalog-view-toggle {
-  display: flex;
-  gap: 4px;
-  background: #f1f5f9;
-  padding: 4px;
-  border-radius: 10px;
-  flex-shrink: 0;
-}
-
-.catalog-view-btn {
-  padding: 6px 10px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  color: #64748b;
-  background: transparent;
-  transition: all 0.2s;
-}
-
-.catalog-view-btn:hover {
-  color: #667eea;
-}
-
-.catalog-view-btn.active {
-  background: white;
-  color: #667eea;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Категории */
-.catalog-categories {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #e2e8f0;
-}
-
-.catalog-category-btn {
-  padding: 6px 16px;
-  border: none;
-  border-radius: 50px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  color: #4a5568;
-  background: #f1f5f9;
-  transition: all 0.2s;
-}
-
-.catalog-category-btn:hover {
-  background: #e2e8f0;
-  transform: translateY(-1px);
-}
-
-.catalog-category-btn.active {
-  background: #667eea;
-  color: white;
-}
-
-/* Сетка */
-.catalog-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-.catalog-item {
-  background: white;
-  border-radius: 16px;
-  padding: 1.5rem;
-  text-decoration: none;
-  color: inherit;
-  border: 1px solid #e2e8f0;
-  transition: all 0.3s;
-}
-
-.catalog-item:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  border-color: #667eea;
-}
-
-.catalog-item-content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.8rem;
-}
-
-.catalog-item-header h3 {
-  font-size: 1.2rem;
-  color: #333;
-  margin: 0;
-}
-
-.catalog-item-sanskrit {
-  font-size: 0.85rem;
-  color: #94a3b8;
-  font-style: italic;
-}
-
-.catalog-item-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.catalog-item-category {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 12px;
-  border-radius: 50px;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.catalog-item-difficulty,
-.catalog-item-duration {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.75rem;
-  color: #718096;
-}
-
-.catalog-item-description {
-  font-size: 0.9rem;
-  color: #4a5568;
-  line-height: 1.5;
-  margin: 0;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  line-clamp: 2; /* Добавлено для стандарта */
-  overflow: hidden;
-}
-.catalog-item-footer {
-  margin-top: 0.5rem;
-  padding-top: 0.5rem;
-  border-top: 1px solid #e2e8f0;
-}
-
-.catalog-item-read-more {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  color: #667eea;
-  font-weight: 500;
-  font-size: 0.9rem;
-  transition: gap 0.2s;
-}
-
-.catalog-item-read-more:hover {
-  gap: 8px;
-}
-
-/* Список */
-.catalog-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.catalog-item-list {
-  display: flex;
-  gap: 1.5rem;
-  padding: 1.2rem 1.5rem;
-  background: white;
-  border-radius: 16px;
-  border: 1px solid #e2e8f0;
-  text-decoration: none;
-  color: inherit;
-  transition: all 0.3s;
-  align-items: center;
-}
-
-.catalog-item-list:hover {
-  border-color: #667eea;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-}
-
-.catalog-item-list .catalog-item-content {
-  flex: 1;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.8rem;
-}
-
-.catalog-item-list .catalog-item-header {
-  flex: 1;
-  min-width: 150px;
-}
-
-.catalog-item-list .catalog-item-description {
-  -webkit-line-clamp: 1;
-  line-clamp: 1; /* Добавлено для стандарта */
-  flex: 2;
-  min-width: 200px;
-}
-
-.catalog-item-list .catalog-item-footer {
-  border: none;
-  margin: 0;
-  padding: 0;
-}
-
-/* Пустое состояние */
-.catalog-empty {
-  text-align: center;
-  padding: 4rem 2rem;
-  color: #718096;
-}
-
-.catalog-empty svg {
-  opacity: 0.3;
-  margin-bottom: 1rem;
-}
-
-.catalog-empty h3 {
-  color: #333;
-  margin-bottom: 0.5rem;
-}
-
-/* ============================================ */
-/* 22. ТЁМНАЯ ТЕМА ДЛЯ КАТАЛОГА */
-/* ============================================ */
-
-body.dark-mode .catalog-container {
-  background: rgba(30, 30, 46, 0.95);
-}
-
-body.dark-mode .catalog-header h1 {
-  color: #e2e8f0;
-}
-
-body.dark-mode .catalog-subtitle {
-  color: #94a3b8;
-}
-
-body.dark-mode .catalog-search-input {
-  background: #1a1a2e;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
-body.dark-mode .catalog-search-input::placeholder {
-  color: #64748b;
-}
-
-body.dark-mode .catalog-search-input:focus {
-  border-color: #818cf8;
-}
-
-body.dark-mode .catalog-category-btn {
-  background: #334155;
-  color: #cbd5e0;
-}
-
-body.dark-mode .catalog-category-btn:hover {
-  background: #475569;
-}
-
-body.dark-mode .catalog-category-btn.active {
-  background: #818cf8;
-}
-
-body.dark-mode .catalog-item {
-  background: #1e1e2e;
-  border-color: #334155;
-}
-
-body.dark-mode .catalog-item:hover {
-  border-color: #818cf8;
-}
-
-body.dark-mode .catalog-item-header h3 {
-  color: #e2e8f0;
-}
-
-body.dark-mode .catalog-item-sanskrit {
-  color: #64748b;
-}
-
-body.dark-mode .catalog-item-description {
-  color: #cbd5e0;
-}
-
-body.dark-mode .catalog-item-footer {
-  border-top-color: #334155;
-}
-
-body.dark-mode .catalog-item-read-more {
-  color: #818cf8;
-}
-
-body.dark-mode .catalog-empty h3 {
-  color: #e2e8f0;
-}
-
-body.dark-mode .catalog-empty p {
-  color: #94a3b8;
-}
-
-body.dark-mode .catalog-view-btn {
-  color: #94a3b8;
-}
-
-body.dark-mode .catalog-view-btn.active {
-  background: #1e1e2e;
-  color: #818cf8;
-}
-
-body.dark-mode .catalog-item-list {
-  background: #1e1e2e;
-  border-color: #334155;
-}
-
-body.dark-mode .catalog-item-list:hover {
-  border-color: #818cf8;
-}
-
-/* ============================================ */
-/* 23. АДАПТИВНОСТЬ ДЛЯ КАТАЛОГА */
-/* ============================================ */
-
-@media (max-width: 768px) {
   .catalog-controls {
     flex-direction: column;
-    align-items: stretch;
+    gap: 12px;
+  }
+
+  .catalog-search {
+    width: 100%;
   }
 
   .catalog-view-toggle {
     align-self: flex-end;
+  }
+
+  .catalog-categories {
+    gap: 6px;
+  }
+
+  .catalog-category-btn {
+    padding: 6px 12px;
+    font-size: 12px;
   }
 
   .catalog-grid {
@@ -3499,507 +3170,169 @@ body.dark-mode .catalog-item-list:hover {
     align-items: stretch;
   }
 
-.catalog-item-list .catalog-item-description {
-  -webkit-line-clamp: 2;
-  line-clamp: 2; /* Добавлено для стандарта */
-}
-
-  .catalog-categories {
-    gap: 0.4rem;
+  .catalog-item-list .catalog-item-description {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
   }
 
-  .catalog-category-btn {
-    font-size: 0.75rem;
-    padding: 4px 12px;
+  .course-detail-container {
+    padding: 1rem;
   }
 
-  .catalog-header h1 {
+  .course-detail-header h1 {
     font-size: 1.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .catalog-container {
-    padding: 1rem;
+    margin-bottom: 1rem;
   }
 
-  .catalog-item {
-    padding: 1rem;
+  .course-detail-meta {
+    gap: 0.6rem;
   }
 
-  .catalog-item-meta {
-    gap: 0.3rem;
+  .course-full-description {
+    font-size: 0.95rem;
   }
 
-  .catalog-item-category {
-    font-size: 0.65rem;
-    padding: 2px 8px;
-  }
-}
-
-/* ============================================ */
-/* 24. СТРАНИЦА ОБУЧЕНИЯ (LEARNING) */
-/* ============================================ */
-
-.learning-container {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 28px;
-  padding: 2rem;
-  transition: all 0.3s ease;
-}
-
-.learning-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.learning-header h1 {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  color: #333;
-  font-size: 2rem;
-}
-
-.learning-header-icon {
-  color: #667eea;
-}
-
-.learning-subtitle {
-  color: #718096;
-  font-size: 1.1rem;
-  margin-top: 0.5rem;
-}
-
-/* Статистика */
-.learning-stats {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-}
-
-.learning-stat {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #4a5568;
-  font-size: 0.95rem;
-  background: #f7fafc;
-  padding: 0.5rem 1rem;
-  border-radius: 50px;
-}
-
-.learning-stat svg {
-  color: #667eea;
-}
-
-/* Поиск */
-.learning-controls {
-  margin-bottom: 2rem;
-}
-
-.learning-search {
-  position: relative;
-  max-width: 400px;
-  margin: 0 auto;
-}
-
-.learning-search-icon {
-  position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #94a3b8;
-  font-size: 18px;
-}
-
-.learning-search-input {
-  width: 100%;
-  padding: 10px 16px 10px 44px;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-  font-size: 1rem;
-  background: white;
-  transition: all 0.2s;
-}
-
-.learning-search-input:focus {
-  outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-/* Сетка направлений */
-.directions-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1.5rem;
-}
-
-.direction-card {
-  background: white;
-  border-radius: 16px;
-  padding: 1.5rem;
-  text-decoration: none;
-  color: #333;
-  border: 2px solid #e2e8f0;
-  transition: all 0.3s;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.direction-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-  border-color: #667eea;
-}
-
-.direction-icon {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 1rem;
-  transition: transform 0.3s;
-}
-
-.direction-card:hover .direction-icon {
-  transform: scale(1.1);
-}
-
-.direction-card h3 {
-  font-size: 1.4rem;
-  margin-bottom: 0.5rem;
-  color: #333;
-}
-
-.direction-card p {
-  color: #718096;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  margin-bottom: 1rem;
-  flex: 1;
-}
-
-.read-more {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: #667eea;
-  font-weight: 500;
-  font-size: 0.9rem;
-  transition: gap 0.3s;
-}
-
-.read-more-arrow {
-  transition: transform 0.3s;
-}
-
-.direction-card:hover .read-more-arrow {
-  transform: translateX(4px);
-}
-
-/* ============================================ */
-/* 25. ДЕТАЛЬНАЯ СТРАНИЦА НАПРАВЛЕНИЯ */
-/* ============================================ */
-
-.direction-detail-container {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 28px;
-  padding: 2rem;
-  transition: all 0.3s ease;
-}
-
-.direction-detail-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.direction-detail-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  border: 3px solid;
-  margin-bottom: 1rem;
-}
-
-.direction-detail-header h1 {
-  font-size: 2.2rem;
-  margin-bottom: 0.5rem;
-}
-
-.direction-detail-short {
-  font-size: 1.1rem;
-  color: #4a5568;
-  font-style: italic;
-}
-
-.direction-detail-meta {
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-}
-
-.direction-meta-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: #4a5568;
-  font-size: 0.9rem;
-  background: #f7fafc;
-  padding: 0.3rem 1rem;
-  border-radius: 50px;
-}
-
-.direction-meta-item svg {
-  color: #667eea;
-}
-
-.direction-detail-section {
-  margin-bottom: 2rem;
-}
-
-.direction-detail-section h2 {
-  color: #333;
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-  border-left: 4px solid #667eea;
-  padding-left: 1rem;
-}
-
-.direction-detail-section p {
-  line-height: 1.8;
-  color: #4a5568;
-  font-size: 1rem;
-}
-
-.direction-practices-list,
-.direction-asanas-list {
-  list-style: none;
-  padding: 0;
-}
-
-.direction-practices-list li,
-.direction-asanas-list li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0.7rem 0;
-  border-bottom: 1px solid #f0f0f0;
-  color: #4a5568;
-  font-size: 0.95rem;
-}
-
-.direction-practices-list li:last-child,
-.direction-asanas-list li:last-child {
-  border-bottom: none;
-}
-
-.direction-detail-tips {
-  margin-top: 2rem;
-  padding: 1.5rem;
-  border-radius: 16px;
-  border: 2px solid;
-}
-
-.direction-detail-tips h3 {
-  font-size: 1.1rem;
-  margin-bottom: 0.5rem;
-  color: #333;
-}
-
-.direction-detail-tips p {
-  color: #4a5568;
-  line-height: 1.6;
-}
-
-.direction-error {
-  text-align: center;
-  padding: 3rem;
-}
-
-.direction-error h2 {
-  color: #333;
-  margin-bottom: 1rem;
-}
-
-.direction-error .btn-primary {
-  display: inline-block;
-}
-
-/* ============================================ */
-/* 26. ТЁМНАЯ ТЕМА ДЛЯ ОБУЧЕНИЯ */
-/* ============================================ */
-
-body.dark-mode .learning-container,
-body.dark-mode .direction-detail-container {
-  background: rgba(30, 30, 46, 0.95);
-}
-
-body.dark-mode .learning-header h1 {
-  color: #e2e8f0;
-}
-
-body.dark-mode .learning-subtitle {
-  color: #94a3b8;
-}
-
-body.dark-mode .learning-stat {
-  background: #1a1a2e;
-  color: #cbd5e0;
-}
-
-body.dark-mode .learning-stat svg {
-  color: #818cf8;
-}
-
-body.dark-mode .learning-search-input {
-  background: #1a1a2e;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
-body.dark-mode .learning-search-input::placeholder {
-  color: #64748b;
-}
-
-body.dark-mode .learning-search-input:focus {
-  border-color: #818cf8;
-}
-
-body.dark-mode .direction-card {
-  background: #1e1e2e;
-  border-color: #334155;
-  color: #e2e8f0;
-}
-
-body.dark-mode .direction-card:hover {
-  border-color: #818cf8;
-}
-
-body.dark-mode .direction-card h3 {
-  color: #e2e8f0;
-}
-
-body.dark-mode .direction-card p {
-  color: #94a3b8;
-}
-
-body.dark-mode .read-more {
-  color: #818cf8;
-}
-
-body.dark-mode .direction-detail-header h1 {
-  color: #e2e8f0;
-}
-
-body.dark-mode .direction-detail-short {
-  color: #94a3b8;
-}
-
-body.dark-mode .direction-meta-item {
-  background: #1a1a2e;
-  color: #cbd5e0;
-}
-
-body.dark-mode .direction-detail-section h2 {
-  color: #e2e8f0;
-  border-left-color: #818cf8;
-}
-
-body.dark-mode .direction-detail-section p {
-  color: #cbd5e0;
-}
-
-body.dark-mode .direction-practices-list li,
-body.dark-mode .direction-asanas-list li {
-  border-bottom-color: #334155;
-  color: #cbd5e0;
-}
-
-body.dark-mode .direction-detail-tips {
-  border-color: #818cf8;
-  background: #1a1a2e;
-}
-
-body.dark-mode .direction-detail-tips h3 {
-  color: #e2e8f0;
-}
-
-body.dark-mode .direction-detail-tips p {
-  color: #cbd5e0;
-}
-
-body.dark-mode .direction-error h2 {
-  color: #e2e8f0;
-}
-
-/* ============================================ */
-/* 27. АДАПТИВНОСТЬ ДЛЯ ОБУЧЕНИЯ */
-/* ============================================ */
-
-@media (max-width: 768px) {
-  .learning-container,
-  .direction-detail-container {
-    padding: 1rem;
+  .course-info-grid,
+  .course-progress-section {
+    margin-bottom: 2rem;
   }
 
-  .learning-header h1 {
-    font-size: 1.5rem;
+  .lesson-item {
+    flex-direction: column;
+    text-align: center;
   }
 
-  .learning-stats {
-    gap: 0.8rem;
+  .lesson-number {
+    margin: 0 auto;
   }
 
-  .learning-stat {
-    font-size: 0.8rem;
-    padding: 0.4rem 0.8rem;
+  .complete-btn,
+  .completed-check {
+    width: 100%;
+    justify-content: center;
   }
 
-  .directions-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
+  .post-header {
+    flex-wrap: wrap;
   }
 
-  .direction-detail-header h1 {
-    font-size: 1.8rem;
+  .post-avatar {
+    width: 32px;
+    height: 32px;
   }
 
-  .direction-detail-meta {
-    gap: 0.8rem;
+  .post-username {
+    font-size: 14px;
   }
 
-  .direction-meta-item {
-    font-size: 0.8rem;
-    padding: 0.2rem 0.8rem;
+  .post-content p {
+    font-size: 15px;
   }
 
-  .direction-detail-section h2 {
+  .post-actions {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .beautiful-timer {
+    width: 200px;
+    height: 200px;
+  }
+
+  .timer-digits {
+    font-size: 2.2rem;
+  }
+
+  .time-btn {
+    padding: 10px 14px;
+    min-width: 60px;
+  }
+
+  .time-btn .time-number {
+    font-size: 1.1rem;
+  }
+
+  .meditation-title {
     font-size: 1.3rem;
   }
 
-  .direction-detail-tips {
-    padding: 1rem;
+  .timer-wrapper {
+    padding: 16px;
+    border-radius: 32px;
   }
 }
 
 @media (max-width: 480px) {
-  .learning-container {
+  .stats-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-card .btn-primary {
+    max-width: 100%;
+  }
+
+  .time-buttons {
+    gap: 8px;
+  }
+
+  .time-btn {
+    min-width: 55px;
+    padding: 8px 12px;
+  }
+
+  .admin-stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .admin-tabs {
+    flex-direction: column;
+  }
+
+  .admin-tab {
+    justify-content: center;
+  }
+
+  .courses-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .courses-filters .filter-btn {
+    text-align: center;
+  }
+
+  .course-card-meta {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .auth-card {
+    padding: 20px 16px;
+    border-radius: 16px;
+    margin: 0 8px;
+  }
+
+  .auth-card .logo h1 {
+    font-size: 1.5rem;
+  }
+
+  .auth-card h2 {
+    font-size: 1.2rem;
+  }
+
+  .input-wrapper input {
+    padding: 14px 16px 14px 40px;
+    font-size: 16px;
+  }
+
+  .input-icon {
+    left: 12px;
+    font-size: 16px;
+  }
+
+  .learning-container,
+  .direction-detail-container,
+  .catalog-container {
     padding: 0.8rem;
   }
 
@@ -4016,369 +3349,105 @@ body.dark-mode .direction-error h2 {
     width: 60px;
     height: 60px;
   }
-}
 
-/* ============================================ */
-/* 28. СТРАНИЦА КУРСОВ (COURSES) */
-/* ============================================ */
+  .direction-detail-header h1 {
+    font-size: 1.8rem;
+  }
 
-.courses-container {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 28px;
-  padding: 2rem;
-  transition: all 0.3s ease;
-}
+  .direction-detail-meta {
+    gap: 0.6rem;
+  }
 
-.courses-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
+  .direction-meta-item {
+    font-size: 0.8rem;
+    padding: 0.2rem 0.8rem;
+  }
 
-.courses-header h1 {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  color: #333;
-  font-size: 2rem;
-}
+  .direction-detail-section h2 {
+    font-size: 1.3rem;
+  }
 
-.courses-subtitle {
-  color: #718096;
-  font-size: 1.1rem;
-  margin-top: 0.5rem;
-}
-
-/* Фильтры */
-.courses-filters {
-  display: flex;
-  gap: 0.75rem;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-  flex-wrap: wrap;
-}
-
-.courses-filters .filter-btn {
-  background: #f1f5f9;
-  border: none;
-  padding: 0.6rem 1.5rem;
-  border-radius: 50px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  color: #4a5568;
-}
-
-.courses-filters .filter-btn:hover {
-  background: #e2e8f0;
-  transform: translateY(-2px);
-}
-
-.courses-filters .filter-btn.active {
-  background: #667eea;
-  color: white;
-}
-
-/* Статистика */
-.courses-stats {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  margin-bottom: 2rem;
-  flex-wrap: wrap;
-}
-
-.courses-stat {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #4a5568;
-  font-size: 0.9rem;
-  background: #f7fafc;
-  padding: 0.4rem 1rem;
-  border-radius: 50px;
-}
-
-.courses-stat svg {
-  color: #667eea;
-}
-
-/* Сетка курсов */
-.courses-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-
-.course-card {
-  background: white;
-  border-radius: 16px;
-  overflow: hidden;
-  text-decoration: none;
-  color: inherit;
-  border: 1px solid #e2e8f0;
-  transition: all 0.3s;
-}
-
-.course-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
-  border-color: #667eea;
-}
-
-.course-card-image {
-  height: 120px;
-  background: linear-gradient(135deg, #667eea15, #764ba215);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.course-card-content {
-  padding: 1.2rem 1.5rem 1.5rem;
-}
-
-.course-card-content h3 {
-  font-size: 1.2rem;
-  color: #333;
-  margin-bottom: 0.5rem;
-}
-
-.course-card-content p {
-  font-size: 0.9rem;
-  color: #718096;
-  line-height: 1.5;
-  margin-bottom: 1rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  line-clamp: 2;
-  overflow: hidden;
-}
-
-.course-card-meta {
-  display: flex;
-  gap: 0.8rem;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
-}
-
-.course-card-difficulty {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.2rem 0.8rem;
-  border-radius: 50px;
-  font-size: 0.75rem;
-  font-weight: 500;
-}
-
-.course-card-lessons {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 0.75rem;
-  color: #718096;
-}
-
-.course-card-footer {
-  padding-top: 0.8rem;
-  border-top: 1px solid #e2e8f0;
-}
-
-.course-card-read-more {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  color: #667eea;
-  font-weight: 500;
-  font-size: 0.9rem;
-  transition: gap 0.2s;
-}
-
-.course-card-read-more:hover {
-  gap: 10px;
-}
-
-/* Пустое состояние */
-.courses-empty {
-  text-align: center;
-  padding: 4rem 2rem;
-  color: #718096;
-}
-
-.courses-empty svg {
-  opacity: 0.3;
-  margin-bottom: 1rem;
-}
-
-.courses-empty h3 {
-  color: #333;
-  margin-bottom: 0.5rem;
-}
-
-/* Ошибка */
-.courses-error {
-  text-align: center;
-  padding: 3rem;
-}
-
-.courses-error h3 {
-  color: #333;
-  margin-top: 1rem;
-}
-
-.courses-error p {
-  color: #718096;
-  margin-bottom: 1.5rem;
-}
-
-/* ============================================ */
-/* 29. ТЁМНАЯ ТЕМА ДЛЯ КУРСОВ */
-/* ============================================ */
-
-body.dark-mode .courses-container {
-  background: rgba(30, 30, 46, 0.95);
-}
-
-body.dark-mode .courses-header h1 {
-  color: #e2e8f0;
-}
-
-body.dark-mode .courses-subtitle {
-  color: #94a3b8;
-}
-
-body.dark-mode .courses-filters .filter-btn {
-  background: #334155;
-  color: #cbd5e0;
-}
-
-body.dark-mode .courses-filters .filter-btn:hover {
-  background: #475569;
-}
-
-body.dark-mode .courses-filters .filter-btn.active {
-  background: #818cf8;
-  color: white;
-}
-
-body.dark-mode .courses-stat {
-  background: #1a1a2e;
-  color: #cbd5e0;
-}
-
-body.dark-mode .courses-stat svg {
-  color: #818cf8;
-}
-
-body.dark-mode .course-card {
-  background: #1e1e2e;
-  border-color: #334155;
-}
-
-body.dark-mode .course-card:hover {
-  border-color: #818cf8;
-}
-
-body.dark-mode .course-card-content h3 {
-  color: #e2e8f0;
-}
-
-body.dark-mode .course-card-content p {
-  color: #94a3b8;
-}
-
-body.dark-mode .course-card-lessons {
-  color: #94a3b8;
-}
-
-body.dark-mode .course-card-footer {
-  border-top-color: #334155;
-}
-
-body.dark-mode .course-card-read-more {
-  color: #818cf8;
-}
-
-body.dark-mode .courses-empty h3 {
-  color: #e2e8f0;
-}
-
-body.dark-mode .courses-empty p {
-  color: #94a3b8;
-}
-
-body.dark-mode .courses-error h3 {
-  color: #e2e8f0;
-}
-
-/* ============================================ */
-/* 30. АДАПТИВНОСТЬ ДЛЯ КУРСОВ */
-/* ============================================ */
-
-@media (max-width: 768px) {
-  .courses-container {
+  .direction-detail-tips {
     padding: 1rem;
   }
 
-  .courses-header h1 {
+  .catalog-item {
+    padding: 1rem;
+  }
+
+  .catalog-item-meta {
+    gap: 0.3rem;
+  }
+
+  .catalog-item-category {
+    font-size: 0.65rem;
+    padding: 2px 8px;
+  }
+
+  .catalog-header h1 {
     font-size: 1.5rem;
-    flex-direction: column;
   }
 
-  .courses-filters {
-    gap: 0.5rem;
-  }
-
-  .courses-filters .filter-btn {
-    padding: 0.4rem 1rem;
-    font-size: 0.8rem;
-  }
-
-  .courses-stats {
-    gap: 0.8rem;
-  }
-
-  .courses-stat {
-    font-size: 0.8rem;
-    padding: 0.3rem 0.8rem;
-  }
-
-  .courses-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .course-card-image {
-    height: 80px;
-  }
-
-  .course-card-content {
-    padding: 1rem;
-  }
-
-  .course-card-content h3 {
-    font-size: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .courses-container {
-    padding: 0.8rem;
-  }
-
-  .courses-filters {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .courses-filters .filter-btn {
-    text-align: center;
-  }
-
-  .course-card-meta {
-    flex-direction: column;
+  .catalog-categories {
     gap: 0.4rem;
   }
+
+  .catalog-category-btn {
+    font-size: 0.7rem;
+    padding: 4px 10px;
+  }
+}
+
+/* Отключаем hover-эффекты на мобильных */
+@media (hover: none) {
+  *:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  
+  .btn-primary:hover,
+  .btn-secondary:hover,
+  .direction-card:hover,
+  .course-card:hover,
+  .catalog-item:hover {
+    transform: none !important;
+    box-shadow: none !important;
+  }
+
+  .direction-card:hover .direction-icon {
+    transform: none !important;
+  }
+
+  .direction-card:hover .read-more-arrow {
+    transform: none !important;
+  }
+
+  .admin-btn:hover,
+  .view-post-btn:hover {
+    transform: none !important;
+  }
+}
+
+/* Улучшенное нажатие на кнопки на мобильных */
+@media (max-width: 768px) {
+  .btn-primary:active,
+  .btn-secondary:active,
+  button:active {
+    transform: scale(0.96);
+    opacity: 0.8;
+    transition: transform 0.1s;
+  }
+
+  .time-btn:active:not(.disabled) {
+    transform: scale(0.95);
+  }
+
+  .admin-btn:active {
+    transform: scale(0.95);
+  }
+}
+
+/* Плавные переходы для всех элементов */
+* {
+  transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
