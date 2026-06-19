@@ -21,6 +21,28 @@ const SECRET_KEY = process.env.SECRET_KEY;
 const appRoot = process.cwd();
 console.log('📁 App root:', appRoot);
 
+// Определяем папку со статикой (для React сборки)
+const staticDir = path.join(appRoot, 'dist');
+const publicDir = path.join(appRoot, 'public');
+
+console.log('📁 Static dir (dist):', staticDir);
+console.log('📁 Public dir:', publicDir);
+
+// Проверяем, какая папка существует
+let staticPath = null;
+if (fs.existsSync(staticDir)) {
+  staticPath = staticDir;
+  console.log('✅ Использую папку dist для статики');
+} else if (fs.existsSync(publicDir)) {
+  staticPath = publicDir;
+  console.log('✅ Использую папку public для статики');
+} else {
+  console.log('⚠️ Папка со статикой не найдена!');
+  fs.mkdirSync(publicDir, { recursive: true });
+  staticPath = publicDir;
+  console.log('📁 Создана папка public');
+}
+
 // Папка для загрузок (внутри public)
 const uploadDir = path.join(appRoot, 'public', 'uploads');
 if (!fs.existsSync(uploadDir)) {
@@ -56,7 +78,7 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   limits: { 
-    fileSize: 5 * 1024 * 1024 // 5MB
+    fileSize: 5 * 1024 * 1024
   },
   fileFilter: (req, file, cb) => {
     const allowedTypes = /jpeg|jpg|png|gif|webp/;
@@ -96,39 +118,31 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ============================================================
-// 4. РАЗДАЧА СТАТИКИ (ДОЛЖНА БЫТЬ ПЕРЕД ВСЕМИ МАРШРУТАМИ!)
+// 4. РАЗДАЧА СТАТИКИ
 // ============================================================
 
-// ✅ СНАЧАЛА раздаем папку uploads
+// СНАЧАЛА раздаем папку uploads
 app.use('/uploads', (req, res, next) => {
   console.log('🖼️ Запрос к /uploads:', req.url);
+  console.log('📂 Путь к файлу:', path.join(uploadDir, req.url));
   next();
 });
 
 app.use('/uploads', express.static(uploadDir, {
-  maxAge: 0, // Отключаем кэширование для разработки
-  etag: true,
-  lastModified: true
-}));
-
-// ✅ ПОТОМ раздаем всю папку public (для favicon, index.html и т.д.)
-app.use(express.static(path.join(appRoot, 'public'), {
   maxAge: 0,
   etag: true,
   lastModified: true
 }));
 
-// ✅ Добавляем заголовки для правильной работы
-app.use((req, res, next) => {
-  // Для всех запросов к /uploads устанавливаем правильные заголовки
-  if (req.url.startsWith('/uploads/')) {
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-  }
-  next();
-});
+// ПОТОМ раздаем всю статику (dist или public)
+if (staticPath) {
+  app.use(express.static(staticPath, {
+    maxAge: 0,
+    etag: true,
+    lastModified: true
+  }));
+  console.log('✅ Статика раздается из:', staticPath);
+}
 
 // ============================================================
 // 5. ГЛОБАЛЬНЫЙ ОБРАБОТЧИК ОШИБОК MULTER
@@ -746,6 +760,8 @@ app.get('/api/admin/users', authMiddleware, adminMiddleware, async (req, res) =>
         avatar, 
         role, 
         is_blocked,
+        block_reason,
+        blocked_at,
         created_at,
         (SELECT COUNT(*) FROM meditation_sessions WHERE user_id = users.id) as total_sessions,
         (SELECT COUNT(*) FROM posts WHERE user_id = users.id) as total_posts
@@ -761,9 +777,9 @@ app.get('/api/admin/users', authMiddleware, adminMiddleware, async (req, res) =>
 
 app.post('/api/admin/users/:id/toggle-block', authMiddleware, adminMiddleware, async (req, res) => {
   const { id } = req.params;
-  const { blocked } = req.body;
+  const { blocked, reason } = req.body;
   
-  console.log(`🔄 Блокировка пользователя ${id}:`, blocked);
+  console.log(`🔄 Блокировка пользователя ${id}:`, blocked, 'Причина:', reason);
   
   if (parseInt(id) === req.user.userId) {
     return res.status(400).json({ error: 'Нельзя заблокировать самого себя' });
@@ -775,12 +791,16 @@ app.post('/api/admin/users/:id/toggle-block', authMiddleware, adminMiddleware, a
       return res.status(404).json({ error: 'Пользователь не найден' });
     }
     
-    await pool.query('UPDATE users SET is_blocked = $1 WHERE id = $2', [blocked, id]);
+    await pool.query(
+      'UPDATE users SET is_blocked = $1, block_reason = $2, blocked_at = $3 WHERE id = $4',
+      [blocked, blocked ? reason : null, blocked ? new Date() : null, id]
+    );
     
     console.log(`✅ Пользователь ${id} ${blocked ? 'заблокирован' : 'разблокирован'}`);
     res.json({ 
       message: `Пользователь ${blocked ? 'заблокирован' : 'разблокирован'}`,
-      blocked: blocked
+      blocked: blocked,
+      reason: blocked ? reason : null
     });
   } catch (err) {
     console.error('❌ Ошибка блокировки пользователя:', err);
@@ -904,79 +924,112 @@ app.get('/api/admin/posts/:id/comments', authMiddleware, adminMiddleware, async 
 
 app.delete('/api/admin/comments/:id', authMiddleware, adminMiddleware, async (req, res) => {
   const { id } = req.params;
+  const { reason } = req.body;
+  
+  console.log(`🗑️ Удаление комментария ${id}, причина:`, reason);
   
   try {
-    const comment = await pool.query('SELECT post_id FROM comments WHERE id = $1', [id]);
+    const comment = await pool.query(`
+      SELECT c.*, u.username 
+      FROM comments c
+      JOIN users u ON u.id = c.user_id
+      WHERE c.id = $1
+    `, [id]);
+    
     if (comment.rows.length === 0) {
       return res.status(404).json({ error: 'Комментарий не найден' });
     }
     
     const postId = comment.rows[0].post_id;
+    const commentData = comment.rows[0];
+    
+    console.log(`📝 Удалён комментарий #${id} от ${commentData.username}: "${commentData.content}"`);
+    console.log(`📝 Причина: ${reason || 'Не указана'}`);
     
     await pool.query('DELETE FROM comments WHERE id = $1', [id]);
     await pool.query('UPDATE posts SET comments_count = comments_count - 1 WHERE id = $1', [postId]);
     
-    res.json({ message: 'Комментарий удалён' });
+    res.json({ 
+      message: 'Комментарий удалён',
+      deletedComment: {
+        id: commentData.id,
+        content: commentData.content,
+        author: commentData.username,
+        reason: reason || 'Не указана'
+      }
+    });
   } catch (err) {
     console.error('❌ Ошибка удаления комментария:', err);
     res.status(500).json({ error: 'Ошибка удаления комментария' });
   }
 });
 
-
-// ---------- БЛОКИРОВКА/РАЗБЛОКИРОВКА ПОЛЬЗОВАТЕЛЯ ----------
-app.post('/api/admin/users/:id/toggle-block', authMiddleware, adminMiddleware, async (req, res) => {
-  const { id } = req.params;
-  const { blocked, reason } = req.body;
-  
-  console.log(`🔄 Блокировка пользователя ${id}:`, blocked, 'Причина:', reason);
-  
-  if (parseInt(id) === req.user.userId) {
-    return res.status(400).json({ error: 'Нельзя заблокировать самого себя' });
-  }
-  
+// ---------- СПИСОК ВСЕХ КОММЕНТАРИЕВ ----------
+app.get('/api/admin/comments', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const userCheck = await pool.query('SELECT id FROM users WHERE id = $1', [id]);
-    if (userCheck.rows.length === 0) {
-      return res.status(404).json({ error: 'Пользователь не найден' });
-    }
-    
-    // Сохраняем причину блокировки
-    await pool.query(
-      'UPDATE users SET is_blocked = $1, block_reason = $2, blocked_at = $3 WHERE id = $4',
-      [blocked, blocked ? reason : null, blocked ? new Date() : null, id]
-    );
-    
-    console.log(`✅ Пользователь ${id} ${blocked ? 'заблокирован' : 'разблокирован'}`);
-    res.json({ 
-      message: `Пользователь ${blocked ? 'заблокирован' : 'разблокирован'}`,
-      blocked: blocked,
-      reason: blocked ? reason : null
-    });
+    const result = await pool.query(`
+      SELECT 
+        c.id,
+        c.content,
+        c.created_at,
+        c.post_id,
+        u.id as user_id,
+        u.username,
+        u.avatar
+      FROM comments c
+      JOIN users u ON u.id = c.user_id
+      ORDER BY c.created_at DESC
+    `);
+    res.json(result.rows);
   } catch (err) {
-    console.error('❌ Ошибка блокировки пользователя:', err);
-    res.status(500).json({ error: 'Ошибка изменения статуса блокировки' });
+    console.error('❌ Ошибка получения всех комментариев:', err);
+    res.status(500).json({ error: 'Ошибка получения комментариев' });
   }
 });
 
 // ============================================================
-// 12. ОБРАБОТКА ЗАПРОСОВ НА ФРОНТЕНД (SPA)
+// 7. ОБРАБОТКА ЗАПРОСОВ НА ФРОНТЕНД (SPA)
 // ============================================================
 // ВАЖНО: ЭТО ДОЛЖНО БЫТЬ ПОСЛЕ ВСЕХ API-ЭНДПОИНТОВ!
-// Все запросы, которые не являются API и не ведут к существующим файлам,
-// отправляем на index.html React-приложения
+
+// Проверяем существование index.html в разных папках
+const indexHtmlPaths = [
+  path.join(staticPath, 'index.html'),
+  path.join(staticPath, '..', 'public', 'index.html'),
+  path.join(appRoot, 'public', 'index.html'),
+  path.join(appRoot, 'dist', 'index.html')
+];
+
+let indexHtmlPath = null;
+for (const testPath of indexHtmlPaths) {
+  if (fs.existsSync(testPath)) {
+    indexHtmlPath = testPath;
+    console.log('✅ Найден index.html:', indexHtmlPath);
+    break;
+  }
+}
+
+if (!indexHtmlPath) {
+  console.log('⚠️ index.html не найден! Создаю заглушку...');
+  const fallbackHtml = `<!DOCTYPE html><html><head><title>Meditation App</title></head><body><div id="root">Loading...</div></body></html>`;
+  const fallbackPath = path.join(staticPath || appRoot, 'index.html');
+  fs.writeFileSync(fallbackPath, fallbackHtml);
+  indexHtmlPath = fallbackPath;
+  console.log('✅ Создан fallback index.html:', fallbackPath);
+}
+
 app.get('*', (req, res) => {
-  // Проверяем, не запрос ли это к статическому файлу
-  const staticPath = path.join(appRoot, 'public', req.path);
-  if (fs.existsSync(staticPath) && fs.statSync(staticPath).isFile()) {
-    return res.sendFile(staticPath);
+  // Проверяем, не запрос ли это к существующему файлу
+  const filePath = path.join(staticPath || appRoot, req.path);
+  if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+    return res.sendFile(filePath);
   }
   // Иначе отдаем index.html
-  res.sendFile(path.join(appRoot, 'public', 'index.html'));
+  res.sendFile(indexHtmlPath);
 });
 
 // ============================================================
-// 13. ГЛОБАЛЬНЫЙ ОБРАБОТЧИК ОШИБОК (должен быть последним)
+// 8. ГЛОБАЛЬНЫЙ ОБРАБОТЧИК ОШИБОК (должен быть последним)
 // ============================================================
 app.use((err, req, res, next) => {
   console.error('❌ Глобальная ошибка:', err);
@@ -987,12 +1040,14 @@ app.use((err, req, res, next) => {
 });
 
 // ============================================================
-// 14. ЗАПУСК СЕРВЕРА
+// 9. ЗАПУСК СЕРВЕРА
 // ============================================================
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Сервер запущен на порту ${PORT}`);
   console.log(`📁 Рабочая директория: ${appRoot}`);
   console.log(`📁 Папка uploads: ${uploadDir}`);
+  console.log(`📁 Статика из: ${staticPath || 'не найдена'}`);
+  console.log(`📄 index.html: ${indexHtmlPath || 'не найден'}`);
   console.log(`🌐 Режим: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🖼️ Аватары доступны по: /uploads/`);
 });

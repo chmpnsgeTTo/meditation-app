@@ -15,7 +15,14 @@ import {
   FiLock,
   FiUnlock,
   FiUserCheck,
-  FiAlertCircle
+  FiAlertCircle,
+  FiMessageCircle,
+  FiClock,
+  FiHash,
+  FiUser,
+  FiCalendar,
+  FiCheckCircle,
+  FiXCircle
 } from 'react-icons/fi';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -25,6 +32,7 @@ const AdminPage = () => {
   const [activeTab, setActiveTab] = useState('stats');
   const [users, setUsers] = useState([]);
   const [posts, setPosts] = useState([]);
+  const [comments, setComments] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedPost, setSelectedPost] = useState(null);
@@ -41,6 +49,12 @@ const AdminPage = () => {
   const [blockUser, setBlockUser] = useState(null);
   const [blockReason, setBlockReason] = useState('');
   const [isBlocking, setIsBlocking] = useState(false);
+
+  // ===== СОСТОЯНИЯ ДЛЯ УДАЛЕНИЯ КОММЕНТАРИЯ =====
+  const [showDeleteCommentModal, setShowDeleteCommentModal] = useState(false);
+  const [deleteCommentData, setDeleteCommentData] = useState(null);
+  const [deleteCommentReason, setDeleteCommentReason] = useState('');
+  const [isDeletingComment, setIsDeletingComment] = useState(false);
 
   useEffect(() => {
     if (user?.role === 'admin') {
@@ -72,6 +86,11 @@ const AdminPage = () => {
           headers: { Authorization: `Bearer ${user.token}` }
         });
         setPosts(data);
+      } else if (activeTab === 'comments') {
+        const { data } = await axios.get(`${API_URL}/api/admin/comments`, {
+          headers: { Authorization: `Bearer ${user.token}` }
+        });
+        setComments(data);
       }
     } catch (err) {
       console.error('❌ Ошибка загрузки:', err);
@@ -97,12 +116,53 @@ const AdminPage = () => {
     }
   };
 
-  // ========== УДАЛЕНИЕ КОММЕНТАРИЯ ==========
+  // ========== ОТКРЫТИЕ МОДАЛКИ УДАЛЕНИЯ КОММЕНТАРИЯ ==========
+  const openDeleteCommentModal = (comment) => {
+    setDeleteCommentData(comment);
+    setDeleteCommentReason('');
+    setShowDeleteCommentModal(true);
+  };
+
+  // ========== ЗАКРЫТИЕ МОДАЛКИ УДАЛЕНИЯ КОММЕНТАРИЯ ==========
+  const closeDeleteCommentModal = () => {
+    setShowDeleteCommentModal(false);
+    setDeleteCommentData(null);
+    setDeleteCommentReason('');
+    setIsDeletingComment(false);
+  };
+
+  // ========== УДАЛЕНИЕ КОММЕНТАРИЯ С ПРИЧИНОЙ ==========
+  const confirmDeleteComment = async () => {
+    if (!deleteCommentReason.trim()) {
+      showMessage('Пожалуйста, укажите причину удаления', 'error');
+      return;
+    }
+
+    setIsDeletingComment(true);
+    try {
+      await axios.delete(`${API_URL}/api/admin/comments/${deleteCommentData.id}`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+        data: { reason: deleteCommentReason.trim() }
+      });
+      
+      showMessage('Комментарий удалён', 'success');
+      closeDeleteCommentModal();
+      loadData();
+    } catch (err) {
+      console.error('❌ Ошибка удаления комментария:', err);
+      showMessage(err.response?.data?.error || 'Ошибка удаления комментария', 'error');
+    } finally {
+      setIsDeletingComment(false);
+    }
+  };
+
+  // ========== УДАЛЕНИЕ КОММЕНТАРИЯ (старая версия для модалки поста) ==========
   const deleteComment = async (commentId) => {
     if (!window.confirm('Удалить комментарий?')) return;
     try {
       await axios.delete(`${API_URL}/api/admin/comments/${commentId}`, {
-        headers: { Authorization: `Bearer ${user.token}` }
+        headers: { Authorization: `Bearer ${user.token}` },
+        data: { reason: 'Удалено администратором' }
       });
       showMessage('Комментарий удалён', 'success');
       if (selectedPost) {
@@ -117,7 +177,7 @@ const AdminPage = () => {
 
   // ========== УДАЛЕНИЕ ПОЛЬЗОВАТЕЛЯ ==========
   const deleteUser = async (userId) => {
-    if (!window.confirm('⚠️ Удалить пользователя? Все его посты, комментарии и сессии будут удалены безвозвратно.')) return;
+    if (!window.confirm('Удалить пользователя? Все его посты, комментарии и сессии будут удалены безвозвратно.')) return;
     try {
       await axios.delete(`${API_URL}/api/admin/users/${userId}`, {
         headers: { Authorization: `Bearer ${user.token}` }
@@ -162,13 +222,12 @@ const AdminPage = () => {
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
       
-      console.log('✅ Ответ сервера:', response.data);
+      console.log('Ответ сервера:', response.data);
       showMessage(`Пользователь ${blockUser.username} заблокирован`, 'success');
       closeBlockModal();
       loadData();
     } catch (err) {
-      console.error('❌ Ошибка блокировки:', err);
-      console.error('❌ Детали:', err.response?.data);
+      console.error('Ошибка блокировки:', err);
       showMessage(err.response?.data?.error || 'Ошибка блокировки пользователя', 'error');
     } finally {
       setIsBlocking(false);
@@ -177,7 +236,7 @@ const AdminPage = () => {
 
   // ========== РАЗБЛОКИРОВКА ==========
   const toggleUserUnblock = async (userId, username) => {
-    if (!window.confirm(`⚠️ Разблокировать пользователя ${username}?`)) return;
+    if (!window.confirm(`Разблокировать пользователя ${username}?`)) return;
     
     try {
       const response = await axios.post(
@@ -188,11 +247,11 @@ const AdminPage = () => {
         },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
-      console.log('✅ Ответ сервера:', response.data);
+      console.log('Ответ сервера:', response.data);
       showMessage(`Пользователь ${username} разблокирован`, 'success');
       loadData();
     } catch (err) {
-      console.error('❌ Ошибка разблокировки:', err);
+      console.error('Ошибка разблокировки:', err);
       showMessage(err.response?.data?.error || 'Ошибка разблокировки', 'error');
     }
   };
@@ -201,7 +260,7 @@ const AdminPage = () => {
   const toggleAdminRole = async (userId, currentRole) => {
     const newRole = currentRole === 'admin' ? 'user' : 'admin';
     
-    if (!window.confirm(`⚠️ ${currentRole === 'admin' ? 'Лишить прав администратора' : 'Назначить администратором'} пользователя?`)) return;
+    if (!window.confirm(`${currentRole === 'admin' ? 'Лишить прав администратора' : 'Назначить администратором'} пользователя?`)) return;
     
     try {
       await axios.post(`${API_URL}/api/admin/users/${userId}/toggle-role`,
@@ -277,7 +336,7 @@ const AdminPage = () => {
 
           {message && (
             <div className={`admin-message admin-message-${messageType}`}>
-              {messageType === 'success' ? '✅' : '❌'} {message}
+              {messageType === 'success' ? <FiCheckCircle size={16} /> : <FiXCircle size={16} />} {message}
             </div>
           )}
 
@@ -299,6 +358,12 @@ const AdminPage = () => {
               className={`admin-tab ${activeTab === 'posts' ? 'active' : ''}`}
             >
               <FiFileText size={16} /> Посты
+            </button>
+            <button 
+              onClick={() => setActiveTab('comments')} 
+              className={`admin-tab ${activeTab === 'comments' ? 'active' : ''}`}
+            >
+              <FiMessageCircle size={16} /> Комментарии
             </button>
           </div>
 
@@ -334,11 +399,11 @@ const AdminPage = () => {
                   <table className="admin-table">
                     <thead>
                       <tr>
-                        <th>ID</th>
-                        <th>Имя</th>
-                        <th>Роль</th>
-                        <th>Статус</th>
-                        <th>Дата регистрации</th>
+                        <th><FiHash size={14} /> ID</th>
+                        <th><FiUser size={14} /> Имя</th>
+                        <th><FiShield size={14} /> Роль</th>
+                        <th><FiLock size={14} /> Статус</th>
+                        <th><FiCalendar size={14} /> Дата регистрации</th>
                         <th>Сессий</th>
                         <th>Постов</th>
                         <th>Действия</th>
@@ -423,12 +488,12 @@ const AdminPage = () => {
                   <table className="admin-table">
                     <thead>
                       <tr>
-                        <th>ID</th>
-                        <th>Автор</th>
-                        <th>Текст (предпросмотр)</th>
+                        <th><FiHash size={14} /> ID</th>
+                        <th><FiUser size={14} /> Автор</th>
+                        <th><FiFileText size={14} /> Текст (предпросмотр)</th>
                         <th>Лайков</th>
-                        <th>Комментариев</th>
-                        <th>Дата</th>
+                        <th><FiMessageSquare size={14} /> Комментариев</th>
+                        <th><FiCalendar size={14} /> Дата</th>
                         <th>Действия</th>
                       </tr>
                     </thead>
@@ -465,6 +530,66 @@ const AdminPage = () => {
                       ))}
                     </tbody>
                   </table>
+                </div>
+              )}
+
+              {/* ========== КОММЕНТАРИИ ========== */}
+              {activeTab === 'comments' && (
+                <div className="admin-table-wrapper">
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th><FiHash size={14} /> ID</th>
+                        <th><FiUser size={14} /> Автор</th>
+                        <th><FiFileText size={14} /> Пост</th>
+                        <th><FiMessageCircle size={14} /> Текст комментария</th>
+                        <th><FiClock size={14} /> Дата и время</th>
+                        <th>Действия</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {comments.map(c => (
+                        <tr key={c.id}>
+                          <td>{c.id}</td>
+                          <td><strong>{c.username}</strong></td>
+                          <td>
+                            <span style={{ fontSize: '12px', color: '#718096' }}>
+                              Пост #{c.post_id}
+                            </span>
+                          </td>
+                          <td className="post-preview" style={{ maxWidth: '300px' }}>
+                            {c.content}
+                          </td>
+                          <td style={{ fontSize: '12px', whiteSpace: 'nowrap' }}>
+                            {new Date(c.created_at).toLocaleString('ru-RU', {
+                              day: '2-digit',
+                              month: '2-digit',
+                              year: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </td>
+                          <td>
+                            <div className="admin-btn-group">
+                              <button
+                                onClick={() => openDeleteCommentModal(c)}
+                                className="admin-btn admin-btn-danger"
+                                title="Удалить комментарий"
+                              >
+                                <FiTrash2 size={12} /> Удалить
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {comments.length === 0 && (
+                    <div style={{ textAlign: 'center', padding: '40px', color: '#718096' }}>
+                      <FiMessageCircle size={48} style={{ marginBottom: '16px', opacity: 0.3 }} />
+                      <p>Комментариев пока нет</p>
+                    </div>
+                  )}
                 </div>
               )}
             </>
@@ -584,6 +709,139 @@ const AdminPage = () => {
         </div>
       )}
 
+      {/* ========== МОДАЛКА УДАЛЕНИЯ КОММЕНТАРИЯ ========== */}
+      {showDeleteCommentModal && deleteCommentData && (
+        <div className="modal-overlay" onClick={closeDeleteCommentModal}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+            <div className="modal-header">
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#e53e3e' }}>
+                <FiTrash2 size={24} />
+                Удаление комментария
+              </h3>
+              <button className="modal-close" onClick={closeDeleteCommentModal}>✕</button>
+            </div>
+            
+            <div style={{ marginBottom: '20px' }}>
+              <p style={{ fontSize: '16px', marginBottom: '8px' }}>
+                <strong>Автор:</strong> {deleteCommentData.username}
+              </p>
+              <p style={{ fontSize: '14px', color: '#4a5568', marginBottom: '8px' }}>
+                <strong>Комментарий:</strong>
+              </p>
+              <div style={{
+                padding: '12px',
+                background: '#f8fafc',
+                borderRadius: '8px',
+                fontSize: '14px',
+                color: '#2d3748',
+                marginBottom: '12px'
+              }}>
+                {deleteCommentData.content}
+              </div>
+              <p style={{ fontSize: '12px', color: '#718096' }}>
+                <strong>Дата:</strong> {new Date(deleteCommentData.created_at).toLocaleString('ru-RU', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </p>
+              <p style={{ fontSize: '14px', color: '#718096', marginTop: '12px' }}>
+                <FiAlertCircle size={16} style={{ verticalAlign: 'middle', marginRight: '6px' }} />
+                Комментарий будет удалён безвозвратно.
+              </p>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label htmlFor="deleteCommentReason" style={{ 
+                display: 'block', 
+                fontWeight: '500', 
+                marginBottom: '8px',
+                fontSize: '14px'
+              }}>
+                Причина удаления <span style={{ color: '#e53e3e' }}>*</span>
+              </label>
+              <textarea
+                id="deleteCommentReason"
+                value={deleteCommentReason}
+                onChange={(e) => setDeleteCommentReason(e.target.value)}
+                placeholder="Укажите причину удаления комментария..."
+                style={{
+                  width: '100%',
+                  minHeight: '80px',
+                  padding: '12px',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontFamily: 'inherit',
+                  resize: 'vertical',
+                  transition: 'border-color 0.2s'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+                disabled={isDeletingComment}
+                autoFocus
+              />
+              <div style={{ 
+                fontSize: '12px', 
+                color: '#718096', 
+                marginTop: '4px',
+                textAlign: 'right'
+              }}>
+                {deleteCommentReason.length}/500 символов
+              </div>
+            </div>
+
+            <div className="modal-buttons" style={{ 
+              display: 'flex', 
+              gap: '10px',
+              justifyContent: 'flex-end',
+              borderTop: '1px solid #e2e8f0',
+              paddingTop: '16px'
+            }}>
+              <button
+                onClick={closeDeleteCommentModal}
+                className="admin-btn admin-btn-secondary"
+                disabled={isDeletingComment}
+              >
+                Отмена
+              </button>
+              <button
+                onClick={confirmDeleteComment}
+                className="admin-btn admin-btn-danger"
+                disabled={isDeletingComment || !deleteCommentReason.trim()}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                {isDeletingComment ? (
+                  <>
+                    <span className="spinner" style={{ 
+                      display: 'inline-block',
+                      width: '16px',
+                      height: '16px',
+                      border: '2px solid rgba(255,255,255,0.3)',
+                      borderTopColor: 'white',
+                      borderRadius: '50%',
+                      animation: 'spin 0.8s linear infinite'
+                    }}></span>
+                    Удаление...
+                  </>
+                ) : (
+                  <>
+                    <FiTrash2 size={16} />
+                    Удалить комментарий
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ========== МОДАЛКА ПОСТА С КОММЕНТАРИЯМИ ========== */}
       {showPostModal && selectedPost && (
         <div className="modal-overlay" onClick={closePostModal}>
@@ -599,16 +857,16 @@ const AdminPage = () => {
             <div className="post-full-text">{selectedPost.content}</div>
             {selectedPost.meditation_duration && (
               <div className="post-meditation-info">
-                🧘 Медитация {selectedPost.meditation_duration} минут
+                <FiClock size={14} style={{ marginRight: '6px' }} />
+                Медитация {selectedPost.meditation_duration} минут
               </div>
             )}
             <div className="post-stats-info">
               <span>❤️ {selectedPost.likes_count} лайков</span>
-              <span>💬 {selectedPost.comments_count} комментариев</span>
-              <span>📅 {new Date(selectedPost.created_at).toLocaleString('ru-RU')}</span>
+              <span><FiMessageSquare size={14} style={{ marginRight: '4px' }} /> {selectedPost.comments_count} комментариев</span>
+              <span><FiCalendar size={14} style={{ marginRight: '4px' }} /> {new Date(selectedPost.created_at).toLocaleString('ru-RU')}</span>
             </div>
 
-            {/* ===== КОММЕНТАРИИ ===== */}
             <div style={{ marginTop: '1.5rem', borderTop: '1px solid #e2e8f0', paddingTop: '1rem' }}>
               <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
                 <FiMessageSquare size={18} />
@@ -639,6 +897,7 @@ const AdminPage = () => {
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                           <span style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>{comment.username}</span>
                           <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
+                            <FiClock size={12} style={{ marginRight: '4px' }} />
                             {new Date(comment.created_at).toLocaleString('ru-RU')}
                           </span>
                         </div>
@@ -716,7 +975,6 @@ const AdminPage = () => {
         </div>
       )}
 
-      {/* Стили для спиннера */}
       <style>{`
         @keyframes spin {
           to { transform: rotate(360deg); }
