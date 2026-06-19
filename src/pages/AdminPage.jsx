@@ -24,7 +24,9 @@ import {
   FiCheckCircle,
   FiXCircle,
   FiMail,
-  FiSend
+  FiSend,
+  FiX,
+  FiHeart
 } from 'react-icons/fi';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -47,6 +49,7 @@ const AdminPage = () => {
   const [loadingComments, setLoadingComments] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('success');
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // ===== СОСТОЯНИЯ ДЛЯ БЛОКИРОВКИ =====
   const [showBlockModal, setShowBlockModal] = useState(false);
@@ -70,7 +73,7 @@ const AdminPage = () => {
     if (user?.role === 'admin') {
       loadData();
     }
-  }, [activeTab, user]);
+  }, [activeTab, user, refreshKey]);
 
   const showMessage = (text, type = 'success') => {
     setMessage(text);
@@ -114,11 +117,15 @@ const AdminPage = () => {
         setUnblockRequests(requestsData.data);
       }
     } catch (err) {
-      console.error('❌ Ошибка загрузки:', err);
+      console.error('Ошибка загрузки:', err);
       showMessage(err.response?.data?.error || 'Ошибка загрузки данных', 'error');
     } finally {
       setLoading(false);
     }
+  };
+
+  const reloadData = () => {
+    setRefreshKey(prev => prev + 1);
   };
 
   // ========== ЗАГРУЗКА КОММЕНТАРИЕВ К ПОСТУ ==========
@@ -130,7 +137,7 @@ const AdminPage = () => {
       });
       setPostComments(data);
     } catch (err) {
-      console.error('❌ Ошибка загрузки комментариев:', err);
+      console.error('Ошибка загрузки комментариев:', err);
       showMessage('Ошибка загрузки комментариев', 'error');
     } finally {
       setLoadingComments(false);
@@ -149,9 +156,9 @@ const AdminPage = () => {
       if (selectedPost) {
         await loadPostComments(selectedPost.id);
       }
-      await loadData();
+      reloadData();
     } catch (err) {
-      console.error('❌ Ошибка удаления комментария:', err);
+      console.error('Ошибка удаления комментария:', err);
       showMessage(err.response?.data?.error || 'Ошибка удаления комментария', 'error');
     }
   };
@@ -164,7 +171,7 @@ const AdminPage = () => {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       showMessage('Пользователь удалён', 'success');
-      loadData();
+      reloadData();
     } catch (err) {
       showMessage(err.response?.data?.error || 'Ошибка удаления', 'error');
     }
@@ -200,7 +207,7 @@ const AdminPage = () => {
       );
       showMessage(`Пользователь ${blockUser.username} заблокирован`, 'success');
       closeBlockModal();
-      loadData();
+      reloadData();
     } catch (err) {
       console.error('Ошибка блокировки:', err);
       showMessage(err.response?.data?.error || 'Ошибка блокировки пользователя', 'error');
@@ -219,7 +226,7 @@ const AdminPage = () => {
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
       showMessage(`Пользователь ${username} разблокирован`, 'success');
-      loadData();
+      reloadData();
     } catch (err) {
       console.error('Ошибка разблокировки:', err);
       showMessage(err.response?.data?.error || 'Ошибка разблокировки', 'error');
@@ -236,7 +243,7 @@ const AdminPage = () => {
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
       showMessage(`Пользователь ${currentRole === 'admin' ? 'лишён прав администратора' : 'назначен администратором'}`, 'success');
-      loadData();
+      reloadData();
     } catch (err) {
       showMessage(err.response?.data?.error || 'Ошибка', 'error');
     }
@@ -250,9 +257,9 @@ const AdminPage = () => {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       showMessage('Пост удалён', 'success');
-      loadData();
       setShowPostModal(false);
       setSelectedPost(null);
+      reloadData();
     } catch (err) {
       showMessage(err.response?.data?.error || 'Ошибка удаления', 'error');
     }
@@ -305,9 +312,9 @@ const AdminPage = () => {
       });
       showMessage('Комментарий удалён', 'success');
       closeDeleteCommentModal();
-      loadData();
+      reloadData();
     } catch (err) {
-      console.error('❌ Ошибка удаления комментария:', err);
+      console.error('Ошибка удаления комментария:', err);
       showMessage(err.response?.data?.error || 'Ошибка удаления комментария', 'error');
     } finally {
       setIsDeletingComment(false);
@@ -323,7 +330,7 @@ const AdminPage = () => {
       );
       showMessage(`Статус запроса обновлён на "${status}"`, 'success');
       setShowRequestModal(false);
-      loadData();
+      reloadData();
     } catch (err) {
       showMessage(err.response?.data?.error || 'Ошибка обновления', 'error');
     }
@@ -336,7 +343,7 @@ const AdminPage = () => {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       showMessage('Запрос удалён', 'success');
-      loadData();
+      reloadData();
     } catch (err) {
       showMessage(err.response?.data?.error || 'Ошибка удаления', 'error');
     }
@@ -540,7 +547,7 @@ const AdminPage = () => {
                         <th><FiHash size={14} /> ID</th>
                         <th><FiUser size={14} /> Автор</th>
                         <th><FiFileText size={14} /> Текст (предпросмотр)</th>
-                        <th>Лайков</th>
+                        <th><FiHeart size={14} /> Лайков</th>
                         <th><FiMessageSquare size={14} /> Комментариев</th>
                         <th><FiCalendar size={14} /> Дата</th>
                         <th>Действия</th>
@@ -552,7 +559,7 @@ const AdminPage = () => {
                           <td>{p.id}</td>
                           <td><strong>{p.username}</strong></td>
                           <td className="post-preview">{p.content?.substring(0, 80)}...</td>
-                          <td>❤️ {p.likes_count}</td>
+                          <td><FiHeart size={14} color="#e53e3e" /> {p.likes_count}</td>
                           <td>
                             <span className="admin-badge-comments">
                               <FiMessageSquare size={12} /> {parseInt(p.comments_count)}
@@ -643,23 +650,23 @@ const AdminPage = () => {
                     <div className="admin-stats-grid">
                       <div className="admin-stat-card">
                         <div className="admin-stat-value" style={{ color: '#ed8936' }}>{requestStats.pending}</div>
-                        <div className="admin-stat-label">⏳ Ожидают</div>
+                        <div className="admin-stat-label">Ожидают</div>
                       </div>
                       <div className="admin-stat-card">
                         <div className="admin-stat-value" style={{ color: '#4299e1' }}>{requestStats.in_progress}</div>
-                        <div className="admin-stat-label">🔄 В работе</div>
+                        <div className="admin-stat-label">В работе</div>
                       </div>
                       <div className="admin-stat-card">
                         <div className="admin-stat-value" style={{ color: '#48bb78' }}>{requestStats.resolved}</div>
-                        <div className="admin-stat-label">✅ Разблокированы</div>
+                        <div className="admin-stat-label">Разблокированы</div>
                       </div>
                       <div className="admin-stat-card">
                         <div className="admin-stat-value" style={{ color: '#e53e3e' }}>{requestStats.rejected}</div>
-                        <div className="admin-stat-label">❌ Отклонены</div>
+                        <div className="admin-stat-label">Отклонены</div>
                       </div>
                       <div className="admin-stat-card">
                         <div className="admin-stat-value" style={{ color: '#667eea' }}>{requestStats.total}</div>
-                        <div className="admin-stat-label">📨 Всего запросов</div>
+                        <div className="admin-stat-label">Всего запросов</div>
                       </div>
                     </div>
                   )}
@@ -746,7 +753,9 @@ const AdminPage = () => {
                 <FiLock size={24} />
                 Блокировка пользователя
               </h3>
-              <button className="modal-close" onClick={closeBlockModal}>✕</button>
+              <button className="modal-close" onClick={closeBlockModal}>
+                <FiX size={24} />
+              </button>
             </div>
             
             <div className="modal-body">
@@ -804,7 +813,9 @@ const AdminPage = () => {
                 <FiTrash2 size={24} />
                 Удаление комментария
               </h3>
-              <button className="modal-close" onClick={closeDeleteCommentModal}>✕</button>
+              <button className="modal-close" onClick={closeDeleteCommentModal}>
+                <FiX size={24} />
+              </button>
             </div>
             
             <div className="modal-body">
@@ -867,7 +878,9 @@ const AdminPage = () => {
                 <FiMail size={20} />
                 Запрос на разблокировку #{selectedRequest.id}
               </h3>
-              <button className="modal-close" onClick={() => setShowRequestModal(false)}>✕</button>
+              <button className="modal-close" onClick={() => setShowRequestModal(false)}>
+                <FiX size={24} />
+              </button>
             </div>
             
             <div className="modal-body">
@@ -893,10 +906,10 @@ const AdminPage = () => {
                 value={requestStatus}
                 onChange={(e) => setRequestStatus(e.target.value)}
               >
-                <option value="pending">⏳ Ожидает</option>
-                <option value="in_progress">🔄 В работе</option>
-                <option value="resolved">✅ Разблокировать</option>
-                <option value="rejected">❌ Отклонить</option>
+                <option value="pending">Ожидает</option>
+                <option value="in_progress">В работе</option>
+                <option value="resolved">Разблокировать</option>
+                <option value="rejected">Отклонить</option>
               </select>
             </div>
 
@@ -937,7 +950,9 @@ const AdminPage = () => {
                 <FiFileText size={20} />
                 Пост от {selectedPost.username}
               </h3>
-              <button className="modal-close" onClick={closePostModal}>✕</button>
+              <button className="modal-close" onClick={closePostModal}>
+                <FiX size={24} />
+              </button>
             </div>
             
             <div className="post-full-text">{selectedPost.content}</div>
@@ -948,7 +963,7 @@ const AdminPage = () => {
               </div>
             )}
             <div className="post-stats-info">
-              <span>❤️ {selectedPost.likes_count} лайков</span>
+              <span><FiHeart size={14} color="#e53e3e" /> {selectedPost.likes_count} лайков</span>
               <span><FiMessageSquare size={14} /> {selectedPost.comments_count} комментариев</span>
               <span><FiCalendar size={14} /> {new Date(selectedPost.created_at).toLocaleString('ru-RU')}</span>
             </div>
@@ -1011,7 +1026,9 @@ const AdminPage = () => {
                 <FiUsers size={20} />
                 {selectedUser.username}
               </h3>
-              <button className="modal-close" onClick={() => setShowUserModal(false)}>✕</button>
+              <button className="modal-close" onClick={() => setShowUserModal(false)}>
+                <FiX size={24} />
+              </button>
             </div>
             <div className="user-details-grid">
               <p><strong>ID:</strong> {selectedUser.id}</p>
