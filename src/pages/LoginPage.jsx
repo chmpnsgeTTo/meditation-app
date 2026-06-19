@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FiUser, FiLock, FiLogIn, FiArrowLeft } from 'react-icons/fi';
 import { GiMeditation } from 'react-icons/gi';
 import { useAuth } from '../contexts/AuthContext';
-import api from '../api/axios'; // ← Импортируем настроенный axios
+import api from '../api/axios';
 import BlockedModal from '../components/BlockedModal';
 
 const LoginPage = () => {
@@ -23,7 +23,6 @@ const LoginPage = () => {
   const submitLock = useRef(false);
 
   const handleSubmit = async (e) => {
-    console.trace('🔍 Вызов login');
     e.preventDefault();
     
     if (isSubmitting || submitLock.current) {
@@ -48,7 +47,7 @@ const LoginPage = () => {
     });
     
     try {
-      // Используем api вместо axios
+      // 1. Отправляем запрос на логин
       const response = await api.post('/api/login', { 
         username: username.trim(), 
         password: password.trim() 
@@ -57,11 +56,19 @@ const LoginPage = () => {
       console.log('✅ Ответ сервера:', response.data);
       
       if (response.data.token) {
-        login(response.data.token, response.data.username, response.data.userId);
-        submitLock.current = false;
-        setIsSubmitting(false);
-        navigate('/meditation');
-        return;
+        // 2. ✅ ПРАВИЛЬНО: передаём username и password, а не token!
+        const result = await login(username.trim(), password.trim());
+        console.log('📝 Результат login():', result);
+        
+        if (result.success) {
+          console.log('✅ Вход успешен, редирект');
+          submitLock.current = false;
+          setIsSubmitting(false);
+          navigate('/meditation');
+          return;
+        } else {
+          setError(result.error || 'Ошибка входа');
+        }
       }
     } catch (err) {
       console.error('❌ Ошибка входа:', err);
