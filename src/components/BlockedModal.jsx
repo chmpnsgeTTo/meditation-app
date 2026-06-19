@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { FiAlertCircle, FiMail, FiX, FiSend, FiCheckCircle } from 'react-icons/fi';
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+import api from '../api/axios'; // ← Импортируем настроенный axios
 
 const BlockedModal = ({ isOpen, onClose, blockReason, userId, username }) => {
   const [email, setEmail] = useState('');
@@ -25,7 +23,7 @@ const BlockedModal = ({ isOpen, onClose, blockReason, userId, username }) => {
     setIsSubmitting(true);
     
     try {
-      await axios.post(`${API_URL}/api/unblock-request`, {
+      await api.post('/api/unblock-request', {
         userId: userId,
         username: username,
         email: email || null,

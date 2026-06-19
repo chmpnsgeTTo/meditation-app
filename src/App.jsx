@@ -21,9 +21,11 @@ import AdminPage from './pages/AdminPage';
 
 // Компонент-обёртка для проверки блокировки
 const AppContent = () => {
-  const { user, loading, isUserBlocked, getBlockReason, checkUserBlocked } = useAuth();
+  const { user, loading, checkUserBlocked } = useAuth();
   const [showBlockedModal, setShowBlockedModal] = useState(false);
   const [blockReason, setBlockReason] = useState('');
+  const [blockedUserId, setBlockedUserId] = useState(null);
+  const [blockedUsername, setBlockedUsername] = useState('');
 
   useEffect(() => {
     const verifyUser = async () => {
@@ -31,6 +33,8 @@ const AppContent = () => {
         const result = await checkUserBlocked(user.token);
         if (result.isBlocked) {
           setBlockReason(result.reason || 'Причина не указана');
+          setBlockedUserId(user.userId);
+          setBlockedUsername(user.username);
           setShowBlockedModal(true);
         }
       }
@@ -79,6 +83,8 @@ const AppContent = () => {
         isOpen={showBlockedModal}
         onClose={() => setShowBlockedModal(false)}
         blockReason={blockReason}
+        userId={blockedUserId}
+        username={blockedUsername}
       />
     </>
   );

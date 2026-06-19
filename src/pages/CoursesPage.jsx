@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
+import api from '../api/axios';
 import { 
   FiBookOpen, 
   FiClock, 
@@ -15,11 +15,12 @@ import {
   FiBarChart2,
   FiCheckCircle,
   FiCalendar,
-  FiTarget
+  FiTarget,
+  FiLeaf,
+  FiLayers,
+  FiZap
 } from 'react-icons/fi';
 import { GiMeditation, GiLotus, GiSittingDog } from 'react-icons/gi';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const CoursesPage = () => {
   const { user } = useAuth();
@@ -36,7 +37,7 @@ const CoursesPage = () => {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await axios.get(`${API_URL}/api/courses`, {
+      const { data } = await api.get('/api/courses', {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       console.log('✅ Загружено курсов:', data.length);
@@ -58,11 +59,20 @@ const CoursesPage = () => {
     return colorMap[difficulty] || '#667eea';
   };
 
+  const getDifficultyIcon = (difficulty) => {
+    const iconMap = {
+      'Начинающий': <FiLeaf size={14} color="#48bb78" />,
+      'Средний': <FiLayers size={14} color="#f6ad55" />,
+      'Продвинутый': <FiZap size={14} color="#fc8181" />
+    };
+    return iconMap[difficulty] || <FiStar size={14} color="#667eea" />;
+  };
+
   const getDifficultyBadge = (difficulty) => {
     const labelMap = {
-      'Начинающий': '🌱 Начинающий',
-      'Средний': '📘 Средний',
-      'Продвинутый': '🔥 Продвинутый'
+      'Начинающий': 'Начинающий',
+      'Средний': 'Средний',
+      'Продвинутый': 'Продвинутый'
     };
     return labelMap[difficulty] || difficulty;
   };
@@ -131,22 +141,22 @@ const CoursesPage = () => {
             <button
               className={`filter-btn ${filter === 'Начинающий' ? 'active' : ''}`}
               onClick={() => setFilter('Начинающий')}
-              style={filter === 'Начинающий' ? { background: '#48bb78', color: 'white' } : {}}
             >
+              <FiLeaf size={14} />
               Начинающий
             </button>
             <button
               className={`filter-btn ${filter === 'Средний' ? 'active' : ''}`}
               onClick={() => setFilter('Средний')}
-              style={filter === 'Средний' ? { background: '#f6ad55', color: 'white' } : {}}
             >
+              <FiLayers size={14} />
               Средний
             </button>
             <button
               className={`filter-btn ${filter === 'Продвинутый' ? 'active' : ''}`}
               onClick={() => setFilter('Продвинутый')}
-              style={filter === 'Продвинутый' ? { background: '#fc8181', color: 'white' } : {}}
             >
+              <FiZap size={14} />
               Продвинутый
             </button>
           </div>
@@ -190,6 +200,7 @@ const CoursesPage = () => {
                           color: getDifficultyColor(course.difficulty)
                         }}
                       >
+                        {getDifficultyIcon(course.difficulty)}
                         {getDifficultyBadge(course.difficulty)}
                       </span>
                       <span className="course-card-lessons">

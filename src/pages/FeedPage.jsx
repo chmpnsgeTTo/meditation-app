@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
+import api from '../api/axios';
 import { FaHeart, FaRegHeart, FaComment, FaTrash } from 'react-icons/fa';
 import { MdSend, MdClose } from 'react-icons/md';
 import { GiMeditation, GiLotus } from 'react-icons/gi';
 import { IoMdMedal } from 'react-icons/io';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+import { FiPlus } from 'react-icons/fi';
 
 const FeedPage = () => {
   const { user } = useAuth();
@@ -27,7 +26,7 @@ const FeedPage = () => {
   useEffect(() => {
     const loadStats = async () => {
       try {
-        const { data } = await axios.get(`${API_URL}/api/statistics?period=all`, {
+        const { data } = await api.get('/api/statistics?period=all', {
           headers: { Authorization: `Bearer ${user.token}` }
         });
         setStatistics(data);
@@ -39,7 +38,7 @@ const FeedPage = () => {
   // Загрузка ленты
   const loadFeed = async (pageNum = 1, append = false) => {
     try {
-      const { data } = await axios.get(`${API_URL}/api/feed?page=${pageNum}&limit=10`, {
+      const { data } = await api.get(`/api/feed?page=${pageNum}&limit=10`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       if (append) {
@@ -59,7 +58,7 @@ const FeedPage = () => {
   const loadComments = async (postId) => {
     if (comments[postId]) return;
     try {
-      const { data } = await axios.get(`${API_URL}/api/posts/${postId}/comments`, {
+      const { data } = await api.get(`/api/posts/${postId}/comments`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setComments(prev => ({ ...prev, [postId]: data }));
@@ -74,7 +73,7 @@ const FeedPage = () => {
   // Лайк / дизлайк
   const handleLike = async (postId) => {
     try {
-      const { data } = await axios.post(`${API_URL}/api/posts/${postId}/like`, {}, {
+      const { data } = await api.post(`/api/posts/${postId}/like`, {}, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setPosts(prev => prev.map(p => 
@@ -90,11 +89,11 @@ const FeedPage = () => {
     const text = commentText[postId];
     if (!text?.trim()) return;
     try {
-      await axios.post(`${API_URL}/api/posts/${postId}/comments`, { content: text }, {
+      await api.post(`/api/posts/${postId}/comments`, { content: text }, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       // Обновляем комментарии
-      const { data } = await axios.get(`${API_URL}/api/posts/${postId}/comments`, {
+      const { data } = await api.get(`/api/posts/${postId}/comments`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setComments(prev => ({ ...prev, [postId]: data }));
@@ -110,7 +109,7 @@ const FeedPage = () => {
   const createPost = async () => {
     if (!newPostContent.trim()) return;
     try {
-      await axios.post(`${API_URL}/api/posts`, {
+      await api.post('/api/posts', {
         content: newPostContent,
         meditation_duration: newPostDuration ? parseInt(newPostDuration) : null,
         image_url: null
@@ -130,7 +129,7 @@ const FeedPage = () => {
   const deletePost = async (postId) => {
     if (!window.confirm('Удалить пост?')) return;
     try {
-      await axios.delete(`${API_URL}/api/posts/${postId}`, {
+      await api.delete(`/api/posts/${postId}`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setPosts(prev => prev.filter(p => p.id !== postId));
@@ -173,6 +172,10 @@ const FeedPage = () => {
                 <IoMdMedal size={20} color="#fbbf24" />
                 <span>Сессий: {statistics.total_sessions}</span>
               </div>
+              <div className="achievement-badge">
+                <FaHeart size={18} color="#e53e3e" />
+                <span>Лайков: {posts.reduce((acc, p) => acc + p.likes_count, 0)}</span>
+              </div>
             </div>
           )}
 
@@ -182,6 +185,7 @@ const FeedPage = () => {
               <div className="no-posts">
                 <p>Пока нет постов</p>
                 <button className="btn-primary" onClick={() => setShowCreateModal(true)}>
+                  <FiPlus size={18} />
                   Создать первый пост
                 </button>
               </div>
@@ -190,7 +194,14 @@ const FeedPage = () => {
                 <div key={post.id} className="feed-post">
                   {/* Автор */}
                   <div className="post-header">
-                    <img src={post.avatar || '/uploads/default-avatar.png'} alt="avatar" className="post-avatar" />
+                    <img 
+                      src={post.avatar || '/uploads/default-avatar.png'} 
+                      alt="avatar" 
+                      className="post-avatar"
+                      onError={(e) => {
+                        e.target.src = '/uploads/default-avatar.png';
+                      }}
+                    />
                     <div className="post-author">
                       <span className="post-username">{post.username}</span>
                       <span className="post-date">{formatDate(post.created_at)}</span>
@@ -231,7 +242,14 @@ const FeedPage = () => {
                       <div className="comments-list">
                         {comments[post.id]?.map(comment => (
                           <div key={comment.id} className="comment-item">
-                            <img src={comment.avatar || '/uploads/default-avatar.png'} alt="" className="comment-avatar" />
+                            <img 
+                              src={comment.avatar || '/uploads/default-avatar.png'} 
+                              alt="" 
+                              className="comment-avatar"
+                              onError={(e) => {
+                                e.target.src = '/uploads/default-avatar.png';
+                              }}
+                            />
                             <div className="comment-content">
                               <span className="comment-username">{comment.username}</span>
                               <span className="comment-text">{comment.content}</span>
@@ -276,7 +294,9 @@ const FeedPage = () => {
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>Поделиться результатом</h3>
-              <button className="modal-close" onClick={() => setShowCreateModal(false)}><MdClose size={24} /></button>
+              <button className="modal-close" onClick={() => setShowCreateModal(false)}>
+                <MdClose size={24} />
+              </button>
             </div>
             <textarea
               className="post-textarea"

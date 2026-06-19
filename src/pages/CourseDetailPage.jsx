@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
+import api from '../api/axios';
 import { 
   GiDuration, 
   GiMeditation, 
@@ -24,10 +24,8 @@ import {
   FaExclamationTriangle,
   FaLightbulb
 } from 'react-icons/fa';
-import { MdOutlineEmojiObjects } from 'react-icons/md';
 import { IoRibbonOutline } from 'react-icons/io5';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+import { MdCelebration } from 'react-icons/md';
 
 const CourseDetailPage = () => {
   const { id } = useParams();
@@ -46,7 +44,7 @@ const CourseDetailPage = () => {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await axios.get(`${API_URL}/api/courses/${id}`, {
+      const { data } = await api.get(`/api/courses/${id}`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       
@@ -82,8 +80,8 @@ const CourseDetailPage = () => {
     setError(null);
     
     try {
-      const { data } = await axios.post(
-        `${API_URL}/api/courses/${id}/lessons/${lessonId}/complete`,
+      const { data } = await api.post(
+        `/api/courses/${id}/lessons/${lessonId}/complete`,
         {},
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
@@ -142,9 +140,9 @@ const CourseDetailPage = () => {
       <>
         <Navbar />
         <div className="container">
-          <div style={{ textAlign: 'center', padding: '40px' }}>
-            <GiMeditation size={48} color="#667eea" style={{ animation: 'spin 2s linear infinite' }} />
-            <p style={{ marginTop: '16px', color: '#4a5568' }}>Загрузка курса...</p>
+          <div className="course-detail-loading">
+            <GiMeditation size={48} color="#667eea" className="course-detail-spinner" />
+            <p>Загрузка курса...</p>
           </div>
         </div>
       </>
@@ -156,26 +154,11 @@ const CourseDetailPage = () => {
       <>
         <Navbar />
         <div className="container">
-          <div style={{ textAlign: 'center', padding: '40px' }}>
+          <div className="course-detail-error">
             <FaExclamationTriangle size={48} color="#e53e3e" />
-            <h2 style={{ color: '#e53e3e', marginTop: '16px' }}>Ошибка</h2>
-            <p style={{ color: '#4a5568' }}>{error}</p>
-            <button 
-              onClick={loadCourse}
-              style={{
-                padding: '10px 24px',
-                marginTop: '20px',
-                backgroundColor: '#667eea',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-            >
+            <h2>Ошибка</h2>
+            <p>{error}</p>
+            <button onClick={loadCourse} className="course-detail-retry-btn">
               <FaArrowLeft size={14} />
               Попробовать снова
             </button>
@@ -190,10 +173,10 @@ const CourseDetailPage = () => {
       <>
         <Navbar />
         <div className="container">
-          <div style={{ textAlign: 'center', padding: '40px' }}>
+          <div className="course-detail-not-found">
             <FaBookOpen size={48} color="#94a3b8" />
-            <h2 style={{ marginTop: '16px' }}>Курс не найден</h2>
-            <Link to="/courses" style={{ color: '#667eea', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <h2>Курс не найден</h2>
+            <Link to="/courses" className="course-detail-back-link">
               <FaArrowLeft size={14} />
               Вернуться к курсам
             </Link>
@@ -208,178 +191,90 @@ const CourseDetailPage = () => {
       <Navbar />
       <div className="container">
         <div className="course-detail-container">
-          <Link to="/courses" style={{ 
-            display: 'inline-flex', 
-            alignItems: 'center', 
-            gap: '8px',
-            marginBottom: '20px', 
-            color: '#667eea',
-            textDecoration: 'none',
-            fontWeight: '500'
-          }}>
+          <Link to="/courses" className="course-detail-back-link">
             <FaArrowLeft size={14} />
             Все курсы
           </Link>
           
           <div className="course-detail-header">
-            <h1 style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <h1>
               <GiLotus size={32} color="#667eea" />
               {course.title || 'Курс'}
             </h1>
             
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', margin: '12px 0' }}>
+            <div className="course-detail-meta">
               {course.difficulty && (
-                <span style={{ 
-                  background: getDifficultyColor(course.difficulty) + '20', 
-                  color: getDifficultyColor(course.difficulty),
-                  padding: '4px 14px',
-                  borderRadius: '20px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  fontSize: '14px',
-                  fontWeight: '500'
-                }}>
+                <span 
+                  className="course-detail-difficulty-badge"
+                  style={{
+                    background: getDifficultyColor(course.difficulty) + '20',
+                    color: getDifficultyColor(course.difficulty)
+                  }}
+                >
                   {getDifficultyIcon(course.difficulty)} {course.difficulty}
                 </span>
               )}
-              <span style={{
-                padding: '4px 14px',
-                borderRadius: '20px',
-                background: '#f0f0f0',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                fontSize: '14px'
-              }}>
-                <FaClock size={14} color="#718096" /> {course.duration_minutes || 0} мин
+              <span className="course-detail-meta-item">
+                <FaClock size={14} /> {course.duration_minutes || 0} мин
               </span>
-              <span style={{
-                padding: '4px 14px',
-                borderRadius: '20px',
-                background: '#f0f0f0',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                fontSize: '14px'
-              }}>
-                <GiDuration size={14} color="#718096" /> {course.total_lessons || 0} уроков
+              <span className="course-detail-meta-item">
+                <GiDuration size={14} /> {course.total_lessons || 0} уроков
               </span>
             </div>
             
-            <p style={{ fontSize: '16px', lineHeight: '1.6', color: '#4a5568', marginTop: '8px' }}>
+            <p className="course-full-description">
               {course.description || 'Описание курса будет добавлено позже'}
             </p>
           </div>
 
-          {/* Информационные карточки */}
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-            gap: '16px',
-            margin: '24px 0'
-          }}>
-            <div style={{ 
-              padding: '16px', 
-              background: '#f7fafc', 
-              borderRadius: '12px',
-              border: '1px solid #e2e8f0'
-            }}>
-              <h3 style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#4a5568', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div className="course-info-grid">
+            <div className="info-card">
+              <h3>
                 <FaInfoCircle size={16} color="#667eea" />
                 Польза курса
               </h3>
-              <p style={{ margin: 0, fontSize: '14px', color: '#2d3748' }}>{course.benefits}</p>
+              <p>{course.benefits}</p>
             </div>
-            <div style={{ 
-              padding: '16px', 
-              background: '#f7fafc', 
-              borderRadius: '12px',
-              border: '1px solid #e2e8f0'
-            }}>
-              <h3 style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#4a5568', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="info-card">
+              <h3>
                 <FaExclamationTriangle size={16} color="#ed8936" />
                 Противопоказания
               </h3>
-              <p style={{ margin: 0, fontSize: '14px', color: '#2d3748' }}>{course.contraindications}</p>
+              <p>{course.contraindications}</p>
             </div>
-            <div style={{ 
-              padding: '16px', 
-              background: '#f7fafc', 
-              borderRadius: '12px',
-              border: '1px solid #e2e8f0'
-            }}>
-              <h3 style={{ margin: '0 0 8px 0', fontSize: '14px', color: '#4a5568', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="info-card">
+              <h3>
                 <FaLightbulb size={16} color="#fbbf24" />
                 Советы
               </h3>
-              <p style={{ margin: 0, fontSize: '14px', color: '#2d3748' }}>{course.tips}</p>
+              <p>{course.tips}</p>
             </div>
           </div>
 
-          {/* Прогресс */}
-          <div style={{ 
-            margin: '24px 0',
-            padding: '20px 24px',
-            background: 'linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%)',
-            borderRadius: '12px',
-            border: '1px solid #e2e8f0'
-          }}>
-            <div style={{ 
-              display: 'flex', 
-              justifyContent: 'space-between',
-              marginBottom: '12px',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: '8px'
-            }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: '500' }}>
+          <div className="course-progress-section">
+            <div className="progress-header">
+              <span>
                 <IoRibbonOutline size={20} color="#667eea" />
                 Ваш прогресс
               </span>
-              <span style={{ 
-                fontSize: '14px', 
-                color: '#4a5568',
-                background: 'white',
-                padding: '2px 12px',
-                borderRadius: '12px',
-                fontWeight: '500'
-              }}>
+              <span className="progress-count">
                 {completedLessons}/{totalLessons} уроков
               </span>
             </div>
-            <div style={{
-              width: '100%',
-              height: '8px',
-              background: '#e2e8f0',
-              borderRadius: '4px',
-              overflow: 'hidden'
-            }}>
-              <div style={{
-                width: `${progressPercent}%`,
-                height: '100%',
-                background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
-                transition: 'width 0.5s ease'
-              }}></div>
+            <div className="progress-bar-large">
+              <div className="progress-fill-large" style={{ width: `${progressPercent}%` }}></div>
             </div>
             {course.progress?.is_completed && (
-              <div style={{
-                marginTop: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                color: '#48bb78',
-                fontWeight: '500'
-              }}>
-                <FaAward size={20} />
+              <div className="completion-badge">
+                <FaAward size={20} color="#48bb78" />
+                <MdCelebration size={20} color="#fbbf24" />
                 Курс успешно завершён!
               </div>
             )}
           </div>
 
-          {/* Список уроков */}
           <div className="lessons-list">
-            <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
+            <h2>
               <FaBookOpen size={20} color="#667eea" />
               Уроки курса
             </h2>
@@ -389,98 +284,34 @@ const CourseDetailPage = () => {
                 const isCompleted = course.completedLessonIds?.includes(lesson.id) || false;
                 
                 return (
-                  <div key={lesson.id} style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    padding: '16px 20px',
-                    marginBottom: '12px',
-                    background: isCompleted ? '#f0fff4' : 'white',
-                    border: isCompleted ? '1px solid #c6f6d5' : '1px solid #e2e8f0',
-                    borderRadius: '12px',
-                    gap: '16px',
-                    flexWrap: 'wrap',
-                    transition: 'all 0.2s ease',
-                    boxShadow: isCompleted ? '0 1px 3px rgba(72, 187, 120, 0.1)' : '0 1px 3px rgba(0,0,0,0.05)'
-                  }}>
-                    <div style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '50%',
-                      background: isCompleted ? '#48bb78' : '#e2e8f0',
-                      color: isCompleted ? 'white' : '#4a5568',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontWeight: 'bold',
-                      fontSize: '14px',
-                      flexShrink: 0
-                    }}>
+                  <div key={lesson.id} className={`lesson-item ${isCompleted ? 'completed' : ''}`}>
+                    <div className="lesson-number">
                       {isCompleted ? <FaCheckCircle size={18} /> : index + 1}
                     </div>
                     
-                    <div style={{ flex: '1 1 200px' }}>
-                      <h3 style={{ 
-                        margin: '0 0 4px 0', 
-                        fontSize: '16px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                      }}>
+                    <div className="lesson-info">
+                      <h3>
                         {lesson.title}
                         {isCompleted && (
-                          <span style={{ 
-                            fontSize: '12px', 
-                            color: '#48bb78',
-                            background: '#f0fff4',
-                            padding: '2px 10px',
-                            borderRadius: '12px'
-                          }}>
-                            Пройдено
-                          </span>
+                          <span className="lesson-completed-badge">Пройдено</span>
                         )}
                       </h3>
-                      <p style={{ margin: '0 0 4px 0', fontSize: '14px', color: '#4a5568' }}>
-                        {lesson.content}
-                      </p>
-                      <span style={{ fontSize: '12px', color: '#718096', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                      <p className="lesson-content">{lesson.content}</p>
+                      <span className="lesson-duration">
                         <FaClock size={12} /> {lesson.duration_minutes || 0} мин
                       </span>
                     </div>
                     
-                    <div style={{ flexShrink: 0 }}>
+                    <div className="lesson-action">
                       {!isCompleted ? (
                         <button 
                           onClick={() => completeLesson(lesson.id)} 
                           disabled={completing[lesson.id]} 
-                          style={{
-                            padding: '8px 20px',
-                            background: completing[lesson.id] ? '#a0aec0' : '#667eea',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '8px',
-                            cursor: completing[lesson.id] ? 'not-allowed' : 'pointer',
-                            opacity: completing[lesson.id] ? 0.7 : 1,
-                            fontSize: '14px',
-                            fontWeight: '500',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            transition: 'all 0.2s ease'
-                          }}
-                          onMouseEnter={(e) => {
-                            if (!completing[lesson.id]) {
-                              e.target.style.background = '#764ba2';
-                            }
-                          }}
-                          onMouseLeave={(e) => {
-                            if (!completing[lesson.id]) {
-                              e.target.style.background = '#667eea';
-                            }
-                          }}
+                          className="complete-btn"
                         >
                           {completing[lesson.id] ? (
                             <>
-                              <span style={{ display: 'inline-block', animation: 'spin 1s linear infinite' }}>⟳</span>
+                              <span className="spinner-small"></span>
                               ...
                             </>
                           ) : (
@@ -491,14 +322,7 @@ const CourseDetailPage = () => {
                           )}
                         </button>
                       ) : (
-                        <span style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          color: '#48bb78',
-                          fontSize: '14px',
-                          fontWeight: '500'
-                        }}>
+                        <span className="completed-check">
                           <FaCheckCircle size={16} />
                           Пройдено
                         </span>
@@ -508,27 +332,14 @@ const CourseDetailPage = () => {
                 );
               })
             ) : (
-              <div style={{ 
-                textAlign: 'center', 
-                color: '#718096', 
-                padding: '40px 20px',
-                background: '#f7fafc',
-                borderRadius: '12px'
-              }}>
+              <div className="lessons-empty">
                 <FaBookOpen size={32} color="#cbd5e0" />
-                <p style={{ marginTop: '12px' }}>Уроки пока не добавлены</p>
+                <p>Уроки пока не добавлены</p>
               </div>
             )}
           </div>
         </div>
       </div>
-
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </>
   );
 };

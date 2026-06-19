@@ -5,6 +5,7 @@ import Navbar from '../components/Navbar';
 import { FiSettings, FiBarChart2, FiUser, FiLock, FiCamera, FiCalendar, FiStar, FiTrendingUp, FiActivity, FiAward, FiBookOpen } from 'react-icons/fi';
 import { GiMeditation } from 'react-icons/gi';
 import { useAuth } from '../contexts/AuthContext';
+import api from '../api/axios'; // ← Импортируем настроенный axios
 import {
   LineChart,
   Line,
@@ -16,8 +17,6 @@ import {
   ResponsiveContainer
 } from 'recharts';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
 const ProfilePage = () => {
   const { user, login } = useAuth();
   const [userData, setUserData] = useState(null);
@@ -28,7 +27,7 @@ const ProfilePage = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState('success'); // 'success' or 'error'
+  const [messageType, setMessageType] = useState('success');
   const [activeTab, setActiveTab] = useState('stats');
   const [userCourses, setUserCourses] = useState([]);
   const [loadingCourses, setLoadingCourses] = useState(false);
@@ -52,7 +51,7 @@ const ProfilePage = () => {
 
   const loadUserData = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/user`, {
+      const response = await api.get('/api/user', {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       console.log('📦 Данные пользователя с сервера:', response.data);
@@ -67,7 +66,7 @@ const ProfilePage = () => {
   const loadStatistics = async (p) => {
     setPeriod(p);
     try {
-      const response = await axios.get(`${API_URL}/api/statistics?period=${p}`, {
+      const response = await api.get(`/api/statistics?period=${p}`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setStats(response.data);
@@ -80,7 +79,7 @@ const ProfilePage = () => {
   const loadUserCourses = async () => {
     setLoadingCourses(true);
     try {
-      const { data } = await axios.get(`${API_URL}/api/user/courses`, {
+      const { data } = await api.get('/api/user/courses', {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setUserCourses(data);
@@ -93,16 +92,12 @@ const ProfilePage = () => {
   };
 
   const getAvatarUrl = () => {
-    // Проверяем, есть ли аватар у пользователя
     if (userData?.avatar && userData.avatar !== '/uploads/default-avatar.png') {
-      // Если аватар - это полный URL (начинается с http), используем его
       if (userData.avatar.startsWith('http')) {
         return userData.avatar;
       }
-      // Иначе добавляем timestamp для сброса кэша
       return `${userData.avatar}?t=${avatarTimestamp}`;
     }
-    // Дефолтный аватар
     return `/uploads/default-avatar.png?t=${avatarTimestamp}`;
   };
 
@@ -112,13 +107,11 @@ const ProfilePage = () => {
     
     console.log('📄 Выбран файл:', file.name, file.size, file.type);
     
-    // Проверка типа файла
     if (!file.type.match(/image\/(jpeg|jpg|png|gif|webp)/)) {
       showMessage('Пожалуйста, выберите изображение (JPEG, PNG, GIF, WEBP)', 'error');
       return;
     }
     
-    // Проверка размера (5MB)
     if (file.size > 5 * 1024 * 1024) {
       showMessage('Файл слишком большой. Максимум 5MB', 'error');
       return;
@@ -129,7 +122,7 @@ const ProfilePage = () => {
     formData.append('avatar', file);
     
     try {
-      const response = await axios.post(`${API_URL}/api/upload-avatar`, formData, {
+      const response = await api.post('/api/upload-avatar', formData, {
         headers: { 
           Authorization: `Bearer ${user.token}`,
           'Content-Type': 'multipart/form-data'
@@ -139,11 +132,8 @@ const ProfilePage = () => {
       console.log('✅ Ответ сервера:', response.data);
       
       if (response.data.avatarUrl) {
-        // Обновляем локальное состояние
         setUserData(prev => ({ ...prev, avatar: response.data.avatarUrl }));
-        // Обновляем таймштамп для сброса кэша
         setAvatarTimestamp(Date.now());
-        // Перезагружаем данные с сервера для синхронизации
         await loadUserData();
         showMessage('Аватар успешно обновлен!', 'success');
       }
@@ -153,7 +143,6 @@ const ProfilePage = () => {
       showMessage(error.response?.data?.error || 'Ошибка загрузки аватара', 'error');
     } finally {
       setIsUploading(false);
-      // Очищаем input, чтобы можно было загрузить тот же файл повторно
       e.target.value = '';
     }
   };
@@ -174,17 +163,15 @@ const ProfilePage = () => {
     
     setIsChangingUsername(true);
     try {
-      const response = await axios.post(`${API_URL}/api/change-username`, 
+      const response = await api.post('/api/change-username', 
         { newUsername, password: oldPassword },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
       
       if (response.data.message) {
-        // Обновляем токен, если он пришел в ответе
         if (response.data.token) {
           login(response.data.token, response.data.username, user.userId);
         }
-        // Обновляем данные пользователя
         await loadUserData();
         setNewUsername('');
         setOldPassword('');
@@ -214,7 +201,7 @@ const ProfilePage = () => {
     
     setIsChangingPassword(true);
     try {
-      const response = await axios.post(`${API_URL}/api/change-password`,
+      const response = await api.post('/api/change-password',
         { oldPassword, newPassword },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
@@ -310,7 +297,6 @@ const ProfilePage = () => {
                   console.log('⚠️ Ошибка загрузки аватара, использую дефолтный');
                   e.target.src = `/uploads/default-avatar.png?t=${Date.now()}`;
                 }}
-                style={{ width: '120px', height: '120px', borderRadius: '50%', objectFit: 'cover' }}
               />
               <div>
                 <input 
@@ -326,19 +312,6 @@ const ProfilePage = () => {
                   onClick={() => document.getElementById('avatarInput').click()}
                   disabled={isUploading}
                   aria-label="Изменить аватар профиля"
-                  style={{
-                    padding: '8px 16px',
-                    marginTop: '10px',
-                    backgroundColor: '#667eea',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    cursor: isUploading ? 'not-allowed' : 'pointer',
-                    opacity: isUploading ? 0.7 : 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '6px'
-                  }}
                 >
                   <FiCamera size={14} />
                   {isUploading ? 'Загрузка...' : 'Сменить фото'}

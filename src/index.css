@@ -3451,3 +3451,418 @@ body.dark-mode .nav-links .logout-btn:hover {
 * {
   transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
+
+/* ============================================ */
+/* 34. ДЕТАЛЬНАЯ СТРАНИЦА КУРСА */
+/* ============================================ */
+
+.course-detail-loading {
+  text-align: center;
+  padding: 40px;
+}
+
+.course-detail-spinner {
+  animation: spin 2s linear infinite;
+}
+
+.course-detail-loading p {
+  margin-top: 16px;
+  color: #4a5568;
+}
+
+.course-detail-error {
+  text-align: center;
+  padding: 40px;
+}
+
+.course-detail-error h2 {
+  color: #e53e3e;
+  margin-top: 16px;
+}
+
+.course-detail-error p {
+  color: #4a5568;
+}
+
+.course-detail-retry-btn {
+  padding: 10px 24px;
+  margin-top: 20px;
+  background-color: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s;
+}
+
+.course-detail-retry-btn:hover {
+  background-color: #5a67d8;
+  transform: translateY(-2px);
+}
+
+.course-detail-not-found {
+  text-align: center;
+  padding: 40px;
+}
+
+.course-detail-not-found h2 {
+  margin-top: 16px;
+}
+
+.course-detail-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 500;
+  margin-top: 16px;
+}
+
+.course-detail-back-link:hover {
+  text-decoration: underline;
+}
+
+.course-detail-difficulty-badge {
+  padding: 4px 14px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.progress-count {
+  font-size: 14px;
+  color: #4a5568;
+  background: white;
+  padding: 2px 12px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.spinner-small {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.lessons-empty {
+  text-align: center;
+  color: #718096;
+  padding: 40px 20px;
+  background: #f7fafc;
+  border-radius: 12px;
+}
+
+.lessons-empty p {
+  margin-top: 12px;
+}
+
+.lesson-completed-badge {
+  font-size: 12px;
+  color: #48bb78;
+  background: #f0fff4;
+  padding: 2px 10px;
+  border-radius: 12px;
+  margin-left: 8px;
+}
+
+/* ============================================ */
+/* 35. ТЁМНАЯ ТЕМА ДЛЯ ДЕТАЛЬНОЙ СТРАНИЦЫ КУРСА */
+/* ============================================ */
+
+body.dark-mode .course-detail-loading p {
+  color: #94a3b8;
+}
+
+body.dark-mode .course-detail-error p {
+  color: #94a3b8;
+}
+
+body.dark-mode .course-detail-not-found h2 {
+  color: #e2e8f0;
+}
+
+body.dark-mode .course-detail-back-link {
+  color: #818cf8;
+}
+
+body.dark-mode .course-detail-retry-btn {
+  background-color: #818cf8;
+}
+
+body.dark-mode .course-detail-retry-btn:hover {
+  background-color: #6366f1;
+}
+
+body.dark-mode .progress-count {
+  background: #1a1a2e;
+  color: #cbd5e0;
+}
+
+body.dark-mode .lessons-empty {
+  background: #1a1a2e;
+  color: #94a3b8;
+}
+
+body.dark-mode .lesson-completed-badge {
+  background: #1a2e1a;
+}
+
+/* ============================================ */
+/* 36. ОБРАТНАЯ СВЯЗЬ (ЗАПРОСЫ НА РАЗБЛОКИРОВКУ) */
+/* ============================================ */
+
+.request-status {
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+/* ============================================ */
+/* 37. КАТАЛОГ АСАН (ДОПОЛНИТЕЛЬНЫЕ СТИЛИ) */
+/* ============================================ */
+
+.catalog-error {
+  text-align: center;
+  padding: 3rem;
+}
+
+.catalog-error h3 {
+  color: #333;
+  margin-top: 1rem;
+}
+
+.catalog-error p {
+  color: #718096;
+  margin-bottom: 1.5rem;
+}
+
+.catalog-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.catalog-item-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 12px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.catalog-item-difficulty,
+.catalog-item-duration {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: #718096;
+}
+
+/* ============================================ */
+/* 38. СТРАНИЦА КУРСОВ (ДОПОЛНИТЕЛЬНЫЕ СТИЛИ) */
+/* ============================================ */
+
+.courses-error {
+  text-align: center;
+  padding: 3rem;
+}
+
+.courses-error h3 {
+  color: #333;
+  margin-top: 1rem;
+}
+
+.courses-error p {
+  color: #718096;
+  margin-bottom: 1.5rem;
+}
+
+.course-card-difficulty {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.2rem 0.8rem;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* ============================================ */
+/* 39. ЛЕНТА (ДОПОЛНИТЕЛЬНЫЕ СТИЛИ) */
+/* ============================================ */
+
+.post-textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  margin-bottom: 12px;
+  background: white;
+  color: #333;
+}
+
+.post-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.post-options {
+  margin-bottom: 16px;
+}
+
+.option-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.option-group label {
+  font-size: 14px;
+  color: #4a5568;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.option-group input {
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  width: 100%;
+  max-width: 150px;
+}
+
+.option-group input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* ============================================ */
+/* 40. ТЁМНАЯ ТЕМА ДЛЯ ЛЕНТЫ */
+/* ============================================ */
+
+body.dark-mode .post-textarea {
+  background: #1a1a2e;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+body.dark-mode .post-textarea::placeholder {
+  color: #64748b;
+}
+
+body.dark-mode .option-group label {
+  color: #cbd5e0;
+}
+
+body.dark-mode .option-group input {
+  background: #1a1a2e;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+body.dark-mode .option-group input::placeholder {
+  color: #64748b;
+}
+
+body.dark-mode .courses-error h3 {
+  color: #e2e8f0;
+}
+
+body.dark-mode .courses-error p {
+  color: #94a3b8;
+}
+
+body.dark-mode .catalog-error h3 {
+  color: #e2e8f0;
+}
+
+body.dark-mode .catalog-error p {
+  color: #94a3b8;
+}
+
+/* ============================================ */
+/* 41. ИСПРАВЛЕНИЕ LINE-CLAMP ДЛЯ КРОССБРАУЗЕРНОСТИ */
+/* ============================================ */
+
+/* Исправляем предупреждения line-clamp */
+.catalog-item-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+.catalog-item-list .catalog-item-description {
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  flex: 2;
+  min-width: 200px;
+}
+
+@media (max-width: 768px) {
+  .catalog-item-list .catalog-item-description {
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+}
+
+.course-card-content p {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  overflow: hidden;
+}
+
+/* ============================================ */
+/* 42. СТИЛИ ДЛЯ БЛОКИРОВКИ (ДОПОЛНИТЕЛЬНЫЕ) */
+/* ============================================ */
+
+.blocked-modal-close-btn {
+  width: 100%;
+  padding: 14px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.blocked-modal-close-btn:hover {
+  background: #5a67d8;
+}
+
+body.dark-mode .blocked-modal-close-btn {
+  background: #818cf8;
+}
+
+body.dark-mode .blocked-modal-close-btn:hover {
+  background: #6366f1;
+}

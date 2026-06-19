@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
+import api from '../api/axios'; // ← Импортируем настроенный axios
 import { 
   FiSearch, 
   FiFilter, 
@@ -21,8 +21,6 @@ import {
   FiAlertCircle
 } from 'react-icons/fi';
 import { GiLotus, GiMeditation, GiSittingDog } from 'react-icons/gi';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const AsanasCatalog = () => {
   const { user } = useAuth();
@@ -56,7 +54,7 @@ const AsanasCatalog = () => {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await axios.get(`${API_URL}/api/asanas`, {
+      const { data } = await api.get('/api/asanas', {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       console.log('✅ Загружено асан:', data.length);

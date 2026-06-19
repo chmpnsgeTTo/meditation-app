@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
+import api from '../api/axios'; // ← Импортируем настроенный axios
 import { 
   FiUsers, 
   FiFileText, 
@@ -28,8 +28,6 @@ import {
   FiX,
   FiHeart
 } from 'react-icons/fi';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const AdminPage = () => {
   const { user } = useAuth();
@@ -85,31 +83,31 @@ const AdminPage = () => {
     setLoading(true);
     try {
       if (activeTab === 'stats') {
-        const { data } = await axios.get(`${API_URL}/api/admin/stats`, {
+        const { data } = await api.get('/api/admin/stats', {
           headers: { Authorization: `Bearer ${user.token}` }
         });
         setStats(data);
       } else if (activeTab === 'users') {
-        const { data } = await axios.get(`${API_URL}/api/admin/users`, {
+        const { data } = await api.get('/api/admin/users', {
           headers: { Authorization: `Bearer ${user.token}` }
         });
         setUsers(data);
       } else if (activeTab === 'posts') {
-        const { data } = await axios.get(`${API_URL}/api/admin/posts`, {
+        const { data } = await api.get('/api/admin/posts', {
           headers: { Authorization: `Bearer ${user.token}` }
         });
         setPosts(data);
       } else if (activeTab === 'comments') {
-        const { data } = await axios.get(`${API_URL}/api/admin/comments`, {
+        const { data } = await api.get('/api/admin/comments', {
           headers: { Authorization: `Bearer ${user.token}` }
         });
         setComments(data);
       } else if (activeTab === 'feedback') {
         const [statsData, requestsData] = await Promise.all([
-          axios.get(`${API_URL}/api/admin/unblock-requests/stats`, {
+          api.get('/api/admin/unblock-requests/stats', {
             headers: { Authorization: `Bearer ${user.token}` }
           }),
-          axios.get(`${API_URL}/api/admin/unblock-requests`, {
+          api.get('/api/admin/unblock-requests', {
             headers: { Authorization: `Bearer ${user.token}` }
           })
         ]);
@@ -132,7 +130,7 @@ const AdminPage = () => {
   const loadPostComments = async (postId) => {
     setLoadingComments(true);
     try {
-      const { data } = await axios.get(`${API_URL}/api/admin/posts/${postId}/comments`, {
+      const { data } = await api.get(`/api/admin/posts/${postId}/comments`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       setPostComments(data);
@@ -148,7 +146,7 @@ const AdminPage = () => {
   const deleteComment = async (commentId) => {
     if (!window.confirm('Удалить комментарий?')) return;
     try {
-      await axios.delete(`${API_URL}/api/admin/comments/${commentId}`, {
+      await api.delete(`/api/admin/comments/${commentId}`, {
         headers: { Authorization: `Bearer ${user.token}` },
         data: { reason: 'Удалено администратором' }
       });
@@ -167,7 +165,7 @@ const AdminPage = () => {
   const deleteUser = async (userId) => {
     if (!window.confirm('Удалить пользователя? Все его посты, комментарии и сессии будут удалены безвозвратно.')) return;
     try {
-      await axios.delete(`${API_URL}/api/admin/users/${userId}`, {
+      await api.delete(`/api/admin/users/${userId}`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       showMessage('Пользователь удалён', 'success');
@@ -200,8 +198,8 @@ const AdminPage = () => {
 
     setIsBlocking(true);
     try {
-      await axios.post(
-        `${API_URL}/api/admin/users/${blockUser.id}/toggle-block`,
+      await api.post(
+        `/api/admin/users/${blockUser.id}/toggle-block`,
         { blocked: true, reason: blockReason.trim() },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
@@ -220,8 +218,8 @@ const AdminPage = () => {
   const toggleUserUnblock = async (userId, username) => {
     if (!window.confirm(`Разблокировать пользователя ${username}?`)) return;
     try {
-      await axios.post(
-        `${API_URL}/api/admin/users/${userId}/toggle-block`,
+      await api.post(
+        `/api/admin/users/${userId}/toggle-block`,
         { blocked: false, reason: null },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
@@ -238,7 +236,7 @@ const AdminPage = () => {
     const newRole = currentRole === 'admin' ? 'user' : 'admin';
     if (!window.confirm(`${currentRole === 'admin' ? 'Лишить прав администратора' : 'Назначить администратором'} пользователя?`)) return;
     try {
-      await axios.post(`${API_URL}/api/admin/users/${userId}/toggle-role`,
+      await api.post(`/api/admin/users/${userId}/toggle-role`,
         { role: newRole },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
@@ -253,7 +251,7 @@ const AdminPage = () => {
   const deletePost = async (postId) => {
     if (!window.confirm('Удалить пост?')) return;
     try {
-      await axios.delete(`${API_URL}/api/admin/posts/${postId}`, {
+      await api.delete(`/api/admin/posts/${postId}`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       showMessage('Пост удалён', 'success');
@@ -306,7 +304,7 @@ const AdminPage = () => {
 
     setIsDeletingComment(true);
     try {
-      await axios.delete(`${API_URL}/api/admin/comments/${deleteCommentData.id}`, {
+      await api.delete(`/api/admin/comments/${deleteCommentData.id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
         data: { reason: deleteCommentReason.trim() }
       });
@@ -324,7 +322,7 @@ const AdminPage = () => {
   // ========== ОБРАТНАЯ СВЯЗЬ ==========
   const updateRequestStatus = async (requestId, status, comment) => {
     try {
-      await axios.put(`${API_URL}/api/admin/unblock-requests/${requestId}`,
+      await api.put(`/api/admin/unblock-requests/${requestId}`,
         { status, admin_comment: comment },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
@@ -339,7 +337,7 @@ const AdminPage = () => {
   const deleteRequest = async (requestId) => {
     if (!window.confirm('Удалить запрос?')) return;
     try {
-      await axios.delete(`${API_URL}/api/admin/unblock-requests/${requestId}`, {
+      await api.delete(`/api/admin/unblock-requests/${requestId}`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       showMessage('Запрос удалён', 'success');

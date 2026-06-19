@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
+import api from '../api/axios'; // ← Импортируем настроенный axios
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 const AuthContext = createContext();
@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
   // Проверка блокировки пользователя
   const checkUserBlocked = async (token) => {
     try {
-      const response = await axios.get(`${API_URL}/api/user`, {
+      const response = await api.get('/api/user', {
         headers: { Authorization: `Bearer ${token}` }
       });
       // Пользователь не заблокирован
@@ -54,7 +54,8 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const { data } = await axios.post(`${API_URL}/api/login`, { username, password });
+      // Используем api вместо axios
+      const { data } = await api.post('/api/login', { username, password });
       
       localStorage.setItem('token', data.token);
       localStorage.setItem('username', data.username);
@@ -89,7 +90,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (username, password) => {
     try {
-      await axios.post(`${API_URL}/api/register`, { username, password });
+      await api.post('/api/register', { username, password });
       return { success: true };
     } catch (error) {
       return { 
