@@ -1,7 +1,18 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import { GiMeditation, GiSittingDog, GiSnake, GiLotus, GiBreath, GiPalm } from 'react-icons/gi';
+import { 
+  GiMeditation, 
+  GiSittingDog, 
+  GiSnake, 
+  GiLotus, 
+  GiPalm,
+  GiBreathing,
+  GiBuddha,
+  GiLotusFlower,
+  GiHeartPlus,
+  GiSunrise
+} from 'react-icons/gi';
 import { WiDaySunny } from 'react-icons/wi';
 import { FaFeatherAlt, FaYinYang } from 'react-icons/fa';
 import { IoWaterOutline } from 'react-icons/io5';
@@ -17,7 +28,7 @@ const LearningPage = () => {
       'yoga-nidra': <FaFeatherAlt size={48} />,
       'iyengar': <GiLotus size={48} />,
       'bikram': <WiDaySunny size={48} />,
-      'pranayama': <GiBreath size={48} />,
+      'pranayama': <GiBreathing size={48} />,  // Заменено на GiBreathing
       'yin': <FaYinYang size={48} />,
       'restorative': <IoWaterOutline size={48} />
     };

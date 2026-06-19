@@ -1,10 +1,30 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import { FiArrowLeft, FiClock, FiStar, FiUsers, FiBookOpen, FiCheckCircle, FiInfo } from 'react-icons/fi';
-import { GiLotus, GiMeditation, GiSittingDog, GiSnake, GiBreath } from 'react-icons/gi';
+import { 
+  FiArrowLeft, 
+  FiClock, 
+  FiStar, 
+  FiUsers, 
+  FiBookOpen, 
+  FiCheckCircle, 
+  FiInfo 
+} from 'react-icons/fi';
+import { 
+  GiLotus, 
+  GiMeditation, 
+  GiSittingDog, 
+  GiSnake, 
+  GiBreath,  // В версии 5.6.0 GiBreath ДОЛЖЕН существовать!
+  GiPalm,
+  GiBuddha,
+  GiLotusFlower,
+  GiYoga,
+  GiHealing
+} from 'react-icons/gi';
 import { WiDaySunny } from 'react-icons/wi';
-import { FaFeatherAlt } from 'react-icons/fa';
+import { FaFeatherAlt, FaYinYang } from 'react-icons/fa';
+import { IoWaterOutline } from 'react-icons/io5';
 import { yogaDirections } from '../data/yogaData';
 
 const YogaDirectionPage = () => {
@@ -20,9 +40,9 @@ const YogaDirectionPage = () => {
       'yoga-nidra': <FaFeatherAlt size={28} />,
       'iyengar': <GiLotus size={28} />,
       'bikram': <WiDaySunny size={28} />,
-      'pranayama': <GiBreath size={28} />,
-      'yin': <GiLotus size={28} />,
-      'restorative': <GiSittingDog size={28} />
+      'pranayama': <GiBreath size={28} />,  // GiBreath должен работать в 5.6.0
+      'yin': <FaYinYang size={28} />,
+      'restorative': <IoWaterOutline size={28} />
     };
     return iconMap[id] || <GiLotus size={28} />;
   };
