@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
+import api from '../api/axios'; // ← Используем настроенный axios
 import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import { GiMeditation } from 'react-icons/gi';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const MeditationPage = () => {
   const [duration, setDuration] = useState(0);
@@ -23,7 +21,7 @@ const MeditationPage = () => {
   const saveSession = async (minutes) => {
     if (!minutes || minutes <= 0) return;
     try {
-      await axios.post(`${API_URL}/api/sessions`, 
+      await api.post('/api/sessions', 
         { duration: minutes, completed: true },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
