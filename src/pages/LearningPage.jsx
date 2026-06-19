@@ -6,12 +6,13 @@ import {
   GiSittingDog, 
   GiSnake, 
   GiLotus, 
+  GiLungs,      // GiLungs существует
   GiPalm,
-  GiBreathing,
   GiBuddha,
   GiLotusFlower,
   GiHeartPlus,
-  GiSunrise
+  GiSunrise,
+  GiYoga
 } from 'react-icons/gi';
 import { WiDaySunny } from 'react-icons/wi';
 import { FaFeatherAlt, FaYinYang } from 'react-icons/fa';
@@ -28,7 +29,7 @@ const LearningPage = () => {
       'yoga-nidra': <FaFeatherAlt size={48} />,
       'iyengar': <GiLotus size={48} />,
       'bikram': <WiDaySunny size={48} />,
-      'pranayama': <GiBreathing size={48} />,  // Заменено на GiBreathing
+      'pranayama': <GiLungs size={48} />,  // Используем GiLungs
       'yin': <FaYinYang size={48} />,
       'restorative': <IoWaterOutline size={48} />
     };

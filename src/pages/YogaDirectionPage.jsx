@@ -15,7 +15,7 @@ import {
   GiMeditation, 
   GiSittingDog, 
   GiSnake, 
-  GiBreath,  // В версии 5.6.0 GiBreath ДОЛЖЕН существовать!
+  GiLungs,      // GiLungs существует
   GiPalm,
   GiBuddha,
   GiLotusFlower,
@@ -40,7 +40,7 @@ const YogaDirectionPage = () => {
       'yoga-nidra': <FaFeatherAlt size={28} />,
       'iyengar': <GiLotus size={28} />,
       'bikram': <WiDaySunny size={28} />,
-      'pranayama': <GiBreath size={28} />,  // GiBreath должен работать в 5.6.0
+      'pranayama': <GiLungs size={28} />,  // Используем GiLungs
       'yin': <FaYinYang size={28} />,
       'restorative': <IoWaterOutline size={28} />
     };
