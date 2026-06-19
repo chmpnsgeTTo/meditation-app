@@ -7,7 +7,7 @@ import {
   GiDuration, 
   GiMeditation, 
   GiLotus, 
-  GiBreath, 
+  GiLungs, 
   GiPalm, 
   GiFlowerStar 
 } from 'react-icons/gi';

@@ -15,11 +15,9 @@ import {
   GiMeditation, 
   GiSittingDog, 
   GiSnake, 
-  GiLungs,      // GiLungs существует
+  GiLungs,
   GiPalm,
-  GiBuddha,
   GiLotusFlower,
-  GiYoga,
   GiHealing
 } from 'react-icons/gi';
 import { WiDaySunny } from 'react-icons/wi';

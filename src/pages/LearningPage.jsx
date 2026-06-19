@@ -1,18 +1,16 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import { 
-  GiMeditation, 
-  GiSittingDog, 
-  GiSnake, 
-  GiLotus, 
-  GiLungs,      // GiLungs существует
+import {
+  GiMeditation,
+  GiSittingDog,
+  GiSnake,
+  GiLotus,
+  GiLungs,
   GiPalm,
-  GiBuddha,
   GiLotusFlower,
   GiHeartPlus,
-  GiSunrise,
-  GiYoga
+  GiSunrise
 } from 'react-icons/gi';
 import { WiDaySunny } from 'react-icons/wi';
 import { FaFeatherAlt, FaYinYang } from 'react-icons/fa';
