@@ -3,10 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FiUser, FiLock, FiLogIn, FiArrowLeft } from 'react-icons/fi';
 import { GiMeditation } from 'react-icons/gi';
 import { useAuth } from '../contexts/AuthContext';
-import axios from 'axios';
+import api from '../api/axios'; // ← Импортируем настроенный axios
 import BlockedModal from '../components/BlockedModal';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const LoginPage = () => {
   const [username, setUsername] = useState('');
@@ -17,19 +15,16 @@ const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  // Состояния для модального окна блокировки
   const [showBlockedModal, setShowBlockedModal] = useState(false);
   const [blockReason, setBlockReason] = useState('');
   const [blockedUserId, setBlockedUserId] = useState(null);
   const [blockedUsername, setBlockedUsername] = useState('');
 
-  // Ref для предотвращения повторных отправок
   const submitLock = useRef(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Защита от повторной отправки
     if (isSubmitting || submitLock.current) {
       console.log('⛔ Предотвращена повторная отправка');
       return;
@@ -37,7 +32,6 @@ const LoginPage = () => {
     
     setError('');
     
-    // Валидация полей
     if (!username.trim() || !password.trim()) {
       setError('Заполните все поля');
       return;
@@ -53,7 +47,8 @@ const LoginPage = () => {
     });
     
     try {
-      const response = await axios.post(`${API_URL}/api/login`, { 
+      // Используем api вместо axios
+      const response = await api.post('/api/login', { 
         username: username.trim(), 
         password: password.trim() 
       });
@@ -61,9 +56,7 @@ const LoginPage = () => {
       console.log('✅ Ответ сервера:', response.data);
       
       if (response.data.token) {
-        // Успешный вход
         login(response.data.token, response.data.username, response.data.userId);
-        // Сбрасываем блокировку перед редиректом
         submitLock.current = false;
         setIsSubmitting(false);
         navigate('/meditation');
@@ -71,8 +64,6 @@ const LoginPage = () => {
       }
     } catch (err) {
       console.error('❌ Ошибка входа:', err);
-      console.error('❌ Статус:', err.response?.status);
-      console.error('❌ Данные ошибки:', err.response?.data);
       
       if (err.response?.status === 403 && err.response?.data?.isBlocked) {
         setBlockReason(err.response.data.blockReason || 'Причина не указана');
@@ -84,7 +75,6 @@ const LoginPage = () => {
       }
     } finally {
       setLoading(false);
-      // Разблокируем через небольшую задержку, чтобы предотвратить повторные клики
       setTimeout(() => {
         setIsSubmitting(false);
         submitLock.current = false;
@@ -160,7 +150,6 @@ const LoginPage = () => {
         </div>
       </div>
 
-      {/* ========== МОДАЛЬНОЕ ОКНО БЛОКИРОВКИ ========== */}
       <BlockedModal
         isOpen={showBlockedModal}
         onClose={closeModal}
