@@ -16,7 +16,6 @@ const LoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  // Состояния для модального окна блокировки
   const [showBlockedModal, setShowBlockedModal] = useState(false);
   const [blockReason, setBlockReason] = useState('');
   const [blockedUserId, setBlockedUserId] = useState(null);
@@ -27,15 +26,25 @@ const LoginPage = () => {
     setError('');
     setLoading(true);
     
+    console.log('📤 Отправка логина:', { 
+      username: username || 'пусто', 
+      password: password ? '***' : 'пусто' 
+    });
+    
     try {
-      const response = await axios.post(`${API_URL}/api/login`, { username, password });
+      const response = await axios.post(`${API_URL}/api/login`, { 
+        username: username.trim(), 
+        password: password.trim() 
+      });
+      
+      console.log('✅ Ответ:', response.data);
       
       if (response.data.token) {
         login(response.data.token, response.data.username, response.data.userId);
         navigate('/meditation');
       }
     } catch (err) {
-      console.error('❌ Ошибка входа:', err);
+      console.error('❌ Ошибка:', err.response?.data);
       
       if (err.response?.status === 403 && err.response?.data?.isBlocked) {
         setBlockReason(err.response.data.blockReason || 'Причина не указана');
@@ -110,7 +119,6 @@ const LoginPage = () => {
         </div>
       </div>
 
-      {/* ========== МОДАЛЬНОЕ ОКНО БЛОКИРОВКИ ========== */}
       <BlockedModal
         isOpen={showBlockedModal}
         onClose={closeModal}
