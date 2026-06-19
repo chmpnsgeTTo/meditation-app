@@ -23,7 +23,7 @@ import {
   GiPalm,
   GiLotusFlower,
   GiHealing,
-  GiYoga,
+  GiYogaPose,
   GiBreath
 } from 'react-icons/gi';
 import { WiDaySunny } from 'react-icons/wi';
