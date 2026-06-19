@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiUser, FiLock, FiLogIn, FiArrowLeft } from 'react-icons/fi';
 import { GiMeditation } from 'react-icons/gi';
@@ -13,21 +13,42 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
+  // Состояния для модального окна блокировки
   const [showBlockedModal, setShowBlockedModal] = useState(false);
   const [blockReason, setBlockReason] = useState('');
   const [blockedUserId, setBlockedUserId] = useState(null);
   const [blockedUsername, setBlockedUsername] = useState('');
 
+  // Ref для предотвращения повторных отправок
+  const submitLock = useRef(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Защита от повторной отправки
+    if (isSubmitting || submitLock.current) {
+      console.log('⛔ Предотвращена повторная отправка');
+      return;
+    }
+    
     setError('');
+    
+    // Валидация полей
+    if (!username.trim() || !password.trim()) {
+      setError('Заполните все поля');
+      return;
+    }
+    
+    setIsSubmitting(true);
+    submitLock.current = true;
     setLoading(true);
     
     console.log('📤 Отправка логина:', { 
-      username: username || 'пусто', 
+      username: username.trim(), 
       password: password ? '***' : 'пусто' 
     });
     
@@ -37,14 +58,21 @@ const LoginPage = () => {
         password: password.trim() 
       });
       
-      console.log('✅ Ответ:', response.data);
+      console.log('✅ Ответ сервера:', response.data);
       
       if (response.data.token) {
+        // Успешный вход
         login(response.data.token, response.data.username, response.data.userId);
+        // Сбрасываем блокировку перед редиректом
+        submitLock.current = false;
+        setIsSubmitting(false);
         navigate('/meditation');
+        return;
       }
     } catch (err) {
-      console.error('❌ Ошибка:', err.response?.data);
+      console.error('❌ Ошибка входа:', err);
+      console.error('❌ Статус:', err.response?.status);
+      console.error('❌ Данные ошибки:', err.response?.data);
       
       if (err.response?.status === 403 && err.response?.data?.isBlocked) {
         setBlockReason(err.response.data.blockReason || 'Причина не указана');
@@ -56,6 +84,11 @@ const LoginPage = () => {
       }
     } finally {
       setLoading(false);
+      // Разблокируем через небольшую задержку, чтобы предотвратить повторные клики
+      setTimeout(() => {
+        setIsSubmitting(false);
+        submitLock.current = false;
+      }, 500);
     }
   };
 
@@ -83,7 +116,7 @@ const LoginPage = () => {
           
           <h2>Вход в аккаунт</h2>
           
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} noValidate>
             <div className="input-wrapper">
               <input 
                 type="text" 
@@ -91,7 +124,9 @@ const LoginPage = () => {
                 placeholder="Имя пользователя" 
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                disabled={isSubmitting}
                 required 
+                autoComplete="username"
               />
               <FiUser className="input-icon" />
             </div>
@@ -102,11 +137,17 @@ const LoginPage = () => {
                 placeholder="Пароль" 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                disabled={isSubmitting}
                 required 
+                autoComplete="current-password"
               />
               <FiLock className="input-icon" />
             </div>
-            <button type="submit" className="btn-primary" disabled={loading}>
+            <button 
+              type="submit" 
+              className="btn-primary" 
+              disabled={isSubmitting || loading}
+            >
               <FiLogIn size={18} />
               {loading ? 'Вход...' : 'Войти'}
             </button>
@@ -119,6 +160,7 @@ const LoginPage = () => {
         </div>
       </div>
 
+      {/* ========== МОДАЛЬНОЕ ОКНО БЛОКИРОВКИ ========== */}
       <BlockedModal
         isOpen={showBlockedModal}
         onClose={closeModal}
