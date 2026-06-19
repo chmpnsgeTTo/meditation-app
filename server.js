@@ -392,7 +392,7 @@ app.get('/api/statistics', authMiddleware, async (req, res) => {
 });
 
 // ============================================================
-// 9. КУРСЫ
+// 9. КУРСЫ (ИСПРАВЛЕННАЯ ВЕРСИЯ С ПРОЙДЕННЫМИ УРОКАМИ)
 // ============================================================
 
 // Получить все курсы
@@ -406,24 +406,54 @@ app.get('/api/courses', async (req, res) => {
   }
 });
 
-// Получить один курс с уроками
+// Получить один курс с уроками (ИСПРАВЛЕНО)
 app.get('/api/courses/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
+  const userId = req.user.userId;
   
   try {
+    // 1. Получаем курс
     const courseRes = await pool.query('SELECT * FROM courses WHERE id = $1', [id]);
     if (courseRes.rows.length === 0) {
       return res.status(404).json({ error: 'Курс не найден' });
     }
     
+    // 2. Получаем уроки курса
     const lessonsRes = await pool.query(
       'SELECT * FROM lessons WHERE course_id = $1 ORDER BY order_num',
       [id]
     );
     
+    // 3. Получаем ID уроков, которые пользователь уже прошел
+    const completedRes = await pool.query(`
+      SELECT lesson_id 
+      FROM user_lesson_completions 
+      WHERE user_id = $1 AND lesson_id IN (
+        SELECT id FROM lessons WHERE course_id = $2
+      )
+    `, [userId, id]);
+    
+    const completedLessonIds = completedRes.rows.map(row => row.lesson_id);
+    
+    // 4. Получаем прогресс пользователя по курсу
+    const progressRes = await pool.query(`
+      SELECT completed_lessons, is_completed 
+      FROM user_course_progress 
+      WHERE user_id = $1 AND course_id = $2
+    `, [userId, id]);
+    
+    const progress = progressRes.rows[0] || { completed_lessons: 0, is_completed: false };
+    
+    // 5. Отправляем полные данные
     res.json({
       ...courseRes.rows[0],
-      lessons: lessonsRes.rows
+      lessons: lessonsRes.rows,
+      total_lessons: lessonsRes.rows.length,
+      completedLessonIds: completedLessonIds,
+      progress: {
+        completed_lessons: parseInt(progress.completed_lessons) || 0,
+        is_completed: progress.is_completed || false
+      }
     });
   } catch (err) {
     console.error('❌ Ошибка получения курса:', err);
@@ -480,11 +510,20 @@ app.post('/api/courses/:courseId/lessons/:lessonId/complete', authMiddleware, as
       return res.status(404).json({ error: 'Урок не найден' });
     }
     
+    // Проверяем, не отмечен ли уже урок
+    const alreadyCompleted = await pool.query(
+      'SELECT id FROM user_lesson_completions WHERE user_id = $1 AND lesson_id = $2',
+      [userId, lessonId]
+    );
+    
+    if (alreadyCompleted.rows.length > 0) {
+      return res.status(400).json({ error: 'Урок уже отмечен как пройденный' });
+    }
+    
     // Добавляем запись о завершении урока
     await pool.query(`
       INSERT INTO user_lesson_completions (user_id, lesson_id)
       VALUES ($1, $2)
-      ON CONFLICT (user_id, lesson_id) DO NOTHING
     `, [userId, lessonId]);
     
     // Получаем количество завершённых уроков
@@ -514,21 +553,37 @@ app.post('/api/courses/:courseId/lessons/:lessonId/complete', authMiddleware, as
     );
     
     if (existingProgress.rows.length === 0) {
-      await pool.query(
-        `INSERT INTO user_course_progress (user_id, course_id, completed_lessons, is_completed, completed_at) 
-         VALUES ($1, $2, $3, $4, ${isCompleted ? 'NOW()' : 'NULL'})`,
-        [userId, courseId, completedCount, isCompleted]
-      );
+      if (isCompleted) {
+        await pool.query(
+          'INSERT INTO user_course_progress (user_id, course_id, completed_lessons, is_completed, completed_at) VALUES ($1, $2, $3, $4, NOW())',
+          [userId, courseId, completedCount, isCompleted]
+        );
+      } else {
+        await pool.query(
+          'INSERT INTO user_course_progress (user_id, course_id, completed_lessons, is_completed) VALUES ($1, $2, $3, $4)',
+          [userId, courseId, completedCount, isCompleted]
+        );
+      }
     } else {
-      await pool.query(
-        `UPDATE user_course_progress 
-         SET completed_lessons = $1, is_completed = $2, completed_at = ${isCompleted ? 'NOW()' : 'NULL'}
-         WHERE user_id = $3 AND course_id = $4`,
-        [completedCount, isCompleted, userId, courseId]
-      );
+      if (isCompleted) {
+        await pool.query(
+          'UPDATE user_course_progress SET completed_lessons = $1, is_completed = $2, completed_at = NOW() WHERE user_id = $3 AND course_id = $4',
+          [completedCount, isCompleted, userId, courseId]
+        );
+      } else {
+        await pool.query(
+          'UPDATE user_course_progress SET completed_lessons = $1, is_completed = $2 WHERE user_id = $3 AND course_id = $4',
+          [completedCount, isCompleted, userId, courseId]
+        );
+      }
     }
     
-    res.json({ completedCount, totalLessons, isCompleted });
+    res.json({ 
+      completedCount, 
+      totalLessons, 
+      isCompleted,
+      message: 'Урок отмечен как пройденный'
+    });
   } catch (err) {
     console.error('❌ Ошибка отметки урока:', err);
     res.status(500).json({ error: 'Ошибка сохранения прогресса' });
@@ -769,6 +824,64 @@ app.delete('/api/admin/posts/:id', authMiddleware, adminMiddleware, async (req, 
     res.status(500).json({ error: 'Ошибка удаления поста' });
   }
 });
+
+// ===== НАЗНАЧЕНИЕ/ЛИШЕНИЕ АДМИНА =====
+app.post('/api/admin/users/:id/toggle-role', authMiddleware, adminMiddleware, async (req, res) => {
+  const { id } = req.params;
+  const { role } = req.body;
+  
+  if (parseInt(id) === req.user.userId) {
+    return res.status(400).json({ error: 'Нельзя изменить свои права' });
+  }
+  
+  try {
+    await pool.query('UPDATE users SET role = $1 WHERE id = $2', [role, id]);
+    res.json({ message: `Роль пользователя изменена на ${role}` });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Ошибка изменения роли' });
+  }
+});
+
+// ===== БЛОКИРОВКА/РАЗБЛОКИРОВКА =====
+app.post('/api/admin/users/:id/toggle-block', authMiddleware, adminMiddleware, async (req, res) => {
+  const { id } = req.params;
+  const { blocked } = req.body;
+  
+  if (parseInt(id) === req.user.userId) {
+    return res.status(400).json({ error: 'Нельзя заблокировать самого себя' });
+  }
+  
+  try {
+    await pool.query('UPDATE users SET is_blocked = $1 WHERE id = $2', [blocked, id]);
+    res.json({ message: `Пользователь ${blocked ? 'заблокирован' : 'разблокирован'}` });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Ошибка изменения статуса' });
+  }
+});
+
+// ===== УДАЛЕНИЕ КОММЕНТАРИЯ =====
+app.delete('/api/admin/comments/:id', authMiddleware, adminMiddleware, async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+    // Получаем post_id для обновления счетчика
+    const comment = await pool.query('SELECT post_id FROM comments WHERE id = $1', [id]);
+    if (comment.rows.length === 0) {
+      return res.status(404).json({ error: 'Комментарий не найден' });
+    }
+    
+    await pool.query('DELETE FROM comments WHERE id = $1', [id]);
+    await pool.query('UPDATE posts SET comments_count = comments_count - 1 WHERE id = $1', [comment.rows[0].post_id]);
+    
+    res.json({ message: 'Комментарий удалён' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Ошибка удаления комментария' });
+  }
+});
+
 
 // ============================================================
 // 12. ГЛОБАЛЬНЫЙ ОБРАБОТЧИК ОШИБОК (должен быть последним)
