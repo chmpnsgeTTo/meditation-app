@@ -15,6 +15,12 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const SECRET_KEY = process.env.SECRET_KEY;
 
+// Проверка наличия SECRET_KEY
+if (!SECRET_KEY) {
+  console.error('❌ SECRET_KEY не найден в .env файле!');
+  console.error('⚠️ Добавьте SECRET_KEY=ваш_секретный_ключ в .env');
+}
+
 // ============================================================
 // 1. НАСТРОЙКА ПУТЕЙ ДЛЯ TIMEWEB CLOUD
 // ============================================================
@@ -177,6 +183,8 @@ app.use((err, req, res, next) => {
 app.post('/api/register', async (req, res) => {
   const { username, password } = req.body;
   
+  console.log('📝 Запрос на регистрацию:', username);
+  
   if (!username || !password) {
     return res.status(400).json({ error: 'Заполните все поля' });
   }
@@ -189,10 +197,13 @@ app.post('/api/register', async (req, res) => {
 
   try {
     const hashed = await bcrypt.hash(password, 10);
+    console.log('🔐 Хеш создан для пользователя:', username);
+    
     const result = await pool.query(
       'INSERT INTO users (username, password) VALUES ($1, $2) RETURNING id',
       [username, hashed]
     );
+    console.log('✅ Пользователь создан, ID:', result.rows[0].id);
     res.json({ message: 'Регистрация успешна', userId: result.rows[0].id });
   } catch (err) {
     if (err.code === '23505') {
@@ -203,24 +214,36 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// ---------- ЛОГИН С ПРОВЕРКОЙ БЛОКИРОВКИ ----------
+// ---------- ЛОГИН С ПРОВЕРКОЙ БЛОКИРОВКИ И ПОДРОБНЫМ ЛОГИРОВАНИЕМ ----------
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   
+  console.log('📥 ====== ПОПЫТКА ВХОДА ======');
+  console.log('👤 Имя пользователя:', username);
+  console.log('🔑 Пароль (длина):', password ? password.length : '0');
+  
   if (!username || !password) {
+    console.log('❌ Поля не заполнены');
     return res.status(400).json({ error: 'Заполните все поля' });
   }
 
   try {
+    console.log('🔍 Поиск пользователя в БД...');
     const result = await pool.query('SELECT * FROM users WHERE username = $1', [username]);
     const user = result.rows[0];
     
     if (!user) {
+      console.log('❌ Пользователь НЕ НАЙДЕН:', username);
       return res.status(401).json({ error: 'Неверные учетные данные' });
     }
     
+    console.log('✅ Пользователь найден:', user.username);
+    console.log('🔐 Хеш пароля в БД:', user.password ? user.password.substring(0, 20) + '...' : 'ОТСУТСТВУЕТ');
+    console.log('🔑 Пароль для проверки:', password);
+    
     // Проверка блокировки
     if (user.is_blocked) {
+      console.log('🔒 Пользователь ЗАБЛОКИРОВАН');
       return res.status(403).json({ 
         error: 'Аккаунт заблокирован',
         isBlocked: true,
@@ -229,16 +252,26 @@ app.post('/api/login', async (req, res) => {
       });
     }
     
+    console.log('🔐 Сравнение паролей...');
     const isValid = await bcrypt.compare(password, user.password);
+    console.log('✅ Результат сравнения:', isValid);
+    
     if (!isValid) {
+      console.log('❌ Пароль НЕВЕРНЫЙ');
       return res.status(401).json({ error: 'Неверные учетные данные' });
     }
+    
+    console.log('✅ Пароль ВЕРНЫЙ!');
     
     const token = jwt.sign(
       { userId: user.id, username: user.username, role: user.role || 'user' },
       SECRET_KEY,
       { expiresIn: '7d' }
     );
+    
+    console.log('✅ Токен создан');
+    console.log('📤 Ответ отправлен');
+    console.log('======= КОНЕЦ =======\n');
     
     res.json({ 
       token, 
@@ -1279,7 +1312,7 @@ app.get('/api/asanas/categories', authMiddleware, async (req, res) => {
 });
 
 // ============================================================
-// 8. ОБРАБОТКА ЗАПРОСОВ НА ФРОНТЕНД (SPA)
+// 11. ОБРАБОТКА ЗАПРОСОВ НА ФРОНТЕНД (SPA)
 // ============================================================
 // ВАЖНО: ЭТО ДОЛЖНО БЫТЬ ПОСЛЕ ВСЕХ API-ЭНДПОИНТОВ!
 
@@ -1340,7 +1373,7 @@ app.get('*', (req, res) => {
 });
 
 // ============================================================
-// 9. ГЛОБАЛЬНЫЙ ОБРАБОТЧИК ОШИБОК (должен быть последним)
+// 12. ГЛОБАЛЬНЫЙ ОБРАБОТЧИК ОШИБОК (должен быть последним)
 // ============================================================
 app.use((err, req, res, next) => {
   console.error('❌ Глобальная ошибка:', err);
@@ -1351,7 +1384,7 @@ app.use((err, req, res, next) => {
 });
 
 // ============================================================
-// 10. ЗАПУСК СЕРВЕРА
+// 13. ЗАПУСК СЕРВЕРА
 // ============================================================
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Сервер запущен на порту ${PORT}`);
