@@ -3879,3 +3879,2062 @@ body.dark-mode .blocked-modal-close-btn {
 body.dark-mode .blocked-modal-close-btn:hover {
   background: #6366f1;
 }
+
+/* ============================================ */
+/* БЛОК 43: AsanaDetailPage */
+/* ============================================ */
+.asana-detail-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.asana-detail-header {
+  margin-bottom: 2rem;
+}
+
+.asana-detail-header .back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.2s;
+  font-weight: 500;
+}
+
+.asana-detail-header .back-link:hover {
+  color: var(--primary-color);
+}
+
+.asana-detail-container {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 3rem;
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.asana-detail-image-wrapper {
+  width: 100%;
+  aspect-ratio: 1/1;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--bg-secondary);
+}
+
+.asana-detail-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.asana-detail-image:hover {
+  transform: scale(1.02);
+}
+
+.asana-detail-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+}
+
+.asana-detail-placeholder svg {
+  opacity: 0.5;
+}
+
+.asana-detail-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.asana-detail-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.asana-detail-sanskrit {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: -0.5rem;
+}
+
+.asana-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.asana-difficulty-badge {
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.difficulty-easy {
+  background: #d4edda;
+  color: #155724;
+}
+
+.difficulty-medium {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.difficulty-hard {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.asana-duration {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.asana-category {
+  background: var(--bg-secondary);
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.asana-detail-description h3,
+.asana-detail-benefits h3,
+.asana-detail-contraindications h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.asana-detail-description p {
+  line-height: 1.7;
+  color: var(--text-secondary);
+}
+
+.asana-detail-benefits ul,
+.asana-detail-contraindications ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.asana-detail-benefits li,
+.asana-detail-contraindications li {
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.asana-detail-benefits li::before {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2348bb78'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") no-repeat center;
+  background-size: contain;
+}
+
+.asana-detail-contraindications li::before {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ed8936'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z'/%3E%3C/svg%3E") no-repeat center;
+  background-size: contain;
+}
+
+.empty-item {
+  color: var(--text-muted) !important;
+  font-style: italic;
+}
+
+.asana-detail-loading,
+.asana-detail-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 50vh;
+  gap: 1rem;
+}
+
+.asana-detail-error svg {
+  color: var(--danger-color);
+}
+
+/* ============================================ */
+/* БЛОК 44: AsanasCatalog */
+/* ============================================ */
+.asanas-catalog-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.asanas-header {
+  margin-bottom: 2rem;
+}
+
+.asanas-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.3rem 0;
+}
+
+.asanas-header p {
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+}
+
+.asanas-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  align-items: center;
+}
+
+.search-box {
+  flex: 1;
+  min-width: 200px;
+  position: relative;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 0.6rem 2.5rem 0.6rem 2.5rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+}
+
+.search-box input:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+
+.clear-search {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.clear-search:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.filter-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.filter-group label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.filter-group select {
+  padding: 0.5rem 1.5rem 0.5rem 0.75rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+}
+
+.reset-filters-btn {
+  padding: 0.5rem 1.25rem;
+  background: var(--danger-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.reset-filters-btn:hover {
+  opacity: 0.85;
+}
+
+.view-controls {
+  display: flex;
+  gap: 0.3rem;
+  margin-left: auto;
+}
+
+.view-btn {
+  padding: 0.4rem 0.6rem;
+  background: transparent;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.view-btn:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.view-btn.active {
+  border-color: var(--primary-color);
+  background: var(--primary-color);
+  color: white;
+}
+
+.asanas-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.asanas-grid.grid {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
+
+.asanas-grid.list {
+  grid-template-columns: 1fr;
+}
+
+.asana-card {
+  background: var(--bg-card);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid var(--border-color);
+}
+
+.asana-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.asana-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.asana-card-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/10;
+  overflow: hidden;
+  background: var(--bg-secondary);
+}
+
+.asana-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.asana-card:hover .asana-card-image img {
+  transform: scale(1.03);
+}
+
+.asana-card-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
+}
+
+.asana-card-difficulty {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  backdrop-filter: blur(4px);
+}
+
+.asana-card-content {
+  padding: 1rem 1.25rem 1.25rem;
+}
+
+.asana-card-content h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.2rem 0;
+}
+
+.asana-card-sanskrit {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin: 0 0 0.5rem 0;
+}
+
+.asana-card-description {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 0.75rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.asana-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.asana-card-category {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  padding: 0.2rem 0.6rem;
+  border-radius: 10px;
+}
+
+.asana-card-more {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--primary-color);
+  transition: transform 0.2s;
+}
+
+.asana-card:hover .asana-card-more {
+  transform: translateX(4px);
+}
+
+.asanas-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-secondary);
+}
+
+.asanas-empty p {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+/* ============================================ */
+/* БЛОК 45: LearningPage */
+/* ============================================ */
+.learning-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.learning-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.learning-header h1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.learning-header-icon {
+  color: var(--primary-color);
+}
+
+.learning-subtitle {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.learning-stats {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+}
+
+.learning-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  background: var(--bg-card);
+  border-radius: 30px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.learning-stat svg {
+  color: var(--primary-color);
+}
+
+.directions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.direction-card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-decoration: none;
+  color: inherit;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.direction-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  border-color: var(--primary-color) !important;
+}
+
+.direction-icon {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.direction-card:hover .direction-icon {
+  transform: scale(1.05) rotate(-5deg);
+}
+
+.direction-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.direction-card p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 1rem 0;
+  flex: 1;
+}
+
+.read-more {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--primary-color);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: gap 0.3s ease;
+}
+
+.read-more-arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+.direction-card:hover .read-more-arrow {
+  transform: translateX(4px);
+}
+
+/* ============================================ */
+/* БЛОК 46: HomePage */
+/* ============================================ */
+.home-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  padding: 2rem;
+}
+
+.home-content {
+  max-width: 500px;
+  width: 100%;
+  background: var(--bg-card);
+  border-radius: 24px;
+  padding: 3rem 2.5rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+  text-align: center;
+}
+
+.home-logo {
+  margin-bottom: 2.5rem;
+}
+
+.home-logo-icon {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 1.5rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 8px 30px rgba(var(--primary-rgb), 0.3);
+  transition: transform 0.3s ease;
+}
+
+.home-logo-icon:hover {
+  transform: scale(1.05) rotate(-5deg);
+}
+
+.home-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.5px;
+}
+
+.home-tagline {
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.home-tagline-icon {
+  color: var(--primary-color);
+  opacity: 0.7;
+}
+
+.home-features {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 2.5rem 0;
+}
+
+.home-feature {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border-color);
+}
+
+.home-feature:hover {
+  background: var(--bg-hover);
+  transform: translateX(4px);
+  border-color: var(--primary-color);
+}
+
+.home-feature-icon {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border-radius: 10px;
+  background: var(--primary-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+.home-feature span {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.home-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.home-buttons .btn-primary,
+.home-buttons .btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.9rem 2rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+/* ============================================ */
+/* БЛОК 47: FeedPage (дополнительные стили) */
+/* ============================================ */
+.feed-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 1rem;
+  color: var(--text-secondary);
+}
+
+.feed-loading svg {
+  color: var(--primary-color);
+  animation: spin 1s linear infinite;
+}
+
+.no-posts-icon {
+  color: var(--text-muted);
+  opacity: 0.3;
+  margin-bottom: 1rem;
+}
+
+.post-avatar-placeholder {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+}
+
+.comment-avatar-placeholder {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.action-btn svg.liked {
+  color: #e53e3e;
+}
+
+/* ============================================ */
+/* БЛОК 48: CoursesPage (дополнительные стили) */
+/* ============================================ */
+.courses-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 1rem;
+  color: var(--text-secondary);
+}
+
+.courses-loading-spinner svg {
+  color: var(--primary-color);
+  animation: spin 1s linear infinite;
+}
+
+.courses-header-actions .view-controls {
+  display: flex;
+  gap: 0.3rem;
+  background: var(--bg-secondary);
+  padding: 0.3rem;
+  border-radius: 8px;
+}
+
+.courses-header-actions .view-btn {
+  padding: 0.4rem 0.6rem;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.courses-header-actions .view-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.courses-header-actions .view-btn.active {
+  background: var(--primary-color);
+  color: white;
+}
+
+/* ============================================ */
+/* БЛОК 49: CourseDetailPage (дополнительные стили) */
+/* ============================================ */
+.course-detail-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.course-detail-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 1rem;
+  color: var(--text-secondary);
+}
+
+.course-detail-spinner {
+  animation: spin 1s linear infinite;
+  color: var(--primary-color);
+}
+
+.course-detail-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 1rem;
+  text-align: center;
+}
+
+.course-detail-error svg {
+  color: #e53e3e;
+}
+
+.course-detail-error h2 {
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.course-detail-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.5rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.course-detail-retry-btn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.course-detail-not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 1rem;
+  text-align: center;
+}
+
+.course-detail-not-found svg {
+  color: var(--text-muted);
+  opacity: 0.3;
+}
+
+.course-detail-not-found h2 {
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.course-detail-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.2s;
+  font-weight: 500;
+}
+
+.course-detail-back-link:hover {
+  color: var(--primary-color);
+}
+
+/* ============================================ */
+/* БЛОК 50: AdminPage (дополнительные стили) */
+/* ============================================ */
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.admin-refresh-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.admin-refresh-btn:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  transform: rotate(45deg);
+}
+
+.admin-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 0;
+  gap: 1rem;
+  color: var(--text-secondary);
+}
+
+.admin-loading svg {
+  color: var(--primary-color);
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================ */
+/* БЛОК 51: Auth Pages (дополнительные стили) */
+/* ============================================ */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  padding: 2rem;
+}
+
+.auth-card {
+  max-width: 420px;
+  width: 100%;
+  background: var(--bg-card);
+  border-radius: 24px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+  position: relative;
+}
+
+.auth-logo {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.auth-logo-icon {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 1rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: 0 8px 30px rgba(var(--primary-rgb), 0.3);
+}
+
+.auth-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.3rem 0;
+  letter-spacing: -0.5px;
+}
+
+.auth-subtitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.auth-subtitle svg {
+  color: var(--primary-color);
+}
+
+.auth-heading {
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1.5rem 0;
+}
+
+.auth-success {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: rgba(72, 187, 120, 0.05);
+  border: 1px solid rgba(72, 187, 120, 0.15);
+  border-radius: 8px;
+  color: #48bb78;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  animation: fadeInDown 0.3s ease;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.9rem 2rem;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  background: var(--primary-color);
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.auth-submit-btn:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(var(--primary-rgb), 0.3);
+}
+
+.auth-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.auth-submit-btn .spinner-small {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* ============================================ */
+/* БЛОК 52: MeditationPage (дополнительные стили) */
+/* ============================================ */
+.meditation-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.meditation-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.3rem 0;
+}
+
+.meditation-title svg {
+  color: var(--primary-color);
+}
+
+.meditation-subtitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.meditation-subtitle svg {
+  color: var(--primary-color);
+}
+
+.timer-complete {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.timer-complete svg {
+  color: #48bb78;
+}
+
+.timer-complete-text {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #48bb78;
+}
+
+.modal-title-success {
+  color: #48bb78 !important;
+}
+
+.completion-summary {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.completion-icon {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 1rem;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.completion-icon svg {
+  color: var(--primary-color);
+}
+
+.completion-text {
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.completion-text strong {
+  color: var(--primary-color);
+}
+
+.completion-subtext {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.completion-subtext svg {
+  color: #e53e3e;
+}
+
+/* ============================================ */
+/* БЛОК 53: ProfilePage (дополнительные стили) */
+/* ============================================ */
+.profile-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.profile-message-success {
+  background: rgba(72, 187, 120, 0.1);
+  color: #48bb78;
+  border: 1px solid rgba(72, 187, 120, 0.2);
+}
+
+.profile-message-error {
+  background: rgba(229, 62, 62, 0.1);
+  color: #e53e3e;
+  border: 1px solid rgba(229, 62, 62, 0.2);
+}
+
+.profile-avatar-section {
+  flex-shrink: 0;
+}
+
+.profile-avatar-wrapper {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.profile-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--border-color);
+}
+
+.profile-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  border: 4px solid var(--border-color);
+}
+
+.profile-avatar-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.3rem;
+  background: linear-gradient(transparent, rgba(0,0,0,0.5));
+  border-radius: 0 0 60px 60px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.profile-avatar-wrapper:hover .profile-avatar-overlay {
+  opacity: 1;
+}
+
+.profile-avatar-btn {
+  width: 100%;
+  padding: 0.3rem;
+  border: none;
+  border-radius: 20px;
+  background: var(--primary-color);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+}
+
+.profile-avatar-btn:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: scale(1.02);
+}
+
+.profile-avatar-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.profile-user-info {
+  flex: 1;
+}
+
+.profile-username {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.3rem 0;
+}
+
+.profile-joined {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.profile-badges {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.profile-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
+.profile-settings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.profile-settings-section {
+  padding: 1.5rem;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.profile-settings-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+}
+
+.profile-settings-section h3 svg {
+  color: var(--primary-color);
+}
+
+.profile-settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.profile-settings-form input {
+  padding: 0.6rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  transition: border-color 0.2s;
+}
+
+.profile-settings-form input:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+.profile-settings-form input:disabled {
+  opacity: 0.6;
+}
+
+.profile-settings-form .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  background: var(--primary-color);
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-settings-form .btn-primary:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.profile-settings-form .btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.profile-settings-form .btn-primary .spinner-small {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* ============================================ */
+/* БЛОК 54: YogaDirectionPage */
+/* ============================================ */
+.direction-detail-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.direction-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  gap: 1rem;
+  color: var(--text-secondary);
+}
+
+.direction-error svg {
+  color: #e53e3e;
+}
+
+.direction-error h2 {
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.direction-error p {
+  margin: 0;
+}
+
+.direction-error .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.5rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.direction-error .btn-primary:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+.direction-detail-header {
+  text-align: center;
+  padding: 2rem 0 1.5rem;
+}
+
+.direction-detail-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 3px solid;
+  margin-bottom: 1rem;
+  transition: transform 0.3s ease;
+}
+
+.direction-detail-icon:hover {
+  transform: scale(1.05) rotate(-5deg);
+}
+
+.direction-detail-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.direction-detail-short {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.direction-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1rem 1.5rem;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  margin-bottom: 2rem;
+}
+
+.direction-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.direction-meta-item svg {
+  color: var(--primary-color);
+}
+
+.direction-detail-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: var(--bg-card);
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.direction-detail-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 1rem 0;
+}
+
+.direction-detail-section h2 svg {
+  color: var(--primary-color);
+}
+
+.direction-detail-section p {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.direction-practices-list,
+.direction-asanas-list,
+.direction-benefits-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.direction-practices-list li,
+.direction-asanas-list li,
+.direction-benefits-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+.direction-practices-list li:hover,
+.direction-asanas-list li:hover,
+.direction-benefits-list li:hover {
+  background: var(--bg-hover);
+  transform: translateX(4px);
+}
+
+.direction-practices-list li svg,
+.direction-asanas-list li svg,
+.direction-benefits-list li svg {
+  flex-shrink: 0;
+}
+
+.direction-benefits-list li {
+  background: rgba(72, 187, 120, 0.05);
+}
+
+.direction-benefits-list li:hover {
+  background: rgba(72, 187, 120, 0.1);
+}
+
+.direction-detail-tips {
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 2px solid;
+  margin-top: 0.5rem;
+}
+
+.direction-detail-tips h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.direction-detail-tips p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+/* ============================================ */
+/* АДАПТАЦИЯ ДЛЯ НОВЫХ БЛОКОВ */
+/* ============================================ */
+@media (max-width: 992px) {
+  .asana-detail-container {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .asana-detail-image-wrapper {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .profile-settings {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .asanas-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-controls {
+    flex-wrap: wrap;
+  }
+
+  .view-controls {
+    margin-left: 0;
+    justify-content: flex-end;
+  }
+
+  .asanas-grid.grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+
+  .asanas-grid.list .asana-card {
+    flex-direction: column;
+  }
+
+  .asanas-grid.list .asana-card-image {
+    width: 100%;
+    aspect-ratio: 16/10;
+  }
+
+  .asana-detail-title {
+    font-size: 1.8rem;
+  }
+
+  .asanas-header h1 {
+    font-size: 2rem;
+  }
+
+  .learning-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .learning-header h1 {
+    font-size: 1.8rem;
+    flex-wrap: wrap;
+  }
+
+  .learning-stats {
+    gap: 1rem;
+  }
+
+  .learning-stat {
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .directions-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .direction-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .direction-icon {
+    width: 64px;
+    height: 64px;
+  }
+
+  .direction-icon svg {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .direction-card h3 {
+    font-size: 1.1rem;
+  }
+
+  .home-content {
+    padding: 2rem 1.5rem;
+  }
+
+  .home-logo-icon {
+    width: 100px;
+    height: 100px;
+  }
+
+  .home-logo-icon svg {
+    width: 60px !important;
+    height: 60px !important;
+  }
+
+  .home-title {
+    font-size: 2rem;
+  }
+
+  .home-tagline {
+    font-size: 1rem;
+  }
+
+  .home-feature {
+    padding: 0.85rem 1rem;
+  }
+
+  .home-feature-icon {
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+  }
+
+  .home-feature-icon svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .home-buttons .btn-primary,
+  .home-buttons .btn-secondary {
+    padding: 0.8rem 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  .direction-detail-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .direction-detail-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .direction-detail-short {
+    font-size: 1rem;
+  }
+
+  .direction-detail-icon {
+    width: 64px;
+    height: 64px;
+  }
+
+  .direction-detail-icon svg {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  .direction-detail-meta {
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .direction-meta-item {
+    font-size: 0.85rem;
+  }
+
+  .direction-detail-section {
+    padding: 1rem;
+  }
+
+  .direction-detail-section h2 {
+    font-size: 1.1rem;
+  }
+
+  .direction-practices-list,
+  .direction-asanas-list,
+  .direction-benefits-list {
+    grid-template-columns: 1fr;
+  }
+
+  .direction-practices-list li,
+  .direction-asanas-list li,
+  .direction-benefits-list li {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  .direction-detail-tips {
+    padding: 1rem;
+  }
+
+  .profile-settings {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-avatar-wrapper {
+    width: 100px;
+    height: 100px;
+  }
+
+  .profile-username {
+    font-size: 1.5rem;
+    justify-content: center;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+    gap: 1rem;
+  }
+
+  .profile-joined {
+    justify-content: center;
+  }
+
+  .profile-badges {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .asanas-grid.grid {
+    grid-template-columns: 1fr;
+  }
+
+  .asana-detail-container {
+    padding: 1rem;
+  }
+
+  .asana-detail-page {
+    padding: 1rem;
+  }
+
+  .learning-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .learning-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .directions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .direction-card {
+    padding: 1.25rem;
+  }
+
+  .home-content {
+    padding: 1.5rem 1rem;
+  }
+
+  .home-logo-icon {
+    width: 80px;
+    height: 80px;
+  }
+
+  .home-logo-icon svg {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  .home-title {
+    font-size: 1.6rem;
+  }
+
+  .direction-detail-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .direction-detail-short {
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+  }
+
+  .direction-detail-icon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .direction-detail-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .direction-meta-item {
+    font-size: 0.8rem;
+  }
+
+  .direction-detail-section p {
+    font-size: 0.9rem;
+  }
+
+  .auth-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .auth-logo-icon {
+    width: 80px;
+    height: 80px;
+  }
+
+  .auth-logo-icon svg {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  .auth-title {
+    font-size: 1.6rem;
+  }
+
+  .auth-heading {
+    font-size: 1.1rem;
+  }
+
+  .auth-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .profile-avatar-wrapper {
+    width: 80px;
+    height: 80px;
+  }
+
+  .profile-username {
+    font-size: 1.2rem;
+  }
+
+  .profile-settings-section {
+    padding: 1rem;
+  }
+}

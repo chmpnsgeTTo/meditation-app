@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiUser, FiLock, FiUserPlus, FiArrowLeft, FiCheckCircle } from 'react-icons/fi';
+import { FiUser, FiLock, FiUserPlus, FiArrowLeft, FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
+import { GiMeditation, GiLotus } from 'react-icons/gi';
 import { useAuth } from '../contexts/AuthContext';
-import { GiMeditation } from 'react-icons/gi';
 
 const RegisterPage = () => {
   const [username, setUsername] = useState('');
@@ -10,12 +10,14 @@ const RegisterPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setShowSuccess(false);
     
     if (username.length < 3) {
       setError('Имя пользователя должно быть минимум 3 символа');
@@ -36,9 +38,12 @@ const RegisterPage = () => {
     const result = await register(username, password);
     
     if (result.success) {
-      navigate('/login');
+      setShowSuccess(true);
+      setTimeout(() => {
+        navigate('/login');
+      }, 1500);
     } else {
-      setError(result.error);
+      setError(result.error || 'Ошибка регистрации');
     }
     setLoading(false);
   };
@@ -50,14 +55,26 @@ const RegisterPage = () => {
           <FiArrowLeft size={16} />
           На главную
         </Link>
-        <div className="logo">
-          <div className="logo-icon">
+        
+        <div className="auth-logo">
+          <div className="auth-logo-icon">
             <GiMeditation size={64} />
           </div>
-          <h1>Yoga Practice</h1>
+          <h1 className="auth-title">Yoga Practice</h1>
+          <p className="auth-subtitle">
+            <GiLotus size={14} />
+            Начни свой путь к гармонии
+          </p>
         </div>
         
-        <h2>Создать аккаунт</h2>
+        <h2 className="auth-heading">Создать аккаунт</h2>
+        
+        {showSuccess && (
+          <div className="auth-success">
+            <FiCheckCircle size={18} />
+            Регистрация успешна! Перенаправление...
+          </div>
+        )}
         
         <form onSubmit={handleSubmit}>
           <div className="input-wrapper">
@@ -67,9 +84,12 @@ const RegisterPage = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required 
+              disabled={loading}
+              className={error && !username ? 'input-error' : ''}
             />
             <FiUser className="input-icon" />
           </div>
+          
           <div className="input-wrapper">
             <input 
               type="password" 
@@ -77,9 +97,12 @@ const RegisterPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required 
+              disabled={loading}
+              className={error && !password ? 'input-error' : ''}
             />
             <FiLock className="input-icon" />
           </div>
+          
           <div className="input-wrapper">
             <input 
               type="password" 
@@ -87,14 +110,32 @@ const RegisterPage = () => {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required 
+              disabled={loading}
+              className={error && confirmPassword && password !== confirmPassword ? 'input-error' : ''}
             />
             <FiCheckCircle className="input-icon" />
           </div>
-          <button type="submit" className="btn-primary" disabled={loading}>
-            <FiUserPlus size={18} />
-            {loading ? 'Регистрация...' : 'Зарегистрироваться'}
+          
+          {error && (
+            <div className="error-message">
+              <FiAlertCircle size={16} />
+              {error}
+            </div>
+          )}
+          
+          <button type="submit" className="auth-submit-btn" disabled={loading}>
+            {loading ? (
+              <>
+                <span className="spinner-small"></span>
+                Регистрация...
+              </>
+            ) : (
+              <>
+                <FiUserPlus size={18} />
+                Зарегистрироваться
+              </>
+            )}
           </button>
-          {error && <div className="error-message">{error}</div>}
         </form>
         
         <p className="auth-link">

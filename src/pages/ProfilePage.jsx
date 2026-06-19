@@ -2,10 +2,31 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import { FiSettings, FiBarChart2, FiUser, FiLock, FiCamera, FiCalendar, FiStar, FiTrendingUp, FiActivity, FiAward, FiBookOpen } from 'react-icons/fi';
-import { GiMeditation } from 'react-icons/gi';
+import { 
+  FiSettings, 
+  FiBarChart2, 
+  FiUser, 
+  FiLock, 
+  FiCamera, 
+  FiCalendar, 
+  FiStar, 
+  FiTrendingUp, 
+  FiActivity, 
+  FiAward, 
+  FiBookOpen,
+  FiClock,
+  FiCheckCircle,
+  FiAlertCircle,
+  FiRefreshCw,
+  FiTarget,
+  FiUsers,
+  FiHeart
+} from 'react-icons/fi';
+import { GiMeditation, GiLotus } from 'react-icons/gi';
+import { FaUserCircle, FaChartLine, FaFire } from 'react-icons/fa';
+import { IoMdMedal } from 'react-icons/io';
 import { useAuth } from '../contexts/AuthContext';
-import api from '../api/axios'; // ← Импортируем настроенный axios
+import api from '../api/axios';
 import {
   LineChart,
   Line,
@@ -54,11 +75,10 @@ const ProfilePage = () => {
       const response = await api.get('/api/user', {
         headers: { Authorization: `Bearer ${user.token}` }
       });
-      console.log('📦 Данные пользователя с сервера:', response.data);
       setUserData(response.data);
       setAvatarTimestamp(Date.now());
     } catch (error) {
-      console.error('❌ Ошибка загрузки данных:', error);
+      console.error('Ошибка загрузки данных:', error);
       showMessage('Ошибка загрузки данных пользователя', 'error');
     }
   };
@@ -71,7 +91,7 @@ const ProfilePage = () => {
       });
       setStats(response.data);
     } catch (error) {
-      console.error('❌ Ошибка загрузки статистики:', error);
+      console.error('Ошибка загрузки статистики:', error);
       showMessage('Ошибка загрузки статистики', 'error');
     }
   };
@@ -84,7 +104,7 @@ const ProfilePage = () => {
       });
       setUserCourses(data);
     } catch (err) {
-      console.error('❌ Ошибка загрузки курсов:', err);
+      console.error('Ошибка загрузки курсов:', err);
       showMessage('Ошибка загрузки курсов', 'error');
     } finally {
       setLoadingCourses(false);
@@ -104,8 +124,6 @@ const ProfilePage = () => {
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
-    console.log('📄 Выбран файл:', file.name, file.size, file.type);
     
     if (!file.type.match(/image\/(jpeg|jpg|png|gif|webp)/)) {
       showMessage('Пожалуйста, выберите изображение (JPEG, PNG, GIF, WEBP)', 'error');
@@ -129,8 +147,6 @@ const ProfilePage = () => {
         }
       });
       
-      console.log('✅ Ответ сервера:', response.data);
-      
       if (response.data.avatarUrl) {
         setUserData(prev => ({ ...prev, avatar: response.data.avatarUrl }));
         setAvatarTimestamp(Date.now());
@@ -138,8 +154,7 @@ const ProfilePage = () => {
         showMessage('Аватар успешно обновлен!', 'success');
       }
     } catch (error) {
-      console.error('❌ Ошибка загрузки:', error);
-      console.error('❌ Ответ ошибки:', error.response?.data);
+      console.error('Ошибка загрузки:', error);
       showMessage(error.response?.data?.error || 'Ошибка загрузки аватара', 'error');
     } finally {
       setIsUploading(false);
@@ -178,7 +193,7 @@ const ProfilePage = () => {
         showMessage('Имя пользователя изменено!', 'success');
       }
     } catch (error) {
-      console.error('❌ Ошибка смены имени:', error);
+      console.error('Ошибка смены имени:', error);
       showMessage(error.response?.data?.error || 'Ошибка смены имени', 'error');
     } finally {
       setIsChangingUsername(false);
@@ -213,7 +228,7 @@ const ProfilePage = () => {
         showMessage('Пароль успешно изменен!', 'success');
       }
     } catch (error) {
-      console.error('❌ Ошибка смены пароля:', error);
+      console.error('Ошибка смены пароля:', error);
       showMessage(error.response?.data?.error || 'Ошибка смены пароля', 'error');
     } finally {
       setIsChangingPassword(false);
@@ -235,22 +250,22 @@ const ProfilePage = () => {
     { 
       title: 'Всего минут', 
       value: stats?.total_minutes || 0, 
-      icon: <FiTrendingUp size={24} color="#667eea" />
+      icon: <FiTrendingUp size={24} />
     },
     { 
       title: 'Всего сессий', 
       value: stats?.total_sessions || 0, 
-      icon: <FiActivity size={24} color="#48bb78" />
+      icon: <FiActivity size={24} />
     },
     { 
       title: 'Средняя длительность', 
       value: `${stats?.avg_duration || 0} мин`, 
-      icon: <FiCalendar size={24} color="#ed8936" />
+      icon: <FiClock size={24} />
     },
     { 
       title: 'Самая длинная', 
       value: `${stats?.longest_session || 0} мин`, 
-      icon: <FiStar size={24} color="#fbbf24" />
+      icon: <FiStar size={24} />
     }
   ];
 
@@ -271,59 +286,73 @@ const ProfilePage = () => {
         <div className="profile-container">
           {/* ========== СООБЩЕНИЯ ========== */}
           {message && (
-            <div 
-              className={`message ${messageType === 'success' ? 'message-success' : 'message-error'}`}
-              style={{
-                padding: '12px 20px',
-                borderRadius: '8px',
-                marginBottom: '20px',
-                backgroundColor: messageType === 'success' ? '#48bb78' : '#e53e3e',
-                color: 'white',
-                textAlign: 'center'
-              }}
-            >
+            <div className={`profile-message profile-message-${messageType}`}>
+              {messageType === 'success' ? (
+                <FiCheckCircle size={16} />
+              ) : (
+                <FiAlertCircle size={16} />
+              )}
               {message}
             </div>
           )}
 
           {/* ========== ШАПКА ПРОФИЛЯ ========== */}
           <div className="profile-header">
-            <div className="avatar-section">
-              <img 
-                src={getAvatarUrl()}
-                alt="Avatar"
-                className="avatar"
-                onError={(e) => {
-                  console.log('⚠️ Ошибка загрузки аватара, использую дефолтный');
-                  e.target.src = `/uploads/default-avatar.png?t=${Date.now()}`;
-                }}
-              />
-              <div>
-                <input 
-                  type="file" 
-                  id="avatarInput" 
-                  accept="image/*" 
-                  style={{ display: 'none' }}
-                  onChange={handleAvatarChange}
-                  disabled={isUploading}
-                />
-                <button 
-                  className="change-avatar-btn"
-                  onClick={() => document.getElementById('avatarInput').click()}
-                  disabled={isUploading}
-                  aria-label="Изменить аватар профиля"
-                >
-                  <FiCamera size={14} />
-                  {isUploading ? 'Загрузка...' : 'Сменить фото'}
-                </button>
+            <div className="profile-avatar-section">
+              <div className="profile-avatar-wrapper">
+                {userData?.avatar && userData.avatar !== '/uploads/default-avatar.png' ? (
+                  <img 
+                    src={getAvatarUrl()}
+                    alt="Avatar"
+                    className="profile-avatar"
+                    onError={(e) => {
+                      e.target.src = `/uploads/default-avatar.png?t=${Date.now()}`;
+                    }}
+                  />
+                ) : (
+                  <div className="profile-avatar-placeholder">
+                    <FaUserCircle size={80} />
+                  </div>
+                )}
+                <div className="profile-avatar-overlay">
+                  <input 
+                    type="file" 
+                    id="avatarInput" 
+                    accept="image/*" 
+                    style={{ display: 'none' }}
+                    onChange={handleAvatarChange}
+                    disabled={isUploading}
+                  />
+                  <button 
+                    className="profile-avatar-btn"
+                    onClick={() => document.getElementById('avatarInput').click()}
+                    disabled={isUploading}
+                  >
+                    <FiCamera size={16} />
+                    {isUploading ? 'Загрузка...' : 'Сменить'}
+                  </button>
+                </div>
               </div>
             </div>
-            <div className="user-info">
-              <h2>
-                <FiUser size={18} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+            <div className="profile-user-info">
+              <h2 className="profile-username">
+                <FiUser size={18} />
                 {userData?.username || user.username}
               </h2>
-              <p>Участник с: {userData?.created_at ? new Date(userData.created_at).toLocaleDateString('ru-RU') : 'Недавно'}</p>
+              <p className="profile-joined">
+                <FiCalendar size={14} />
+                Участник с: {userData?.created_at ? new Date(userData.created_at).toLocaleDateString('ru-RU') : 'Недавно'}
+              </p>
+              <div className="profile-badges">
+                <span className="profile-badge">
+                  <IoMdMedal size={14} />
+                  {stats?.total_sessions || 0} сессий
+                </span>
+                <span className="profile-badge">
+                  <FaFire size={14} />
+                  {stats?.total_minutes || 0} минут
+                </span>
+              </div>
             </div>
           </div>
 
@@ -333,29 +362,29 @@ const ProfilePage = () => {
               onClick={() => handleTabChange('stats')} 
               className={`profile-tab ${activeTab === 'stats' ? 'active' : ''}`}
             >
-              <FiBarChart2 size={16} style={{ marginRight: '6px' }} />
+              <FiBarChart2 size={16} />
               Статистика
             </button>
             <button 
               onClick={() => handleTabChange('courses')} 
               className={`profile-tab ${activeTab === 'courses' ? 'active' : ''}`}
             >
-              <FiAward size={16} style={{ marginRight: '6px' }} />
+              <FiAward size={16} />
               Курсы
             </button>
             <button 
               onClick={() => handleTabChange('settings')} 
               className={`profile-tab ${activeTab === 'settings' ? 'active' : ''}`}
             >
-              <FiSettings size={16} style={{ marginRight: '6px' }} />
+              <FiSettings size={16} />
               Настройки
             </button>
           </div>
 
           {/* ========== СТАТИСТИКА ========== */}
           {activeTab === 'stats' && (
-            <div>
-              <div className="stats-filters">
+            <div className="profile-stats">
+              <div className="profile-stats-filters">
                 <button 
                   onClick={() => loadStatistics('all')} 
                   className={`filter-btn ${period === 'all' ? 'active' : ''}`}
@@ -376,30 +405,36 @@ const ProfilePage = () => {
                 </button>
               </div>
 
-              <div className="stats-metrics-grid">
+              <div className="profile-metrics-grid">
                 {keyMetrics.map((metric, idx) => (
-                  <div key={idx} className="stats-metric-card">
-                    <div className="metric-icon">{metric.icon}</div>
-                    <div className="metric-info">
-                      <div className="metric-value">{metric.value}</div>
-                      <div className="metric-title">{metric.title}</div>
+                  <div key={idx} className="profile-metric-card">
+                    <div className="profile-metric-icon">{metric.icon}</div>
+                    <div className="profile-metric-info">
+                      <div className="profile-metric-value">{metric.value}</div>
+                      <div className="profile-metric-title">{metric.title}</div>
                     </div>
                   </div>
                 ))}
               </div>
 
               {chartData.length > 0 && (
-                <div className="stats-chart-card">
-                  <h3>
-                    <FiTrendingUp size={18} style={{ marginRight: '8px' }} />
+                <div className="profile-chart-card">
+                  <h3 className="profile-chart-title">
+                    <FaChartLine size={18} />
                     Динамика медитаций
                   </h3>
                   <ResponsiveContainer width="100%" height={300}>
                     <LineChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                      <XAxis dataKey="day" tick={{ fontSize: 12 }} />
-                      <YAxis tick={{ fontSize: 12 }} />
-                      <Tooltip />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
+                      <XAxis dataKey="day" tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} />
+                      <YAxis tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} />
+                      <Tooltip 
+                        contentStyle={{ 
+                          background: 'var(--bg-card)', 
+                          border: '1px solid var(--border-color)',
+                          borderRadius: '8px'
+                        }}
+                      />
                       <Legend />
                       <Line 
                         type="monotone" 
@@ -423,13 +458,13 @@ const ProfilePage = () => {
                 </div>
               )}
 
-              <div className="meditation-dates">
+              <div className="profile-dates">
                 <p>
-                  <FiCalendar size={16} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+                  <FiCalendar size={16} />
                   Первая медитация: {stats?.first_meditation ? new Date(stats.first_meditation).toLocaleDateString('ru-RU') : '—'}
                 </p>
                 <p>
-                  <FiStar size={16} style={{ marginRight: '8px', verticalAlign: 'middle', color: '#fbbf24' }} />
+                  <FiStar size={16} />
                   Последняя медитация: {stats?.last_meditation ? new Date(stats.last_meditation).toLocaleDateString('ru-RU') : '—'}
                 </p>
               </div>
@@ -438,33 +473,39 @@ const ProfilePage = () => {
 
           {/* ========== КУРСЫ / ДОСТИЖЕНИЯ ========== */}
           {activeTab === 'courses' && (
-            <div className="user-courses-section">
-              <h3>
-                <FiAward size={20} style={{ marginRight: '10px', verticalAlign: 'middle' }} />
+            <div className="profile-courses">
+              <h3 className="profile-courses-title">
+                <FiAward size={20} />
                 Мои достижения
               </h3>
               {loadingCourses ? (
-                <div className="loading-courses">Загрузка...</div>
+                <div className="profile-loading">
+                  <FiRefreshCw size={24} className="spinning" />
+                  <p>Загрузка...</p>
+                </div>
               ) : userCourses.length === 0 ? (
-                <div className="no-courses">
-                  <FiBookOpen size={48} color="#94a3b8" />
+                <div className="profile-no-courses">
+                  <FiBookOpen size={48} />
                   <p>У вас пока нет завершённых курсов</p>
-                  <Link to="/courses" className="btn-primary">Начать обучение</Link>
+                  <Link to="/courses" className="btn-primary">
+                    <FiBookOpen size={16} />
+                    Начать обучение
+                  </Link>
                 </div>
               ) : (
-                <div className="achievements-grid">
+                <div className="profile-achievements-grid">
                   {userCourses.map(course => (
-                    <div key={course.id} className="achievement-card">
-                      <div className="achievement-icon">
-                        <GiMeditation size={32} color="#667eea" />
+                    <div key={course.id} className="profile-achievement-card">
+                      <div className="profile-achievement-icon">
+                        <GiMeditation size={32} />
                       </div>
-                      <div className="achievement-info">
+                      <div className="profile-achievement-info">
                         <h4>{course.title}</h4>
                         <p>
-                          <FiCalendar size={12} style={{ marginRight: '4px' }} />
+                          <FiCalendar size={12} />
                           Завершён: {new Date(course.completed_at).toLocaleDateString('ru-RU')}
                         </p>
-                        <div className="achievement-progress">
+                        <div className="profile-achievement-progress">
                           <div className="progress-bar-small">
                             <div className="progress-fill-small" style={{ width: `${Math.round(course.progress_percent)}%` }}></div>
                           </div>
@@ -480,68 +521,92 @@ const ProfilePage = () => {
 
           {/* ========== НАСТРОЙКИ ========== */}
           {activeTab === 'settings' && (
-            <div>
-              <div className="settings-section">
+            <div className="profile-settings">
+              <div className="profile-settings-section">
                 <h3>
-                  <FiUser size={20} style={{ marginRight: '10px', verticalAlign: 'middle' }} />
+                  <FiUser size={20} />
                   Изменить имя пользователя
                 </h3>
-                <input 
-                  type="text" 
-                  placeholder="Новое имя пользователя (мин. 3 символа)"
-                  value={newUsername}
-                  onChange={(e) => setNewUsername(e.target.value)}
-                  disabled={isChangingUsername}
-                />
-                <input 
-                  type="password" 
-                  placeholder="Введите пароль для подтверждения"
-                  value={oldPassword}
-                  onChange={(e) => setOldPassword(e.target.value)}
-                  disabled={isChangingUsername}
-                />
-                <button 
-                  onClick={changeUsername} 
-                  className="btn-primary"
-                  disabled={isChangingUsername}
-                >
-                  {isChangingUsername ? 'Сохранение...' : 'Изменить имя'}
-                </button>
+                <div className="profile-settings-form">
+                  <input 
+                    type="text" 
+                    placeholder="Новое имя пользователя (мин. 3 символа)"
+                    value={newUsername}
+                    onChange={(e) => setNewUsername(e.target.value)}
+                    disabled={isChangingUsername}
+                  />
+                  <input 
+                    type="password" 
+                    placeholder="Введите пароль для подтверждения"
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    disabled={isChangingUsername}
+                  />
+                  <button 
+                    onClick={changeUsername} 
+                    className="btn-primary"
+                    disabled={isChangingUsername}
+                  >
+                    {isChangingUsername ? (
+                      <>
+                        <span className="spinner-small"></span>
+                        Сохранение...
+                      </>
+                    ) : (
+                      <>
+                        <FiUser size={16} />
+                        Изменить имя
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
 
-              <div className="settings-section">
+              <div className="profile-settings-section">
                 <h3>
-                  <FiLock size={20} style={{ marginRight: '10px', verticalAlign: 'middle' }} />
+                  <FiLock size={20} />
                   Сменить пароль
                 </h3>
-                <input 
-                  type="password" 
-                  placeholder="Старый пароль"
-                  value={oldPassword}
-                  onChange={(e) => setOldPassword(e.target.value)}
-                  disabled={isChangingPassword}
-                />
-                <input 
-                  type="password" 
-                  placeholder="Новый пароль (мин. 6 символов)"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  disabled={isChangingPassword}
-                />
-                <input 
-                  type="password" 
-                  placeholder="Подтвердите пароль"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  disabled={isChangingPassword}
-                />
-                <button 
-                  onClick={changePassword} 
-                  className="btn-primary"
-                  disabled={isChangingPassword}
-                >
-                  {isChangingPassword ? 'Сохранение...' : 'Изменить пароль'}
-                </button>
+                <div className="profile-settings-form">
+                  <input 
+                    type="password" 
+                    placeholder="Старый пароль"
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    disabled={isChangingPassword}
+                  />
+                  <input 
+                    type="password" 
+                    placeholder="Новый пароль (мин. 6 символов)"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    disabled={isChangingPassword}
+                  />
+                  <input 
+                    type="password" 
+                    placeholder="Подтвердите пароль"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    disabled={isChangingPassword}
+                  />
+                  <button 
+                    onClick={changePassword} 
+                    className="btn-primary"
+                    disabled={isChangingPassword}
+                  >
+                    {isChangingPassword ? (
+                      <>
+                        <span className="spinner-small"></span>
+                        Сохранение...
+                      </>
+                    ) : (
+                      <>
+                        <FiLock size={16} />
+                        Изменить пароль
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           )}

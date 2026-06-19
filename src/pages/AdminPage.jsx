@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
-import api from '../api/axios'; // ← Импортируем настроенный axios
+import api from '../api/axios';
 import { 
   FiUsers, 
   FiFileText, 
@@ -26,8 +26,13 @@ import {
   FiMail,
   FiSend,
   FiX,
-  FiHeart
+  FiHeart,
+  FiMoreVertical,
+  FiRefreshCw,
+  FiUserMinus
 } from 'react-icons/fi';
+import { FaUserCog, FaUserShield } from 'react-icons/fa';
+import { GiMeditation } from 'react-icons/gi';
 
 const AdminPage = () => {
   const { user } = useAuth();
@@ -49,19 +54,19 @@ const AdminPage = () => {
   const [messageType, setMessageType] = useState('success');
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // ===== СОСТОЯНИЯ ДЛЯ БЛОКИРОВКИ =====
+  // Состояния для блокировки
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [blockUser, setBlockUser] = useState(null);
   const [blockReason, setBlockReason] = useState('');
   const [isBlocking, setIsBlocking] = useState(false);
 
-  // ===== СОСТОЯНИЯ ДЛЯ УДАЛЕНИЯ КОММЕНТАРИЯ =====
+  // Состояния для удаления комментария
   const [showDeleteCommentModal, setShowDeleteCommentModal] = useState(false);
   const [deleteCommentData, setDeleteCommentData] = useState(null);
   const [deleteCommentReason, setDeleteCommentReason] = useState('');
   const [isDeletingComment, setIsDeletingComment] = useState(false);
 
-  // ===== СОСТОЯНИЯ ДЛЯ ОБРАТНОЙ СВЯЗИ =====
+  // Состояния для обратной связи
   const [selectedRequest, setSelectedRequest] = useState(null);
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [requestStatus, setRequestStatus] = useState('');
@@ -126,7 +131,7 @@ const AdminPage = () => {
     setRefreshKey(prev => prev + 1);
   };
 
-  // ========== ЗАГРУЗКА КОММЕНТАРИЕВ К ПОСТУ ==========
+  // Загрузка комментариев к посту
   const loadPostComments = async (postId) => {
     setLoadingComments(true);
     try {
@@ -142,7 +147,7 @@ const AdminPage = () => {
     }
   };
 
-  // ========== УДАЛЕНИЕ КОММЕНТАРИЯ ==========
+  // Удаление комментария
   const deleteComment = async (commentId) => {
     if (!window.confirm('Удалить комментарий?')) return;
     try {
@@ -161,7 +166,7 @@ const AdminPage = () => {
     }
   };
 
-  // ========== УДАЛЕНИЕ ПОЛЬЗОВАТЕЛЯ ==========
+  // Удаление пользователя
   const deleteUser = async (userId) => {
     if (!window.confirm('Удалить пользователя? Все его посты, комментарии и сессии будут удалены безвозвратно.')) return;
     try {
@@ -175,7 +180,7 @@ const AdminPage = () => {
     }
   };
 
-  // ========== ОТКРЫТИЕ МОДАЛКИ БЛОКИРОВКИ ==========
+  // Открытие модалки блокировки
   const openBlockModal = (user) => {
     setBlockUser(user);
     setBlockReason('');
@@ -189,7 +194,7 @@ const AdminPage = () => {
     setIsBlocking(false);
   };
 
-  // ========== БЛОКИРОВКА ПОЛЬЗОВАТЕЛЯ ==========
+  // Блокировка пользователя
   const confirmBlockUser = async () => {
     if (!blockReason.trim()) {
       showMessage('Пожалуйста, укажите причину блокировки', 'error');
@@ -214,7 +219,7 @@ const AdminPage = () => {
     }
   };
 
-  // ========== РАЗБЛОКИРОВКА ==========
+  // Разблокировка
   const toggleUserUnblock = async (userId, username) => {
     if (!window.confirm(`Разблокировать пользователя ${username}?`)) return;
     try {
@@ -231,7 +236,7 @@ const AdminPage = () => {
     }
   };
 
-  // ========== НАЗНАЧЕНИЕ АДМИНИСТРАТОРА ==========
+  // Назначение администратора
   const toggleAdminRole = async (userId, currentRole) => {
     const newRole = currentRole === 'admin' ? 'user' : 'admin';
     if (!window.confirm(`${currentRole === 'admin' ? 'Лишить прав администратора' : 'Назначить администратором'} пользователя?`)) return;
@@ -247,7 +252,7 @@ const AdminPage = () => {
     }
   };
 
-  // ========== УДАЛЕНИЕ ПОСТА ==========
+  // Удаление поста
   const deletePost = async (postId) => {
     if (!window.confirm('Удалить пост?')) return;
     try {
@@ -263,7 +268,7 @@ const AdminPage = () => {
     }
   };
 
-  // ========== ОТКРЫТИЕ МОДАЛКИ ПОСТА ==========
+  // Открытие модалки поста
   const viewFullPost = async (post) => {
     setSelectedPost(post);
     setShowPostModal(true);
@@ -281,7 +286,7 @@ const AdminPage = () => {
     setShowUserModal(true);
   };
 
-  // ========== ОТКРЫТИЕ МОДАЛКИ УДАЛЕНИЯ КОММЕНТАРИЯ ==========
+  // Открытие модалки удаления комментария
   const openDeleteCommentModal = (comment) => {
     setDeleteCommentData(comment);
     setDeleteCommentReason('');
@@ -295,7 +300,7 @@ const AdminPage = () => {
     setIsDeletingComment(false);
   };
 
-  // ========== УДАЛЕНИЕ КОММЕНТАРИЯ С ПРИЧИНОЙ ==========
+  // Удаление комментария с причиной
   const confirmDeleteComment = async () => {
     if (!deleteCommentReason.trim()) {
       showMessage('Пожалуйста, укажите причину удаления', 'error');
@@ -319,7 +324,7 @@ const AdminPage = () => {
     }
   };
 
-  // ========== ОБРАТНАЯ СВЯЗЬ ==========
+  // Обратная связь
   const updateRequestStatus = async (requestId, status, comment) => {
     try {
       await api.put(`/api/admin/unblock-requests/${requestId}`,
@@ -377,14 +382,20 @@ const AdminPage = () => {
       <Navbar />
       <div className="container">
         <div className="admin-container">
-          <h1>
-            <FiShield size={28} />
-            Админ-панель
-          </h1>
+          <div className="admin-header">
+            <h1>
+              <FiShield size={28} />
+              Админ-панель
+            </h1>
+            <button onClick={reloadData} className="admin-refresh-btn" title="Обновить данные">
+              <FiRefreshCw size={18} />
+            </button>
+          </div>
 
           {message && (
             <div className={`admin-message admin-message-${messageType}`}>
-              {messageType === 'success' ? <FiCheckCircle size={16} /> : <FiXCircle size={16} />} {message}
+              {messageType === 'success' ? <FiCheckCircle size={16} /> : <FiXCircle size={16} />} 
+              {message}
             </div>
           )}
 
@@ -422,32 +433,43 @@ const AdminPage = () => {
           </div>
 
           {loading ? (
-            <div className="loading">Загрузка...</div>
+            <div className="admin-loading">
+              <GiMeditation size={48} className="spinning" />
+              <p>Загрузка данных...</p>
+            </div>
           ) : (
             <>
-              {/* ========== СТАТИСТИКА ========== */}
+              {/* Статистика */}
               {activeTab === 'stats' && stats && (
                 <div className="admin-stats-grid">
                   <div className="admin-stat-card">
                     <div className="admin-stat-value">{stats.total_users}</div>
-                    <div className="admin-stat-label">Пользователей</div>
+                    <div className="admin-stat-label">
+                      <FiUsers size={14} /> Пользователей
+                    </div>
                   </div>
                   <div className="admin-stat-card">
                     <div className="admin-stat-value">{stats.total_posts}</div>
-                    <div className="admin-stat-label">Постов</div>
+                    <div className="admin-stat-label">
+                      <FiFileText size={14} /> Постов
+                    </div>
                   </div>
                   <div className="admin-stat-card">
                     <div className="admin-stat-value">{stats.total_sessions}</div>
-                    <div className="admin-stat-label">Сессий медитации</div>
+                    <div className="admin-stat-label">
+                      <GiMeditation size={14} /> Сессий медитации
+                    </div>
                   </div>
                   <div className="admin-stat-card">
                     <div className="admin-stat-value">{stats.total_minutes}</div>
-                    <div className="admin-stat-label">Всего минут</div>
+                    <div className="admin-stat-label">
+                      <FiClock size={14} /> Всего минут
+                    </div>
                   </div>
                 </div>
               )}
 
-              {/* ========== ПОЛЬЗОВАТЕЛИ ========== */}
+              {/* Пользователи */}
               {activeTab === 'users' && (
                 <div className="admin-table-wrapper">
                   <table className="admin-table">
@@ -470,6 +492,7 @@ const AdminPage = () => {
                           <td><strong>{u.username}</strong></td>
                           <td>
                             <span className={`admin-badge ${u.role === 'admin' ? 'admin-badge-admin' : 'admin-badge-user'}`}>
+                              {u.role === 'admin' ? <FaUserShield size={12} /> : <FiUser size={12} />}
                               {u.role === 'admin' ? 'Админ' : 'Пользователь'}
                             </span>
                           </td>
@@ -492,7 +515,6 @@ const AdminPage = () => {
                                     title={u.role === 'admin' ? 'Лишить прав админа' : 'Назначить админом'}
                                   >
                                     {u.role === 'admin' ? <FiUserX size={12} /> : <FiUserPlus size={12} />}
-                                    {u.role === 'admin' ? 'Лишить' : 'Сделать админом'}
                                   </button>
                                   {u.is_blocked ? (
                                     <button
@@ -500,7 +522,7 @@ const AdminPage = () => {
                                       className="admin-btn admin-btn-success"
                                       title="Разблокировать пользователя"
                                     >
-                                      <FiUnlock size={12} /> Разблок.
+                                      <FiUnlock size={12} />
                                     </button>
                                   ) : (
                                     <button
@@ -508,7 +530,7 @@ const AdminPage = () => {
                                       className="admin-btn admin-btn-warning"
                                       title="Заблокировать пользователя"
                                     >
-                                      <FiLock size={12} /> Заблок.
+                                      <FiLock size={12} />
                                     </button>
                                   )}
                                   <button
@@ -516,7 +538,7 @@ const AdminPage = () => {
                                     className="admin-btn admin-btn-danger"
                                     title="Удалить пользователя"
                                   >
-                                    <FiTrash2 size={12} /> Удалить
+                                    <FiTrash2 size={12} />
                                   </button>
                                 </>
                               )}
@@ -525,7 +547,7 @@ const AdminPage = () => {
                                 className="admin-btn admin-btn-primary"
                                 title="Просмотр деталей"
                               >
-                                <FiEye size={12} /> Детали
+                                <FiEye size={12} />
                               </button>
                             </div>
                           </td>
@@ -536,7 +558,7 @@ const AdminPage = () => {
                 </div>
               )}
 
-              {/* ========== ПОСТЫ ========== */}
+              {/* Посты */}
               {activeTab === 'posts' && (
                 <div className="admin-table-wrapper">
                   <table className="admin-table">
@@ -557,7 +579,7 @@ const AdminPage = () => {
                           <td>{p.id}</td>
                           <td><strong>{p.username}</strong></td>
                           <td className="post-preview">{p.content?.substring(0, 80)}...</td>
-                          <td><FiHeart size={14} color="#e53e3e" /> {p.likes_count}</td>
+                          <td><FiHeart size={14} /> {p.likes_count}</td>
                           <td>
                             <span className="admin-badge-comments">
                               <FiMessageSquare size={12} /> {parseInt(p.comments_count)}
@@ -587,7 +609,7 @@ const AdminPage = () => {
                 </div>
               )}
 
-              {/* ========== КОММЕНТАРИИ ========== */}
+              {/* Комментарии */}
               {activeTab === 'comments' && (
                 <div className="admin-table-wrapper">
                   <table className="admin-table">
@@ -641,7 +663,7 @@ const AdminPage = () => {
                 </div>
               )}
 
-              {/* ========== ОБРАТНАЯ СВЯЗЬ ========== */}
+              {/* Обратная связь */}
               {activeTab === 'feedback' && (
                 <div>
                   {requestStats && (
@@ -742,7 +764,7 @@ const AdminPage = () => {
         </div>
       </div>
 
-      {/* ========== МОДАЛКА БЛОКИРОВКИ ========== */}
+      {/* Модалка блокировки */}
       {showBlockModal && blockUser && (
         <div className="modal-overlay" onClick={closeBlockModal}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -787,7 +809,7 @@ const AdminPage = () => {
               <button onClick={confirmBlockUser} className="admin-btn admin-btn-danger" disabled={isBlocking || !blockReason.trim()}>
                 {isBlocking ? (
                   <>
-                    <span className="spinner"></span>
+                    <span className="spinner-small"></span>
                     Блокировка...
                   </>
                 ) : (
@@ -802,7 +824,7 @@ const AdminPage = () => {
         </div>
       )}
 
-      {/* ========== МОДАЛКА УДАЛЕНИЯ КОММЕНТАРИЯ ========== */}
+      {/* Модалка удаления комментария */}
       {showDeleteCommentModal && deleteCommentData && (
         <div className="modal-overlay" onClick={closeDeleteCommentModal}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -852,7 +874,7 @@ const AdminPage = () => {
               <button onClick={confirmDeleteComment} className="admin-btn admin-btn-danger" disabled={isDeletingComment || !deleteCommentReason.trim()}>
                 {isDeletingComment ? (
                   <>
-                    <span className="spinner"></span>
+                    <span className="spinner-small"></span>
                     Удаление...
                   </>
                 ) : (
@@ -867,7 +889,7 @@ const AdminPage = () => {
         </div>
       )}
 
-      {/* ========== МОДАЛКА ОБРАБОТКИ ЗАПРОСА ========== */}
+      {/* Модалка обработки запроса */}
       {showRequestModal && selectedRequest && (
         <div className="modal-overlay" onClick={() => setShowRequestModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -939,7 +961,7 @@ const AdminPage = () => {
         </div>
       )}
 
-      {/* ========== МОДАЛКА ПОСТА ========== */}
+      {/* Модалка поста */}
       {showPostModal && selectedPost && (
         <div className="modal-overlay" onClick={closePostModal}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -961,7 +983,7 @@ const AdminPage = () => {
               </div>
             )}
             <div className="post-stats-info">
-              <span><FiHeart size={14} color="#e53e3e" /> {selectedPost.likes_count} лайков</span>
+              <span><FiHeart size={14} /> {selectedPost.likes_count} лайков</span>
               <span><FiMessageSquare size={14} /> {selectedPost.comments_count} комментариев</span>
               <span><FiCalendar size={14} /> {new Date(selectedPost.created_at).toLocaleString('ru-RU')}</span>
             </div>
@@ -973,9 +995,15 @@ const AdminPage = () => {
               </h4>
               
               {loadingComments ? (
-                <div className="loading-comments">Загрузка комментариев...</div>
+                <div className="loading-comments">
+                  <span className="spinner-small"></span>
+                  Загрузка комментариев...
+                </div>
               ) : postComments.length === 0 ? (
-                <div className="no-comments">Нет комментариев</div>
+                <div className="no-comments">
+                  <FiMessageCircle size={24} />
+                  <p>Нет комментариев</p>
+                </div>
               ) : (
                 <div className="comments-list">
                   {postComments.map(comment => (
@@ -1015,7 +1043,7 @@ const AdminPage = () => {
         </div>
       )}
 
-      {/* ========== МОДАЛКА ПОЛЬЗОВАТЕЛЯ ========== */}
+      {/* Модалка пользователя */}
       {showUserModal && selectedUser && (
         <div className="modal-overlay" onClick={() => setShowUserModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>

@@ -27,7 +27,7 @@ const LearningPage = () => {
       'yoga-nidra': <FaFeatherAlt size={48} />,
       'iyengar': <GiLotus size={48} />,
       'bikram': <WiDaySunny size={48} />,
-      'pranayama': <GiLungs size={48} />,  // Используем GiLungs
+      'pranayama': <GiLungs size={48} />,
       'yin': <FaYinYang size={48} />,
       'restorative': <IoWaterOutline size={48} />
     };

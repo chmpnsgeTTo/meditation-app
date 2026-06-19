@@ -9,7 +9,9 @@ import {
   GiLotus, 
   GiLungs, 
   GiPalm, 
-  GiFlowerStar 
+  GiFlowerStar,
+  GiSittingDog,
+  GiSnake
 } from 'react-icons/gi';
 import { 
   FaCheckCircle, 
@@ -22,10 +24,13 @@ import {
   FaBookOpen,
   FaInfoCircle,
   FaExclamationTriangle,
-  FaLightbulb
+  FaLightbulb,
+  FaUserGraduate,
+  FaRegClock
 } from 'react-icons/fa';
-import { IoRibbonOutline } from 'react-icons/io5';
-import { MdCelebration } from 'react-icons/md';
+import { IoRibbonOutline, IoTimeOutline } from 'react-icons/io5';
+import { MdCelebration, MdOutlineEmojiEvents } from 'react-icons/md';
+import { FiCheck, FiLoader, FiAlertCircle } from 'react-icons/fi';
 
 const CourseDetailPage = () => {
   const { id } = useParams();
@@ -48,8 +53,6 @@ const CourseDetailPage = () => {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       
-      console.log('📦 Данные курса:', data);
-      
       const normalizedCourse = {
         ...data,
         lessons: data.lessons || [],
@@ -63,7 +66,7 @@ const CourseDetailPage = () => {
       
       setCourse(normalizedCourse);
     } catch (err) {
-      console.error('❌ Ошибка загрузки курса:', err);
+      console.error('Ошибка загрузки курса:', err);
       setError(err.response?.data?.error || 'Ошибка загрузки курса');
       if (err.response?.status === 404) navigate('/courses');
     } finally {
@@ -86,8 +89,6 @@ const CourseDetailPage = () => {
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
       
-      console.log('✅ Урок отмечен:', data);
-      
       setCourse(prev => {
         if (!prev) return prev;
         
@@ -106,7 +107,7 @@ const CourseDetailPage = () => {
       });
       
     } catch (err) {
-      console.error('❌ Ошибка отметки урока:', err);
+      console.error('Ошибка отметки урока:', err);
       setError(err.response?.data?.error || 'Ошибка при отметке урока');
     } finally {
       setCompleting(prev => ({ ...prev, [lessonId]: false }));
@@ -115,10 +116,10 @@ const CourseDetailPage = () => {
 
   const getDifficultyIcon = (difficulty) => {
     switch(difficulty) {
-      case 'Начинающий': return <FaLeaf size={16} color="#48bb78" />;
-      case 'Средний': return <FaStar size={16} color="#fbbf24" />;
-      case 'Продвинутый': return <FaFire size={16} color="#ef4444" />;
-      default: return <GiLotus size={16} color="#667eea" />;
+      case 'Начинающий': return <FaLeaf size={16} />;
+      case 'Средний': return <FaStar size={16} />;
+      case 'Продвинутый': return <FaFire size={16} />;
+      default: return <GiLotus size={16} />;
     }
   };
 
@@ -131,6 +132,19 @@ const CourseDetailPage = () => {
     }
   };
 
+  const getLessonIcon = (index) => {
+    const icons = [
+      <GiMeditation size={18} />,
+      <GiLotus size={18} />,
+      <GiSittingDog size={18} />,
+      <GiSnake size={18} />,
+      <GiLungs size={18} />,
+      <GiPalm size={18} />,
+      <GiFlowerStar size={18} />
+    ];
+    return icons[index % icons.length];
+  };
+
   const completedLessons = course?.progress?.completed_lessons ?? 0;
   const totalLessons = course?.total_lessons ?? 1;
   const progressPercent = Math.min((completedLessons / totalLessons) * 100, 100);
@@ -141,7 +155,7 @@ const CourseDetailPage = () => {
         <Navbar />
         <div className="container">
           <div className="course-detail-loading">
-            <GiMeditation size={48} color="#667eea" className="course-detail-spinner" />
+            <GiMeditation size={48} className="course-detail-spinner" />
             <p>Загрузка курса...</p>
           </div>
         </div>
@@ -155,7 +169,7 @@ const CourseDetailPage = () => {
         <Navbar />
         <div className="container">
           <div className="course-detail-error">
-            <FaExclamationTriangle size={48} color="#e53e3e" />
+            <FiAlertCircle size={48} />
             <h2>Ошибка</h2>
             <p>{error}</p>
             <button onClick={loadCourse} className="course-detail-retry-btn">
@@ -174,7 +188,7 @@ const CourseDetailPage = () => {
         <Navbar />
         <div className="container">
           <div className="course-detail-not-found">
-            <FaBookOpen size={48} color="#94a3b8" />
+            <FaBookOpen size={48} />
             <h2>Курс не найден</h2>
             <Link to="/courses" className="course-detail-back-link">
               <FaArrowLeft size={14} />
@@ -198,7 +212,7 @@ const CourseDetailPage = () => {
           
           <div className="course-detail-header">
             <h1>
-              <GiLotus size={32} color="#667eea" />
+              <GiLotus size={32} />
               {course.title || 'Курс'}
             </h1>
             
@@ -220,6 +234,11 @@ const CourseDetailPage = () => {
               <span className="course-detail-meta-item">
                 <GiDuration size={14} /> {course.total_lessons || 0} уроков
               </span>
+              {course.students_count !== undefined && (
+                <span className="course-detail-meta-item">
+                  <FaUserGraduate size={14} /> {course.students_count} студентов
+                </span>
+              )}
             </div>
             
             <p className="course-full-description">
@@ -230,21 +249,21 @@ const CourseDetailPage = () => {
           <div className="course-info-grid">
             <div className="info-card">
               <h3>
-                <FaInfoCircle size={16} color="#667eea" />
+                <FaInfoCircle size={16} />
                 Польза курса
               </h3>
               <p>{course.benefits}</p>
             </div>
             <div className="info-card">
               <h3>
-                <FaExclamationTriangle size={16} color="#ed8936" />
+                <FaExclamationTriangle size={16} />
                 Противопоказания
               </h3>
               <p>{course.contraindications}</p>
             </div>
             <div className="info-card">
               <h3>
-                <FaLightbulb size={16} color="#fbbf24" />
+                <FaLightbulb size={16} />
                 Советы
               </h3>
               <p>{course.tips}</p>
@@ -254,7 +273,7 @@ const CourseDetailPage = () => {
           <div className="course-progress-section">
             <div className="progress-header">
               <span>
-                <IoRibbonOutline size={20} color="#667eea" />
+                <IoRibbonOutline size={20} />
                 Ваш прогресс
               </span>
               <span className="progress-count">
@@ -266,8 +285,8 @@ const CourseDetailPage = () => {
             </div>
             {course.progress?.is_completed && (
               <div className="completion-badge">
-                <FaAward size={20} color="#48bb78" />
-                <MdCelebration size={20} color="#fbbf24" />
+                <FaAward size={20} />
+                <MdOutlineEmojiEvents size={20} />
                 Курс успешно завершён!
               </div>
             )}
@@ -275,7 +294,7 @@ const CourseDetailPage = () => {
 
           <div className="lessons-list">
             <h2>
-              <FaBookOpen size={20} color="#667eea" />
+              <FaBookOpen size={20} />
               Уроки курса
             </h2>
             
@@ -286,19 +305,26 @@ const CourseDetailPage = () => {
                 return (
                   <div key={lesson.id} className={`lesson-item ${isCompleted ? 'completed' : ''}`}>
                     <div className="lesson-number">
-                      {isCompleted ? <FaCheckCircle size={18} /> : index + 1}
+                      {isCompleted ? (
+                        <FaCheckCircle size={18} />
+                      ) : (
+                        getLessonIcon(index)
+                      )}
                     </div>
                     
                     <div className="lesson-info">
                       <h3>
                         {lesson.title}
                         {isCompleted && (
-                          <span className="lesson-completed-badge">Пройдено</span>
+                          <span className="lesson-completed-badge">
+                            <FiCheck size={12} />
+                            Пройдено
+                          </span>
                         )}
                       </h3>
                       <p className="lesson-content">{lesson.content}</p>
                       <span className="lesson-duration">
-                        <FaClock size={12} /> {lesson.duration_minutes || 0} мин
+                        <IoTimeOutline size={12} /> {lesson.duration_minutes || 0} мин
                       </span>
                     </div>
                     
@@ -311,8 +337,8 @@ const CourseDetailPage = () => {
                         >
                           {completing[lesson.id] ? (
                             <>
-                              <span className="spinner-small"></span>
-                              ...
+                              <FiLoader size={14} className="spinning" />
+                              Отметка...
                             </>
                           ) : (
                             <>
@@ -333,7 +359,7 @@ const CourseDetailPage = () => {
               })
             ) : (
               <div className="lessons-empty">
-                <FaBookOpen size={32} color="#cbd5e0" />
+                <FaBookOpen size={32} />
                 <p>Уроки пока не добавлены</p>
               </div>
             )}

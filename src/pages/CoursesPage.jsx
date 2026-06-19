@@ -16,11 +16,17 @@ import {
   FiCheckCircle,
   FiCalendar,
   FiTarget,
-  FiFeather,    // ← ЗАМЕНИЛИ FiLeaf НА FiFeather
+  FiFeather,
   FiLayers,
-  FiZap
+  FiZap,
+  FiAlertCircle,
+  FiRefreshCw,
+  FiGrid,
+  FiList
 } from 'react-icons/fi';
 import { GiMeditation, GiLotus, GiSittingDog } from 'react-icons/gi';
+import { FaUserGraduate, FaBookOpen } from 'react-icons/fa';
+import { IoTimeOutline } from 'react-icons/io5';
 
 const CoursesPage = () => {
   const { user } = useAuth();
@@ -28,6 +34,7 @@ const CoursesPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('all');
+  const [viewMode, setViewMode] = useState('grid');
 
   useEffect(() => {
     fetchCourses();
@@ -40,10 +47,9 @@ const CoursesPage = () => {
       const { data } = await api.get('/api/courses', {
         headers: { Authorization: `Bearer ${user.token}` }
       });
-      console.log('✅ Загружено курсов:', data.length);
       setCourses(data);
     } catch (err) {
-      console.error('❌ Ошибка загрузки курсов:', err);
+      console.error('Ошибка загрузки курсов:', err);
       setError(err.response?.data?.error || 'Ошибка загрузки курсов');
     } finally {
       setLoading(false);
@@ -61,11 +67,11 @@ const CoursesPage = () => {
 
   const getDifficultyIcon = (difficulty) => {
     const iconMap = {
-      'Начинающий': <FiFeather size={14} color="#48bb78" />,  // ← ЗДЕСЬ ТОЖЕ
-      'Средний': <FiLayers size={14} color="#f6ad55" />,
-      'Продвинутый': <FiZap size={14} color="#fc8181" />
+      'Начинающий': <FiFeather size={14} />,
+      'Средний': <FiLayers size={14} />,
+      'Продвинутый': <FiZap size={14} />
     };
-    return iconMap[difficulty] || <FiStar size={14} color="#667eea" />;
+    return iconMap[difficulty] || <FiStar size={14} />;
   };
 
   const getDifficultyBadge = (difficulty) => {
@@ -87,8 +93,10 @@ const CoursesPage = () => {
       <>
         <Navbar />
         <div className="container">
-          <div className="loading-container">
-            <div className="loading-spinner"></div>
+          <div className="courses-loading">
+            <div className="courses-loading-spinner">
+              <GiMeditation size={48} className="spinning" />
+            </div>
             <p>Загрузка курсов...</p>
           </div>
         </div>
@@ -103,10 +111,11 @@ const CoursesPage = () => {
         <div className="container">
           <div className="courses-container">
             <div className="courses-error">
-              <FiBookOpen size={48} color="#e53e3e" />
+              <FiAlertCircle size={48} />
               <h3>Ошибка загрузки</h3>
               <p>{error}</p>
               <button onClick={fetchCourses} className="btn-primary">
+                <FiRefreshCw size={16} />
                 Попробовать снова
               </button>
             </div>
@@ -122,13 +131,33 @@ const CoursesPage = () => {
       <div className="container">
         <div className="courses-container">
           <div className="courses-header">
-            <h1>
-              <FiBookOpen size={28} />
-              Выберите курс и начните свое обучение
-            </h1>
-            <p className="courses-subtitle">
-              Изучайте йогу с нуля или углубляйте свою практику с опытными наставниками
-            </p>
+            <div className="courses-header-content">
+              <h1>
+                <FiBookOpen size={28} />
+                Выберите курс и начните свое обучение
+              </h1>
+              <p className="courses-subtitle">
+                Изучайте йогу с нуля или углубляйте свою практику с опытными наставниками
+              </p>
+            </div>
+            <div className="courses-header-actions">
+              <div className="view-controls">
+                <button
+                  className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                  onClick={() => setViewMode('grid')}
+                  aria-label="Сетка"
+                >
+                  <FiGrid size={18} />
+                </button>
+                <button
+                  className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
+                  onClick={() => setViewMode('list')}
+                  aria-label="Список"
+                >
+                  <FiList size={18} />
+                </button>
+              </div>
+            </div>
           </div>
 
           <div className="courses-filters">
@@ -136,13 +165,14 @@ const CoursesPage = () => {
               className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
               onClick={() => setFilter('all')}
             >
+              <FiGrid size={14} />
               Все
             </button>
             <button
               className={`filter-btn ${filter === 'Начинающий' ? 'active' : ''}`}
               onClick={() => setFilter('Начинающий')}
             >
-              <FiFeather size={14} />  {/* ← И ЗДЕСЬ */}
+              <FiFeather size={14} />
               Начинающий
             </button>
             <button
@@ -170,6 +200,10 @@ const CoursesPage = () => {
               <FiTrendingUp size={18} />
               <span>Показано: {filteredCourses.length}</span>
             </div>
+            <div className="courses-stat">
+              <FaUserGraduate size={18} />
+              <span>Студентов: {courses.reduce((acc, c) => acc + (c.students_count || 0), 0)}</span>
+            </div>
           </div>
 
           {filteredCourses.length === 0 ? (
@@ -177,9 +211,16 @@ const CoursesPage = () => {
               <FiBookOpen size={48} />
               <h3>Курсы не найдены</h3>
               <p>Попробуйте выбрать другой фильтр</p>
+              <button 
+                className="btn-secondary" 
+                onClick={() => setFilter('all')}
+              >
+                <FiRefreshCw size={16} />
+                Сбросить фильтр
+              </button>
             </div>
           ) : (
-            <div className="courses-grid">
+            <div className={`courses-grid ${viewMode}`}>
               {filteredCourses.map(course => (
                 <Link
                   to={`/courses/${course.id}`}
@@ -187,7 +228,7 @@ const CoursesPage = () => {
                   className="course-card"
                 >
                   <div className="course-card-image">
-                    <GiMeditation size={48} color="#667eea" />
+                    <GiMeditation size={48} />
                   </div>
                   <div className="course-card-content">
                     <h3>{course.title}</h3>
@@ -204,9 +245,15 @@ const CoursesPage = () => {
                         {getDifficultyBadge(course.difficulty)}
                       </span>
                       <span className="course-card-lessons">
-                        <FiBookOpen size={14} />
+                        <FaBookOpen size={14} />
                         {course.total_lessons || 0} уроков
                       </span>
+                      {course.duration && (
+                        <span className="course-card-duration">
+                          <IoTimeOutline size={14} />
+                          {course.duration} мин
+                        </span>
+                      )}
                     </div>
                     <div className="course-card-footer">
                       <span className="course-card-read-more">

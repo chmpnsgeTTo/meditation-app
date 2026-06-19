@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
-import api from '../api/axios'; // ← Импортируем настроенный axios
+import api from '../api/axios';
 import { 
   FiSearch, 
   FiFilter, 
@@ -61,8 +61,6 @@ const AsanasCatalog = () => {
       setAsanas(data);
     } catch (err) {
       console.error('❌ Ошибка загрузки асан:', err);
-      console.error('❌ Статус:', err.response?.status);
-      console.error('❌ Ответ:', err.response?.data);
       setError(err.response?.data?.error || 'Ошибка загрузки асан. Попробуйте позже.');
     } finally {
       setLoading(false);
@@ -219,7 +217,7 @@ const AsanasCatalog = () => {
                 <Link
                   to={`/catalog/${asana.id}`}
                   key={asana.id}
-                  className={`catalog-item catalog-item-${viewMode}`}
+                  className={`catalog-item`}
                 >
                   <div className="catalog-item-content">
                     <div className="catalog-item-header">

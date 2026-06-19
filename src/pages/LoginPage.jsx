@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiUser, FiLock, FiLogIn, FiArrowLeft } from 'react-icons/fi';
-import { GiMeditation } from 'react-icons/gi';
+import { FiUser, FiLock, FiLogIn, FiArrowLeft, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
+import { GiMeditation, GiLotus } from 'react-icons/gi';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../api/axios';
 import BlockedModal from '../components/BlockedModal';
@@ -12,6 +12,7 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -26,11 +27,11 @@ const LoginPage = () => {
     e.preventDefault();
     
     if (isSubmitting || submitLock.current) {
-      console.log('⛔ Предотвращена повторная отправка');
       return;
     }
     
     setError('');
+    setShowSuccess(false);
     
     if (!username.trim() || !password.trim()) {
       setError('Заполните все поля');
@@ -41,37 +42,31 @@ const LoginPage = () => {
     submitLock.current = true;
     setLoading(true);
     
-    console.log('📤 Отправка логина:', { 
-      username: username.trim(), 
-      password: password ? '***' : 'пусто' 
-    });
-    
     try {
-      // 1. Отправляем запрос на логин
       const response = await api.post('/api/login', { 
         username: username.trim(), 
         password: password.trim() 
       });
       
-      console.log('✅ Ответ сервера:', response.data);
-      
       if (response.data.token) {
-        // 2. ✅ ПРАВИЛЬНО: передаём username и password, а не token!
         const result = await login(username.trim(), password.trim());
-        console.log('📝 Результат login():', result);
         
         if (result.success) {
-          console.log('✅ Вход успешен, редирект');
+          setShowSuccess(true);
           submitLock.current = false;
           setIsSubmitting(false);
-          navigate('/meditation');
+          
+          // Небольшая задержка для показа успеха
+          setTimeout(() => {
+            navigate('/meditation');
+          }, 500);
           return;
         } else {
           setError(result.error || 'Ошибка входа');
         }
       }
     } catch (err) {
-      console.error('❌ Ошибка входа:', err);
+      console.error('Ошибка входа:', err);
       
       if (err.response?.status === 403 && err.response?.data?.isBlocked) {
         setBlockReason(err.response.data.blockReason || 'Причина не указана');
@@ -105,14 +100,26 @@ const LoginPage = () => {
             <FiArrowLeft size={16} />
             На главную
           </Link>
-          <div className="logo">
-            <div className="logo-icon">
+          
+          <div className="auth-logo">
+            <div className="auth-logo-icon">
               <GiMeditation size={64} />
             </div>
-            <h1>Yoga Practice</h1>
+            <h1 className="auth-title">Yoga Practice</h1>
+            <p className="auth-subtitle">
+              <GiLotus size={14} />
+              Начни свой путь к гармонии
+            </p>
           </div>
           
-          <h2>Вход в аккаунт</h2>
+          <h2 className="auth-heading">Вход в аккаунт</h2>
+          
+          {showSuccess && (
+            <div className="auth-success">
+              <FiCheckCircle size={18} />
+              Вход выполнен успешно!
+            </div>
+          )}
           
           <form onSubmit={handleSubmit} noValidate>
             <div className="input-wrapper">
@@ -125,9 +132,11 @@ const LoginPage = () => {
                 disabled={isSubmitting}
                 required 
                 autoComplete="username"
+                className={error && !username.trim() ? 'input-error' : ''}
               />
               <FiUser className="input-icon" />
             </div>
+            
             <div className="input-wrapper">
               <input 
                 type="password" 
@@ -138,18 +147,35 @@ const LoginPage = () => {
                 disabled={isSubmitting}
                 required 
                 autoComplete="current-password"
+                className={error && !password.trim() ? 'input-error' : ''}
               />
               <FiLock className="input-icon" />
             </div>
+            
+            {error && (
+              <div className="error-message">
+                <FiAlertCircle size={16} />
+                {error}
+              </div>
+            )}
+            
             <button 
               type="submit" 
-              className="btn-primary" 
+              className="btn-primary auth-submit-btn" 
               disabled={isSubmitting || loading}
             >
-              <FiLogIn size={18} />
-              {loading ? 'Вход...' : 'Войти'}
+              {loading ? (
+                <>
+                  <span className="spinner-small"></span>
+                  Вход...
+                </>
+              ) : (
+                <>
+                  <FiLogIn size={18} />
+                  Войти
+                </>
+              )}
             </button>
-            {error && <div className="error-message">{error}</div>}
           </form>
           
           <p className="auth-link">

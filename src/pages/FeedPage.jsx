@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../api/axios';
-import { FaHeart, FaRegHeart, FaComment, FaTrash } from 'react-icons/fa';
+import { FaHeart, FaRegHeart, FaComment, FaTrash, FaUserCircle } from 'react-icons/fa';
 import { MdSend, MdClose } from 'react-icons/md';
 import { GiMeditation, GiLotus } from 'react-icons/gi';
 import { IoMdMedal } from 'react-icons/io';
-import { FiPlus } from 'react-icons/fi';
+import { FiPlus, FiClock, FiCalendar, FiArrowUp } from 'react-icons/fi';
+import { BiTime } from 'react-icons/bi';
 
 const FeedPage = () => {
   const { user } = useAuth();
@@ -38,6 +39,7 @@ const FeedPage = () => {
   // Загрузка ленты
   const loadFeed = async (pageNum = 1, append = false) => {
     try {
+      setLoading(true);
       const { data } = await api.get(`/api/feed?page=${pageNum}&limit=10`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
@@ -146,7 +148,7 @@ const FeedPage = () => {
     return date.toLocaleDateString('ru-RU');
   };
 
-  if (loading) return <><Navbar /><div className="container"><div className="loading">Загрузка...</div></div></>;
+  if (loading) return <><Navbar /><div className="container"><div className="feed-loading"><FiClock size={32} /><p>Загрузка...</p></div></div></>;
 
   return (
     <>
@@ -155,9 +157,13 @@ const FeedPage = () => {
         <div className="feed-container">
           {/* Шапка ленты */}
           <div className="feed-header">
-            <h2>Лента достижений</h2>
+            <h2>
+              <GiMeditation size={28} className="feed-header-icon" />
+              Лента достижений
+            </h2>
             <button className="create-post-btn" onClick={() => setShowCreateModal(true)}>
-              <GiMeditation size={20} /> Поделиться результатом
+              <FiPlus size={20} />
+              Поделиться результатом
             </button>
           </div>
 
@@ -165,15 +171,15 @@ const FeedPage = () => {
           {statistics && (
             <div className="user-achievements">
               <div className="achievement-badge">
-                <GiMeditation size={24} />
+                <BiTime size={22} />
                 <span>Всего минут: {statistics.total_minutes}</span>
               </div>
               <div className="achievement-badge">
-                <IoMdMedal size={20} color="#fbbf24" />
+                <IoMdMedal size={20} />
                 <span>Сессий: {statistics.total_sessions}</span>
               </div>
               <div className="achievement-badge">
-                <FaHeart size={18} color="#e53e3e" />
+                <FaHeart size={18} />
                 <span>Лайков: {posts.reduce((acc, p) => acc + p.likes_count, 0)}</span>
               </div>
             </div>
@@ -183,6 +189,7 @@ const FeedPage = () => {
           <div className="feed-posts">
             {posts.length === 0 ? (
               <div className="no-posts">
+                <GiLotus size={48} className="no-posts-icon" />
                 <p>Пока нет постов</p>
                 <button className="btn-primary" onClick={() => setShowCreateModal(true)}>
                   <FiPlus size={18} />
@@ -194,17 +201,27 @@ const FeedPage = () => {
                 <div key={post.id} className="feed-post">
                   {/* Автор */}
                   <div className="post-header">
-                    <img 
-                      src={post.avatar || '/uploads/default-avatar.png'} 
-                      alt="avatar" 
-                      className="post-avatar"
-                      onError={(e) => {
-                        e.target.src = '/uploads/default-avatar.png';
-                      }}
-                    />
+                    {post.avatar ? (
+                      <img 
+                        src={post.avatar} 
+                        alt="avatar" 
+                        className="post-avatar"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = '/uploads/default-avatar.png';
+                        }}
+                      />
+                    ) : (
+                      <div className="post-avatar-placeholder">
+                        <FaUserCircle size={40} />
+                      </div>
+                    )}
                     <div className="post-author">
                       <span className="post-username">{post.username}</span>
-                      <span className="post-date">{formatDate(post.created_at)}</span>
+                      <span className="post-date">
+                        <FiCalendar size={12} />
+                        {formatDate(post.created_at)}
+                      </span>
                     </div>
                     {post.user_id === parseInt(user.userId) && (
                       <button className="post-delete" onClick={() => deletePost(post.id)}>
@@ -227,7 +244,7 @@ const FeedPage = () => {
                   {/* Кнопки действий */}
                   <div className="post-actions">
                     <button className="action-btn" onClick={() => handleLike(post.id)}>
-                      {post.is_liked ? <FaHeart color="#e53e3e" size={20} /> : <FaRegHeart size={20} />}
+                      {post.is_liked ? <FaHeart className="liked" size={20} /> : <FaRegHeart size={20} />}
                       <span>{post.likes_count}</span>
                     </button>
                     <button className="action-btn" onClick={() => toggleComments(post.id)}>
@@ -240,23 +257,39 @@ const FeedPage = () => {
                   {showComments[post.id] && (
                     <div className="post-comments">
                       <div className="comments-list">
-                        {comments[post.id]?.map(comment => (
-                          <div key={comment.id} className="comment-item">
-                            <img 
-                              src={comment.avatar || '/uploads/default-avatar.png'} 
-                              alt="" 
-                              className="comment-avatar"
-                              onError={(e) => {
-                                e.target.src = '/uploads/default-avatar.png';
-                              }}
-                            />
-                            <div className="comment-content">
-                              <span className="comment-username">{comment.username}</span>
-                              <span className="comment-text">{comment.content}</span>
-                              <span className="comment-date">{formatDate(comment.created_at)}</span>
-                            </div>
+                        {comments[post.id]?.length === 0 ? (
+                          <div className="no-comments">
+                            <p>Нет комментариев</p>
                           </div>
-                        ))}
+                        ) : (
+                          comments[post.id]?.map(comment => (
+                            <div key={comment.id} className="comment-item">
+                              {comment.avatar ? (
+                                <img 
+                                  src={comment.avatar} 
+                                  alt="" 
+                                  className="comment-avatar"
+                                  onError={(e) => {
+                                    e.target.onerror = null;
+                                    e.target.src = '/uploads/default-avatar.png';
+                                  }}
+                                />
+                              ) : (
+                                <div className="comment-avatar-placeholder">
+                                  <FaUserCircle size={28} />
+                                </div>
+                              )}
+                              <div className="comment-content">
+                                <span className="comment-username">{comment.username}</span>
+                                <span className="comment-text">{comment.content}</span>
+                                <span className="comment-date">
+                                  <FiClock size={10} />
+                                  {formatDate(comment.created_at)}
+                                </span>
+                              </div>
+                            </div>
+                          ))
+                        )}
                       </div>
                       <div className="comment-form">
                         <input
@@ -281,6 +314,7 @@ const FeedPage = () => {
           {hasMore && posts.length > 0 && (
             <div className="load-more">
               <button onClick={() => loadFeed(page + 1, true)} className="btn-secondary">
+                <FiArrowUp size={18} />
                 Загрузить ещё
               </button>
             </div>
@@ -293,7 +327,10 @@ const FeedPage = () => {
         <div className="modal show" onClick={() => setShowCreateModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3>Поделиться результатом</h3>
+              <h3>
+                <GiMeditation size={22} />
+                Поделиться результатом
+              </h3>
               <button className="modal-close" onClick={() => setShowCreateModal(false)}>
                 <MdClose size={24} />
               </button>
@@ -307,7 +344,10 @@ const FeedPage = () => {
             />
             <div className="post-options">
               <div className="option-group">
-                <label><GiMeditation /> Длительность медитации (мин):</label>
+                <label>
+                  <BiTime size={16} />
+                  Длительность медитации (мин):
+                </label>
                 <input
                   type="number"
                   placeholder="Например: 15"
@@ -318,8 +358,14 @@ const FeedPage = () => {
               </div>
             </div>
             <div className="modal-buttons">
-              <button onClick={createPost} className="btn-primary">Опубликовать</button>
-              <button onClick={() => setShowCreateModal(false)} className="btn-secondary">Отмена</button>
+              <button onClick={createPost} className="btn-primary">
+                <MdSend size={18} />
+                Опубликовать
+              </button>
+              <button onClick={() => setShowCreateModal(false)} className="btn-secondary">
+                <MdClose size={18} />
+                Отмена
+              </button>
             </div>
           </div>
         </div>
