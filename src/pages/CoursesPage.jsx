@@ -16,7 +16,7 @@ import {
   FiCheckCircle,
   FiCalendar,
   FiTarget,
-  FiLeaf,
+  FiFeather,
   FiLayers,
   FiZap
 } from 'react-icons/fi';
