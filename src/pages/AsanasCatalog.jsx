@@ -17,7 +17,8 @@ import {
   FiActivity,
   FiUsers,
   FiHeart,
-  FiEye
+  FiEye,
+  FiAlertCircle
 } from 'react-icons/fi';
 import { GiLotus, GiMeditation, GiSittingDog } from 'react-icons/gi';
 
@@ -27,9 +28,10 @@ const AsanasCatalog = () => {
   const { user } = useAuth();
   const [asanas, setAsanas] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' или 'list'
+  const [viewMode, setViewMode] = useState('grid');
 
   const categories = [
     'Все',
@@ -52,13 +54,18 @@ const AsanasCatalog = () => {
 
   const fetchAsanas = async () => {
     setLoading(true);
+    setError(null);
     try {
       const { data } = await axios.get(`${API_URL}/api/asanas`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
+      console.log('✅ Загружено асан:', data.length);
       setAsanas(data);
     } catch (err) {
-      console.error('Ошибка загрузки асан:', err);
+      console.error('❌ Ошибка загрузки асан:', err);
+      console.error('❌ Статус:', err.response?.status);
+      console.error('❌ Ответ:', err.response?.data);
+      setError(err.response?.data?.error || 'Ошибка загрузки асан. Попробуйте позже.');
     } finally {
       setLoading(false);
     }
@@ -78,7 +85,7 @@ const AsanasCatalog = () => {
       'скручивания': <FiGrid size={18} />,
       'перевёрнутые позы': <FiEye size={18} />
     };
-    return iconMap[category.toLowerCase()] || <FiTag size={18} />;
+    return iconMap[category?.toLowerCase()] || <FiTag size={18} />;
   };
 
   const getCategoryColor = (category) => {
@@ -95,7 +102,7 @@ const AsanasCatalog = () => {
       'скручивания': '#38b2ac',
       'перевёрнутые позы': '#805ad5'
     };
-    return colorMap[category.toLowerCase()] || '#667eea';
+    return colorMap[category?.toLowerCase()] || '#667eea';
   };
 
   const filteredAsanas = asanas.filter(asana => {
@@ -121,6 +128,30 @@ const AsanasCatalog = () => {
     );
   }
 
+  if (error) {
+    return (
+      <>
+        <Navbar />
+        <div className="container">
+          <div className="catalog-container">
+            <div className="catalog-error">
+              <FiAlertCircle size={48} color="#e53e3e" />
+              <h3>Ошибка загрузки</h3>
+              <p>{error}</p>
+              <button 
+                onClick={fetchAsanas}
+                className="btn-primary"
+                style={{ marginTop: '1rem' }}
+              >
+                Попробовать снова
+              </button>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <Navbar />
@@ -136,7 +167,6 @@ const AsanasCatalog = () => {
             </p>
           </div>
 
-          {/* Поиск и фильтры */}
           <div className="catalog-controls">
             <div className="catalog-search">
               <FiSearch className="catalog-search-icon" />
@@ -167,7 +197,6 @@ const AsanasCatalog = () => {
             </div>
           </div>
 
-          {/* Категории */}
           <div className="catalog-categories">
             {categories.map(category => (
               <button
@@ -180,7 +209,6 @@ const AsanasCatalog = () => {
             ))}
           </div>
 
-          {/* Результаты */}
           {filteredAsanas.length === 0 ? (
             <div className="catalog-empty">
               <FiSearch size={48} />

@@ -1192,6 +1192,92 @@ app.get('/api/admin/unblock-requests/stats', authMiddleware, adminMiddleware, as
   }
 });
 
+
+// ============================================================
+// 10. КАТАЛОГ АСАН
+// ============================================================
+
+// ---------- ПОЛУЧИТЬ ВСЕ АСАНЫ ----------
+app.get('/api/asanas', authMiddleware, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        id,
+        name,
+        sanskrit,
+        category,
+        difficulty,
+        duration,
+        description,
+        full_description,
+        benefits,
+        contraindications,
+        technique,
+        image_url,
+        created_at,
+        updated_at
+      FROM asanas
+      ORDER BY name ASC
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error('❌ Ошибка получения асан:', err);
+    res.status(500).json({ error: 'Ошибка получения асан' });
+  }
+});
+
+// ---------- ПОЛУЧИТЬ ОДНУ АСАНУ ПО ID ----------
+app.get('/api/asanas/:id', authMiddleware, async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+    const result = await pool.query(`
+      SELECT 
+        id,
+        name,
+        sanskrit,
+        category,
+        difficulty,
+        duration,
+        description,
+        full_description,
+        benefits,
+        contraindications,
+        technique,
+        image_url,
+        created_at,
+        updated_at
+      FROM asanas
+      WHERE id = $1
+    `, [id]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Асана не найдена' });
+    }
+    
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('❌ Ошибка получения асаны:', err);
+    res.status(500).json({ error: 'Ошибка получения асаны' });
+  }
+});
+
+// ---------- ПОЛУЧИТЬ КАТЕГОРИИ АСАН ----------
+app.get('/api/asanas/categories', authMiddleware, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT DISTINCT category 
+      FROM asanas 
+      WHERE category IS NOT NULL 
+      ORDER BY category ASC
+    `);
+    res.json(result.rows.map(row => row.category));
+  } catch (err) {
+    console.error('❌ Ошибка получения категорий:', err);
+    res.status(500).json({ error: 'Ошибка получения категорий' });
+  }
+});
+
 // ============================================================
 // 8. ОБРАБОТКА ЗАПРОСОВ НА ФРОНТЕНД (SPA)
 // ============================================================

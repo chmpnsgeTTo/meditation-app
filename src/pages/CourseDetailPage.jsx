@@ -500,7 +500,7 @@ const CourseDetailPage = () => {
                           fontWeight: '500'
                         }}>
                           <FaCheckCircle size={16} />
-                          Пройдено ✅
+                          Пройдено
                         </span>
                       )}
                     </div>
