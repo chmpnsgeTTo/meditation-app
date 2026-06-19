@@ -21,28 +21,6 @@ const SECRET_KEY = process.env.SECRET_KEY;
 const appRoot = process.cwd();
 console.log('📁 App root:', appRoot);
 
-// Определяем папку со статикой (для React сборки)
-const staticDir = path.join(appRoot, 'dist');
-const publicDir = path.join(appRoot, 'public');
-
-console.log('📁 Static dir (dist):', staticDir);
-console.log('📁 Public dir:', publicDir);
-
-// Проверяем, какая папка существует
-let staticPath = null;
-if (fs.existsSync(staticDir)) {
-  staticPath = staticDir;
-  console.log('✅ Использую папку dist для статики');
-} else if (fs.existsSync(publicDir)) {
-  staticPath = publicDir;
-  console.log('✅ Использую папку public для статики');
-} else {
-  console.log('⚠️ Папка со статикой не найдена!');
-  fs.mkdirSync(publicDir, { recursive: true });
-  staticPath = publicDir;
-  console.log('📁 Создана папка public');
-}
-
 // Папка для загрузок (внутри public)
 const uploadDir = path.join(appRoot, 'public', 'uploads');
 if (!fs.existsSync(uploadDir)) {
@@ -122,27 +100,58 @@ app.use(express.urlencoded({ extended: true }));
 // ============================================================
 
 // СНАЧАЛА раздаем папку uploads
+app.use('/uploads', express.static(uploadDir, {
+  maxAge: 0,
+  etag: true,
+  lastModified: true,
+  setHeaders: (res, filePath) => {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Content-Type', 'image/jpeg');
+  }
+}));
+
+// Логируем запросы к /uploads
 app.use('/uploads', (req, res, next) => {
   console.log('🖼️ Запрос к /uploads:', req.url);
-  console.log('📂 Путь к файлу:', path.join(uploadDir, req.url));
+  const filePath = path.join(uploadDir, req.url);
+  console.log('📂 Проверка файла:', filePath);
+  console.log('📂 Файл существует:', fs.existsSync(filePath));
   next();
 });
 
-app.use('/uploads', express.static(uploadDir, {
+// ПОТОМ раздаем папку public
+app.use(express.static(path.join(appRoot, 'public'), {
   maxAge: 0,
   etag: true,
   lastModified: true
 }));
 
-// ПОТОМ раздаем всю статику (dist или public)
-if (staticPath) {
-  app.use(express.static(staticPath, {
+// ТАКЖЕ раздаем папку dist если она есть
+const distPath = path.join(appRoot, 'dist');
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath, {
     maxAge: 0,
     etag: true,
     lastModified: true
   }));
-  console.log('✅ Статика раздается из:', staticPath);
+  console.log('✅ Статика из dist раздается');
 }
+
+// Специальный эндпоинт для проверки аватара
+app.get('/uploads/:filename', (req, res) => {
+  const filePath = path.join(uploadDir, req.params.filename);
+  console.log('🔍 Прямой запрос к файлу:', filePath);
+  console.log('📂 Файл существует:', fs.existsSync(filePath));
+  
+  if (fs.existsSync(filePath)) {
+    res.sendFile(filePath);
+  } else {
+    res.status(404).json({ error: 'Файл не найден' });
+  }
+});
 
 // ============================================================
 // 5. ГЛОБАЛЬНЫЙ ОБРАБОТЧИК ОШИБОК MULTER
@@ -194,6 +203,7 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
+// ---------- ЛОГИН С ПРОВЕРКОЙ БЛОКИРОВКИ ----------
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   
@@ -207,6 +217,16 @@ app.post('/api/login', async (req, res) => {
     
     if (!user) {
       return res.status(401).json({ error: 'Неверные учетные данные' });
+    }
+    
+    // Проверка блокировки
+    if (user.is_blocked) {
+      return res.status(403).json({ 
+        error: 'Аккаунт заблокирован',
+        isBlocked: true,
+        blockReason: user.block_reason || 'Причина не указана',
+        userId: user.id
+      });
     }
     
     const isValid = await bcrypt.compare(password, user.password);
@@ -232,10 +252,11 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// ---------- ПОЛУЧЕНИЕ ПОЛЬЗОВАТЕЛЯ С ПРОВЕРКОЙ БЛОКИРОВКИ ----------
 app.get('/api/user', authMiddleware, async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT id, username, avatar, created_at FROM users WHERE id = $1',
+      'SELECT id, username, avatar, is_blocked, block_reason, created_at FROM users WHERE id = $1',
       [req.user.userId]
     );
     
@@ -243,7 +264,16 @@ app.get('/api/user', authMiddleware, async (req, res) => {
       return res.status(404).json({ error: 'Пользователь не найден' });
     }
     
-    res.json(result.rows[0]);
+    const user = result.rows[0];
+    if (user.is_blocked) {
+      return res.status(403).json({ 
+        error: 'Аккаунт заблокирован',
+        isBlocked: true,
+        blockReason: user.block_reason || 'Причина не указана'
+      });
+    }
+    
+    res.json(user);
   } catch (err) {
     console.error('❌ Ошибка получения пользователя:', err);
     res.status(500).json({ error: 'Ошибка сервера' });
@@ -964,7 +994,6 @@ app.delete('/api/admin/comments/:id', authMiddleware, adminMiddleware, async (re
   }
 });
 
-// ---------- СПИСОК ВСЕХ КОММЕНТАРИЕВ ----------
 app.get('/api/admin/comments', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const result = await pool.query(`
@@ -988,20 +1017,195 @@ app.get('/api/admin/comments', authMiddleware, adminMiddleware, async (req, res)
 });
 
 // ============================================================
-// 7. ОБРАБОТКА ЗАПРОСОВ НА ФРОНТЕНД (SPA)
+// 7. ОБРАТНАЯ СВЯЗЬ (ЗАПРОСЫ НА РАЗБЛОКИРОВКУ)
+// ============================================================
+
+// ---------- ОТПРАВКА ЗАПРОСА НА РАЗБЛОКИРОВКУ ----------
+app.post('/api/unblock-request', async (req, res) => {
+  const { userId, username, email, message } = req.body;
+  
+  if (!userId || !username || !message) {
+    return res.status(400).json({ error: 'Заполните все обязательные поля' });
+  }
+  
+  try {
+    // Проверяем, не отправлял ли пользователь уже запрос
+    const existingRequest = await pool.query(
+      'SELECT id FROM unblock_requests WHERE user_id = $1 AND status = $2',
+      [userId, 'pending']
+    );
+    
+    if (existingRequest.rows.length > 0) {
+      return res.status(400).json({ 
+        error: 'Вы уже отправили запрос на разблокировку. Ожидайте ответа администратора.' 
+      });
+    }
+    
+    const result = await pool.query(
+      `INSERT INTO unblock_requests (user_id, username, email, message, created_at) 
+       VALUES ($1, $2, $3, $4, NOW()) 
+       RETURNING id`,
+      [userId, username, email || null, message]
+    );
+    
+    console.log(`📨 Новый запрос на разблокировку от ${username} (ID: ${result.rows[0].id})`);
+    
+    res.json({ 
+      message: 'Запрос на разблокировку отправлен. Администратор свяжется с вами.',
+      requestId: result.rows[0].id
+    });
+  } catch (err) {
+    console.error('❌ Ошибка отправки запроса:', err);
+    res.status(500).json({ error: 'Ошибка отправки запроса' });
+  }
+});
+
+// ---------- ПОЛУЧЕНИЕ ВСЕХ ЗАПРОСОВ ----------
+app.get('/api/admin/unblock-requests', authMiddleware, adminMiddleware, async (req, res) => {
+  const { status = 'all' } = req.query;
+  
+  let statusFilter = '';
+  if (status !== 'all') {
+    statusFilter = 'WHERE status = $1';
+  }
+  
+  try {
+    const query = `
+      SELECT 
+        id,
+        user_id,
+        username,
+        email,
+        message,
+        status,
+        created_at,
+        updated_at,
+        admin_comment,
+        resolved_at
+      FROM unblock_requests
+      ${statusFilter}
+      ORDER BY 
+        CASE 
+          WHEN status = 'pending' THEN 1
+          WHEN status = 'in_progress' THEN 2
+          WHEN status = 'resolved' THEN 3
+          WHEN status = 'rejected' THEN 4
+        END,
+        created_at DESC
+    `;
+    
+    const params = status !== 'all' ? [status] : [];
+    const result = await pool.query(query, params);
+    
+    res.json(result.rows);
+  } catch (err) {
+    console.error('❌ Ошибка получения запросов:', err);
+    res.status(500).json({ error: 'Ошибка получения запросов' });
+  }
+});
+
+// ---------- ОБНОВЛЕНИЕ СТАТУСА ЗАПРОСА ----------
+app.put('/api/admin/unblock-requests/:id', authMiddleware, adminMiddleware, async (req, res) => {
+  const { id } = req.params;
+  const { status, admin_comment } = req.body;
+  
+  if (!status || !['pending', 'in_progress', 'resolved', 'rejected'].includes(status)) {
+    return res.status(400).json({ error: 'Некорректный статус' });
+  }
+  
+  try {
+    const requestCheck = await pool.query('SELECT * FROM unblock_requests WHERE id = $1', [id]);
+    if (requestCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Запрос не найден' });
+    }
+    
+    const request = requestCheck.rows[0];
+    
+    let resolvedAt = null;
+    if (status === 'resolved' || status === 'rejected') {
+      resolvedAt = new Date();
+      
+      if (status === 'resolved') {
+        await pool.query(
+          'UPDATE users SET is_blocked = false, block_reason = NULL, blocked_at = NULL WHERE id = $1',
+          [request.user_id]
+        );
+        console.log(`✅ Пользователь ${request.username} разблокирован через запрос #${id}`);
+      }
+    }
+    
+    await pool.query(
+      `UPDATE unblock_requests 
+       SET status = $1, 
+           admin_comment = $2, 
+           resolved_at = $3,
+           updated_at = NOW()
+       WHERE id = $4`,
+      [status, admin_comment || null, resolvedAt, id]
+    );
+    
+    res.json({ 
+      message: `Статус запроса обновлён на "${status}"`,
+      status,
+      resolved: status === 'resolved'
+    });
+  } catch (err) {
+    console.error('❌ Ошибка обновления запроса:', err);
+    res.status(500).json({ error: 'Ошибка обновления запроса' });
+  }
+});
+
+// ---------- УДАЛЕНИЕ ЗАПРОСА ----------
+app.delete('/api/admin/unblock-requests/:id', authMiddleware, adminMiddleware, async (req, res) => {
+  const { id } = req.params;
+  
+  try {
+    const result = await pool.query('DELETE FROM unblock_requests WHERE id = $1 RETURNING id', [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Запрос не найден' });
+    }
+    
+    res.json({ message: 'Запрос удалён' });
+  } catch (err) {
+    console.error('❌ Ошибка удаления запроса:', err);
+    res.status(500).json({ error: 'Ошибка удаления запроса' });
+  }
+});
+
+// ---------- СТАТИСТИКА ПО ЗАПРОСАМ ----------
+app.get('/api/admin/unblock-requests/stats', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        COUNT(*) as total,
+        COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending,
+        COUNT(CASE WHEN status = 'in_progress' THEN 1 END) as in_progress,
+        COUNT(CASE WHEN status = 'resolved' THEN 1 END) as resolved,
+        COUNT(CASE WHEN status = 'rejected' THEN 1 END) as rejected
+      FROM unblock_requests
+    `);
+    
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('❌ Ошибка получения статистики:', err);
+    res.status(500).json({ error: 'Ошибка получения статистики' });
+  }
+});
+
+// ============================================================
+// 8. ОБРАБОТКА ЗАПРОСОВ НА ФРОНТЕНД (SPA)
 // ============================================================
 // ВАЖНО: ЭТО ДОЛЖНО БЫТЬ ПОСЛЕ ВСЕХ API-ЭНДПОИНТОВ!
 
-// Проверяем существование index.html в разных папках
-const indexHtmlPaths = [
-  path.join(staticPath, 'index.html'),
-  path.join(staticPath, '..', 'public', 'index.html'),
+// Проверяем наличие index.html
+const indexPaths = [
   path.join(appRoot, 'public', 'index.html'),
-  path.join(appRoot, 'dist', 'index.html')
+  path.join(appRoot, 'dist', 'index.html'),
+  path.join(appRoot, 'build', 'index.html')
 ];
 
 let indexHtmlPath = null;
-for (const testPath of indexHtmlPaths) {
+for (const testPath of indexPaths) {
   if (fs.existsSync(testPath)) {
     indexHtmlPath = testPath;
     console.log('✅ Найден index.html:', indexHtmlPath);
@@ -1012,24 +1216,45 @@ for (const testPath of indexHtmlPaths) {
 if (!indexHtmlPath) {
   console.log('⚠️ index.html не найден! Создаю заглушку...');
   const fallbackHtml = `<!DOCTYPE html><html><head><title>Meditation App</title></head><body><div id="root">Loading...</div></body></html>`;
-  const fallbackPath = path.join(staticPath || appRoot, 'index.html');
+  const fallbackPath = path.join(appRoot, 'public', 'index.html');
+  fs.mkdirSync(path.dirname(fallbackPath), { recursive: true });
   fs.writeFileSync(fallbackPath, fallbackHtml);
   indexHtmlPath = fallbackPath;
   console.log('✅ Создан fallback index.html:', fallbackPath);
 }
 
+// Все запросы, которые не начинаются с /api и не ведут к существующим файлам,
+// отправляем на index.html
 app.get('*', (req, res) => {
-  // Проверяем, не запрос ли это к существующему файлу
-  const filePath = path.join(staticPath || appRoot, req.path);
-  if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-    return res.sendFile(filePath);
+  // Пропускаем API-запросы
+  if (req.path.startsWith('/api')) {
+    return res.status(404).json({ error: 'API endpoint not found' });
   }
+  
+  // Пропускаем запросы к статике
+  if (req.path.startsWith('/uploads')) {
+    return res.status(404).json({ error: 'File not found' });
+  }
+  
+  // Проверяем, не запрос ли это к существующему файлу
+  const possiblePaths = [
+    path.join(appRoot, 'public', req.path),
+    path.join(appRoot, 'dist', req.path),
+    path.join(appRoot, 'build', req.path)
+  ];
+  
+  for (const filePath of possiblePaths) {
+    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+      return res.sendFile(filePath);
+    }
+  }
+  
   // Иначе отдаем index.html
   res.sendFile(indexHtmlPath);
 });
 
 // ============================================================
-// 8. ГЛОБАЛЬНЫЙ ОБРАБОТЧИК ОШИБОК (должен быть последним)
+// 9. ГЛОБАЛЬНЫЙ ОБРАБОТЧИК ОШИБОК (должен быть последним)
 // ============================================================
 app.use((err, req, res, next) => {
   console.error('❌ Глобальная ошибка:', err);
@@ -1040,13 +1265,12 @@ app.use((err, req, res, next) => {
 });
 
 // ============================================================
-// 9. ЗАПУСК СЕРВЕРА
+// 10. ЗАПУСК СЕРВЕРА
 // ============================================================
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Сервер запущен на порту ${PORT}`);
   console.log(`📁 Рабочая директория: ${appRoot}`);
   console.log(`📁 Папка uploads: ${uploadDir}`);
-  console.log(`📁 Статика из: ${staticPath || 'не найдена'}`);
   console.log(`📄 index.html: ${indexHtmlPath || 'не найден'}`);
   console.log(`🌐 Режим: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🖼️ Аватары доступны по: /uploads/`);

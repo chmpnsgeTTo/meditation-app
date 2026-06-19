@@ -17,6 +17,11 @@ const RegisterPage = () => {
     e.preventDefault();
     setError('');
     
+    if (username.length < 3) {
+      setError('Имя пользователя должно быть минимум 3 символа');
+      return;
+    }
+    
     if (password.length < 6) {
       setError('Пароль должен быть минимум 6 символов');
       return;
@@ -42,7 +47,7 @@ const RegisterPage = () => {
     <div className="auth-page">
       <div className="auth-card">
         <Link to="/" className="back-home">
-          <FiArrowLeft size={16} style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+          <FiArrowLeft size={16} />
           На главную
         </Link>
         <div className="logo">
@@ -58,7 +63,7 @@ const RegisterPage = () => {
           <div className="input-wrapper">
             <input 
               type="text" 
-              placeholder="Имя пользователя" 
+              placeholder="Имя пользователя (мин. 3 символа)" 
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required 
@@ -86,7 +91,7 @@ const RegisterPage = () => {
             <FiCheckCircle className="input-icon" />
           </div>
           <button type="submit" className="btn-primary" disabled={loading}>
-            <FiUserPlus size={18} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+            <FiUserPlus size={18} />
             {loading ? 'Регистрация...' : 'Зарегистрироваться'}
           </button>
           {error && <div className="error-message">{error}</div>}

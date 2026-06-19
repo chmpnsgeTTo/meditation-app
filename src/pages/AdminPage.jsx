@@ -22,7 +22,9 @@ import {
   FiUser,
   FiCalendar,
   FiCheckCircle,
-  FiXCircle
+  FiXCircle,
+  FiMail,
+  FiSend
 } from 'react-icons/fi';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -33,6 +35,8 @@ const AdminPage = () => {
   const [users, setUsers] = useState([]);
   const [posts, setPosts] = useState([]);
   const [comments, setComments] = useState([]);
+  const [unblockRequests, setUnblockRequests] = useState([]);
+  const [requestStats, setRequestStats] = useState(null);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedPost, setSelectedPost] = useState(null);
@@ -55,6 +59,12 @@ const AdminPage = () => {
   const [deleteCommentData, setDeleteCommentData] = useState(null);
   const [deleteCommentReason, setDeleteCommentReason] = useState('');
   const [isDeletingComment, setIsDeletingComment] = useState(false);
+
+  // ===== СОСТОЯНИЯ ДЛЯ ОБРАТНОЙ СВЯЗИ =====
+  const [selectedRequest, setSelectedRequest] = useState(null);
+  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [requestStatus, setRequestStatus] = useState('');
+  const [requestComment, setRequestComment] = useState('');
 
   useEffect(() => {
     if (user?.role === 'admin') {
@@ -91,6 +101,17 @@ const AdminPage = () => {
           headers: { Authorization: `Bearer ${user.token}` }
         });
         setComments(data);
+      } else if (activeTab === 'feedback') {
+        const [statsData, requestsData] = await Promise.all([
+          axios.get(`${API_URL}/api/admin/unblock-requests/stats`, {
+            headers: { Authorization: `Bearer ${user.token}` }
+          }),
+          axios.get(`${API_URL}/api/admin/unblock-requests`, {
+            headers: { Authorization: `Bearer ${user.token}` }
+          })
+        ]);
+        setRequestStats(statsData.data);
+        setUnblockRequests(requestsData.data);
       }
     } catch (err) {
       console.error('❌ Ошибка загрузки:', err);
@@ -116,47 +137,7 @@ const AdminPage = () => {
     }
   };
 
-  // ========== ОТКРЫТИЕ МОДАЛКИ УДАЛЕНИЯ КОММЕНТАРИЯ ==========
-  const openDeleteCommentModal = (comment) => {
-    setDeleteCommentData(comment);
-    setDeleteCommentReason('');
-    setShowDeleteCommentModal(true);
-  };
-
-  // ========== ЗАКРЫТИЕ МОДАЛКИ УДАЛЕНИЯ КОММЕНТАРИЯ ==========
-  const closeDeleteCommentModal = () => {
-    setShowDeleteCommentModal(false);
-    setDeleteCommentData(null);
-    setDeleteCommentReason('');
-    setIsDeletingComment(false);
-  };
-
-  // ========== УДАЛЕНИЕ КОММЕНТАРИЯ С ПРИЧИНОЙ ==========
-  const confirmDeleteComment = async () => {
-    if (!deleteCommentReason.trim()) {
-      showMessage('Пожалуйста, укажите причину удаления', 'error');
-      return;
-    }
-
-    setIsDeletingComment(true);
-    try {
-      await axios.delete(`${API_URL}/api/admin/comments/${deleteCommentData.id}`, {
-        headers: { Authorization: `Bearer ${user.token}` },
-        data: { reason: deleteCommentReason.trim() }
-      });
-      
-      showMessage('Комментарий удалён', 'success');
-      closeDeleteCommentModal();
-      loadData();
-    } catch (err) {
-      console.error('❌ Ошибка удаления комментария:', err);
-      showMessage(err.response?.data?.error || 'Ошибка удаления комментария', 'error');
-    } finally {
-      setIsDeletingComment(false);
-    }
-  };
-
-  // ========== УДАЛЕНИЕ КОММЕНТАРИЯ (старая версия для модалки поста) ==========
+  // ========== УДАЛЕНИЕ КОММЕНТАРИЯ ==========
   const deleteComment = async (commentId) => {
     if (!window.confirm('Удалить комментарий?')) return;
     try {
@@ -196,7 +177,6 @@ const AdminPage = () => {
     setShowBlockModal(true);
   };
 
-  // ========== ЗАКРЫТИЕ МОДАЛКИ БЛОКИРОВКИ ==========
   const closeBlockModal = () => {
     setShowBlockModal(false);
     setBlockUser(null);
@@ -204,7 +184,7 @@ const AdminPage = () => {
     setIsBlocking(false);
   };
 
-  // ========== БЛОКИРОВКА ПОЛЬЗОВАТЕЛЯ С ПРИЧИНОЙ ==========
+  // ========== БЛОКИРОВКА ПОЛЬЗОВАТЕЛЯ ==========
   const confirmBlockUser = async () => {
     if (!blockReason.trim()) {
       showMessage('Пожалуйста, укажите причину блокировки', 'error');
@@ -213,16 +193,11 @@ const AdminPage = () => {
 
     setIsBlocking(true);
     try {
-      const response = await axios.post(
+      await axios.post(
         `${API_URL}/api/admin/users/${blockUser.id}/toggle-block`,
-        { 
-          blocked: true,
-          reason: blockReason.trim()
-        },
+        { blocked: true, reason: blockReason.trim() },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
-      
-      console.log('Ответ сервера:', response.data);
       showMessage(`Пользователь ${blockUser.username} заблокирован`, 'success');
       closeBlockModal();
       loadData();
@@ -237,17 +212,12 @@ const AdminPage = () => {
   // ========== РАЗБЛОКИРОВКА ==========
   const toggleUserUnblock = async (userId, username) => {
     if (!window.confirm(`Разблокировать пользователя ${username}?`)) return;
-    
     try {
-      const response = await axios.post(
+      await axios.post(
         `${API_URL}/api/admin/users/${userId}/toggle-block`,
-        { 
-          blocked: false,
-          reason: null
-        },
+        { blocked: false, reason: null },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
-      console.log('Ответ сервера:', response.data);
       showMessage(`Пользователь ${username} разблокирован`, 'success');
       loadData();
     } catch (err) {
@@ -259,9 +229,7 @@ const AdminPage = () => {
   // ========== НАЗНАЧЕНИЕ АДМИНИСТРАТОРА ==========
   const toggleAdminRole = async (userId, currentRole) => {
     const newRole = currentRole === 'admin' ? 'user' : 'admin';
-    
     if (!window.confirm(`${currentRole === 'admin' ? 'Лишить прав администратора' : 'Назначить администратором'} пользователя?`)) return;
-    
     try {
       await axios.post(`${API_URL}/api/admin/users/${userId}/toggle-role`,
         { role: newRole },
@@ -297,7 +265,6 @@ const AdminPage = () => {
     await loadPostComments(post.id);
   };
 
-  // ========== ЗАКРЫТИЕ МОДАЛКИ ПОСТА ==========
   const closePostModal = () => {
     setShowPostModal(false);
     setSelectedPost(null);
@@ -307,6 +274,82 @@ const AdminPage = () => {
   const viewUserDetails = (user) => {
     setSelectedUser(user);
     setShowUserModal(true);
+  };
+
+  // ========== ОТКРЫТИЕ МОДАЛКИ УДАЛЕНИЯ КОММЕНТАРИЯ ==========
+  const openDeleteCommentModal = (comment) => {
+    setDeleteCommentData(comment);
+    setDeleteCommentReason('');
+    setShowDeleteCommentModal(true);
+  };
+
+  const closeDeleteCommentModal = () => {
+    setShowDeleteCommentModal(false);
+    setDeleteCommentData(null);
+    setDeleteCommentReason('');
+    setIsDeletingComment(false);
+  };
+
+  // ========== УДАЛЕНИЕ КОММЕНТАРИЯ С ПРИЧИНОЙ ==========
+  const confirmDeleteComment = async () => {
+    if (!deleteCommentReason.trim()) {
+      showMessage('Пожалуйста, укажите причину удаления', 'error');
+      return;
+    }
+
+    setIsDeletingComment(true);
+    try {
+      await axios.delete(`${API_URL}/api/admin/comments/${deleteCommentData.id}`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+        data: { reason: deleteCommentReason.trim() }
+      });
+      showMessage('Комментарий удалён', 'success');
+      closeDeleteCommentModal();
+      loadData();
+    } catch (err) {
+      console.error('❌ Ошибка удаления комментария:', err);
+      showMessage(err.response?.data?.error || 'Ошибка удаления комментария', 'error');
+    } finally {
+      setIsDeletingComment(false);
+    }
+  };
+
+  // ========== ОБРАТНАЯ СВЯЗЬ ==========
+  const updateRequestStatus = async (requestId, status, comment) => {
+    try {
+      await axios.put(`${API_URL}/api/admin/unblock-requests/${requestId}`,
+        { status, admin_comment: comment },
+        { headers: { Authorization: `Bearer ${user.token}` } }
+      );
+      showMessage(`Статус запроса обновлён на "${status}"`, 'success');
+      setShowRequestModal(false);
+      loadData();
+    } catch (err) {
+      showMessage(err.response?.data?.error || 'Ошибка обновления', 'error');
+    }
+  };
+
+  const deleteRequest = async (requestId) => {
+    if (!window.confirm('Удалить запрос?')) return;
+    try {
+      await axios.delete(`${API_URL}/api/admin/unblock-requests/${requestId}`, {
+        headers: { Authorization: `Bearer ${user.token}` }
+      });
+      showMessage('Запрос удалён', 'success');
+      loadData();
+    } catch (err) {
+      showMessage(err.response?.data?.error || 'Ошибка удаления', 'error');
+    }
+  };
+
+  const getStatusBadge = (status) => {
+    const statusMap = {
+      pending: { label: 'Ожидает', color: '#ed8936', bg: '#fffaf0' },
+      in_progress: { label: 'В работе', color: '#4299e1', bg: '#ebf8ff' },
+      resolved: { label: 'Разблокирован', color: '#48bb78', bg: '#f0fff4' },
+      rejected: { label: 'Отклонён', color: '#e53e3e', bg: '#fff5f5' }
+    };
+    return statusMap[status] || { label: status, color: '#718096', bg: '#f7fafc' };
   };
 
   if (user?.role !== 'admin') {
@@ -364,6 +407,12 @@ const AdminPage = () => {
               className={`admin-tab ${activeTab === 'comments' ? 'active' : ''}`}
             >
               <FiMessageCircle size={16} /> Комментарии
+            </button>
+            <button 
+              onClick={() => setActiveTab('feedback')} 
+              className={`admin-tab ${activeTab === 'feedback' ? 'active' : ''}`}
+            >
+              <FiMail size={16} /> Обратная связь
             </button>
           </div>
 
@@ -552,15 +601,9 @@ const AdminPage = () => {
                         <tr key={c.id}>
                           <td>{c.id}</td>
                           <td><strong>{c.username}</strong></td>
-                          <td>
-                            <span style={{ fontSize: '12px', color: '#718096' }}>
-                              Пост #{c.post_id}
-                            </span>
-                          </td>
-                          <td className="post-preview" style={{ maxWidth: '300px' }}>
-                            {c.content}
-                          </td>
-                          <td style={{ fontSize: '12px', whiteSpace: 'nowrap' }}>
+                          <td className="comment-post-id">Пост #{c.post_id}</td>
+                          <td className="comment-preview">{c.content}</td>
+                          <td className="comment-date">
                             {new Date(c.created_at).toLocaleString('ru-RU', {
                               day: '2-digit',
                               month: '2-digit',
@@ -585,11 +628,108 @@ const AdminPage = () => {
                     </tbody>
                   </table>
                   {comments.length === 0 && (
-                    <div style={{ textAlign: 'center', padding: '40px', color: '#718096' }}>
-                      <FiMessageCircle size={48} style={{ marginBottom: '16px', opacity: 0.3 }} />
+                    <div className="empty-state">
+                      <FiMessageCircle size={48} />
                       <p>Комментариев пока нет</p>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* ========== ОБРАТНАЯ СВЯЗЬ ========== */}
+              {activeTab === 'feedback' && (
+                <div>
+                  {requestStats && (
+                    <div className="admin-stats-grid">
+                      <div className="admin-stat-card">
+                        <div className="admin-stat-value" style={{ color: '#ed8936' }}>{requestStats.pending}</div>
+                        <div className="admin-stat-label">⏳ Ожидают</div>
+                      </div>
+                      <div className="admin-stat-card">
+                        <div className="admin-stat-value" style={{ color: '#4299e1' }}>{requestStats.in_progress}</div>
+                        <div className="admin-stat-label">🔄 В работе</div>
+                      </div>
+                      <div className="admin-stat-card">
+                        <div className="admin-stat-value" style={{ color: '#48bb78' }}>{requestStats.resolved}</div>
+                        <div className="admin-stat-label">✅ Разблокированы</div>
+                      </div>
+                      <div className="admin-stat-card">
+                        <div className="admin-stat-value" style={{ color: '#e53e3e' }}>{requestStats.rejected}</div>
+                        <div className="admin-stat-label">❌ Отклонены</div>
+                      </div>
+                      <div className="admin-stat-card">
+                        <div className="admin-stat-value" style={{ color: '#667eea' }}>{requestStats.total}</div>
+                        <div className="admin-stat-label">📨 Всего запросов</div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="admin-table-wrapper">
+                    <table className="admin-table">
+                      <thead>
+                        <tr>
+                          <th><FiHash size={14} /> ID</th>
+                          <th><FiUser size={14} /> Пользователь</th>
+                          <th><FiMail size={14} /> Email</th>
+                          <th><FiMessageSquare size={14} /> Сообщение</th>
+                          <th><FiShield size={14} /> Статус</th>
+                          <th><FiClock size={14} /> Дата</th>
+                          <th>Действия</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {unblockRequests.map(req => {
+                          const statusInfo = getStatusBadge(req.status);
+                          return (
+                            <tr key={req.id}>
+                              <td>{req.id}</td>
+                              <td><strong>{req.username}</strong></td>
+                              <td>{req.email || '—'}</td>
+                              <td className="request-preview">{req.message}</td>
+                              <td>
+                                <span className="request-status" style={{
+                                  background: statusInfo.bg,
+                                  color: statusInfo.color
+                                }}>
+                                  {statusInfo.label}
+                                </span>
+                              </td>
+                              <td className="request-date">
+                                {new Date(req.created_at).toLocaleString('ru-RU')}
+                              </td>
+                              <td>
+                                <div className="admin-btn-group">
+                                  <button
+                                    onClick={() => {
+                                      setSelectedRequest(req);
+                                      setRequestStatus(req.status);
+                                      setRequestComment(req.admin_comment || '');
+                                      setShowRequestModal(true);
+                                    }}
+                                    className="admin-btn admin-btn-primary"
+                                  >
+                                    <FiEye size={12} /> Обработать
+                                  </button>
+                                  <button
+                                    onClick={() => deleteRequest(req.id)}
+                                    className="admin-btn admin-btn-danger"
+                                  >
+                                    <FiTrash2 size={12} /> Удалить
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                    {unblockRequests.length === 0 && (
+                      <div className="empty-state">
+                        <FiMail size={48} />
+                        <p>Запросов на разблокировку пока нет</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </>
@@ -600,101 +740,47 @@ const AdminPage = () => {
       {/* ========== МОДАЛКА БЛОКИРОВКИ ========== */}
       {showBlockModal && blockUser && (
         <div className="modal-overlay" onClick={closeBlockModal}>
-          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#e53e3e' }}>
+              <h3 className="modal-title-danger">
                 <FiLock size={24} />
                 Блокировка пользователя
               </h3>
               <button className="modal-close" onClick={closeBlockModal}>✕</button>
             </div>
             
-            <div style={{ marginBottom: '20px' }}>
-              <p style={{ fontSize: '16px', marginBottom: '8px' }}>
-                <strong>Пользователь:</strong> {blockUser.username}
-              </p>
-              <p style={{ fontSize: '14px', color: '#718096' }}>
-                <FiAlertCircle size={16} style={{ verticalAlign: 'middle', marginRight: '6px' }} />
-                После блокировки пользователь не сможет входить в систему, 
-                создавать посты и оставлять комментарии.
+            <div className="modal-body">
+              <p className="modal-user-name"><strong>Пользователь:</strong> {blockUser.username}</p>
+              <p className="modal-warning">
+                <FiAlertCircle size={16} />
+                После блокировки пользователь не сможет входить в систему, создавать посты и оставлять комментарии.
               </p>
             </div>
 
-            <div style={{ marginBottom: '20px' }}>
-              <label htmlFor="blockReason" style={{ 
-                display: 'block', 
-                fontWeight: '500', 
-                marginBottom: '8px',
-                fontSize: '14px'
-              }}>
-                Причина блокировки <span style={{ color: '#e53e3e' }}>*</span>
+            <div className="modal-field">
+              <label htmlFor="blockReason" className="modal-label">
+                Причина блокировки <span className="required">*</span>
               </label>
               <textarea
                 id="blockReason"
+                className="modal-textarea"
                 value={blockReason}
                 onChange={(e) => setBlockReason(e.target.value)}
                 placeholder="Укажите причину блокировки пользователя..."
-                style={{
-                  width: '100%',
-                  minHeight: '100px',
-                  padding: '12px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontFamily: 'inherit',
-                  resize: 'vertical',
-                  transition: 'border-color 0.2s'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
                 disabled={isBlocking}
                 autoFocus
               />
-              <div style={{ 
-                fontSize: '12px', 
-                color: '#718096', 
-                marginTop: '4px',
-                textAlign: 'right'
-              }}>
-                {blockReason.length}/500 символов
-              </div>
+              <div className="modal-char-counter">{blockReason.length}/500 символов</div>
             </div>
 
-            <div className="modal-buttons" style={{ 
-              display: 'flex', 
-              gap: '10px',
-              justifyContent: 'flex-end',
-              borderTop: '1px solid #e2e8f0',
-              paddingTop: '16px'
-            }}>
-              <button
-                onClick={closeBlockModal}
-                className="admin-btn admin-btn-secondary"
-                disabled={isBlocking}
-              >
+            <div className="modal-buttons">
+              <button onClick={closeBlockModal} className="admin-btn admin-btn-secondary" disabled={isBlocking}>
                 Отмена
               </button>
-              <button
-                onClick={confirmBlockUser}
-                className="admin-btn admin-btn-danger"
-                disabled={isBlocking || !blockReason.trim()}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
+              <button onClick={confirmBlockUser} className="admin-btn admin-btn-danger" disabled={isBlocking || !blockReason.trim()}>
                 {isBlocking ? (
                   <>
-                    <span className="spinner" style={{ 
-                      display: 'inline-block',
-                      width: '16px',
-                      height: '16px',
-                      border: '2px solid rgba(255,255,255,0.3)',
-                      borderTopColor: 'white',
-                      borderRadius: '50%',
-                      animation: 'spin 0.8s linear infinite'
-                    }}></span>
+                    <span className="spinner"></span>
                     Блокировка...
                   </>
                 ) : (
@@ -712,122 +798,52 @@ const AdminPage = () => {
       {/* ========== МОДАЛКА УДАЛЕНИЯ КОММЕНТАРИЯ ========== */}
       {showDeleteCommentModal && deleteCommentData && (
         <div className="modal-overlay" onClick={closeDeleteCommentModal}>
-          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#e53e3e' }}>
+              <h3 className="modal-title-danger">
                 <FiTrash2 size={24} />
                 Удаление комментария
               </h3>
               <button className="modal-close" onClick={closeDeleteCommentModal}>✕</button>
             </div>
             
-            <div style={{ marginBottom: '20px' }}>
-              <p style={{ fontSize: '16px', marginBottom: '8px' }}>
-                <strong>Автор:</strong> {deleteCommentData.username}
+            <div className="modal-body">
+              <p className="modal-user-name"><strong>Автор:</strong> {deleteCommentData.username}</p>
+              <p className="modal-label">Комментарий:</p>
+              <div className="modal-comment-preview">{deleteCommentData.content}</div>
+              <p className="modal-date">
+                <strong>Дата:</strong> {new Date(deleteCommentData.created_at).toLocaleString('ru-RU')}
               </p>
-              <p style={{ fontSize: '14px', color: '#4a5568', marginBottom: '8px' }}>
-                <strong>Комментарий:</strong>
-              </p>
-              <div style={{
-                padding: '12px',
-                background: '#f8fafc',
-                borderRadius: '8px',
-                fontSize: '14px',
-                color: '#2d3748',
-                marginBottom: '12px'
-              }}>
-                {deleteCommentData.content}
-              </div>
-              <p style={{ fontSize: '12px', color: '#718096' }}>
-                <strong>Дата:</strong> {new Date(deleteCommentData.created_at).toLocaleString('ru-RU', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
-              </p>
-              <p style={{ fontSize: '14px', color: '#718096', marginTop: '12px' }}>
-                <FiAlertCircle size={16} style={{ verticalAlign: 'middle', marginRight: '6px' }} />
+              <p className="modal-warning">
+                <FiAlertCircle size={16} />
                 Комментарий будет удалён безвозвратно.
               </p>
             </div>
 
-            <div style={{ marginBottom: '20px' }}>
-              <label htmlFor="deleteCommentReason" style={{ 
-                display: 'block', 
-                fontWeight: '500', 
-                marginBottom: '8px',
-                fontSize: '14px'
-              }}>
-                Причина удаления <span style={{ color: '#e53e3e' }}>*</span>
+            <div className="modal-field">
+              <label htmlFor="deleteCommentReason" className="modal-label">
+                Причина удаления <span className="required">*</span>
               </label>
               <textarea
                 id="deleteCommentReason"
+                className="modal-textarea"
                 value={deleteCommentReason}
                 onChange={(e) => setDeleteCommentReason(e.target.value)}
                 placeholder="Укажите причину удаления комментария..."
-                style={{
-                  width: '100%',
-                  minHeight: '80px',
-                  padding: '12px',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '8px',
-                  fontSize: '14px',
-                  fontFamily: 'inherit',
-                  resize: 'vertical',
-                  transition: 'border-color 0.2s'
-                }}
-                onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
                 disabled={isDeletingComment}
                 autoFocus
               />
-              <div style={{ 
-                fontSize: '12px', 
-                color: '#718096', 
-                marginTop: '4px',
-                textAlign: 'right'
-              }}>
-                {deleteCommentReason.length}/500 символов
-              </div>
+              <div className="modal-char-counter">{deleteCommentReason.length}/500 символов</div>
             </div>
 
-            <div className="modal-buttons" style={{ 
-              display: 'flex', 
-              gap: '10px',
-              justifyContent: 'flex-end',
-              borderTop: '1px solid #e2e8f0',
-              paddingTop: '16px'
-            }}>
-              <button
-                onClick={closeDeleteCommentModal}
-                className="admin-btn admin-btn-secondary"
-                disabled={isDeletingComment}
-              >
+            <div className="modal-buttons">
+              <button onClick={closeDeleteCommentModal} className="admin-btn admin-btn-secondary" disabled={isDeletingComment}>
                 Отмена
               </button>
-              <button
-                onClick={confirmDeleteComment}
-                className="admin-btn admin-btn-danger"
-                disabled={isDeletingComment || !deleteCommentReason.trim()}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
+              <button onClick={confirmDeleteComment} className="admin-btn admin-btn-danger" disabled={isDeletingComment || !deleteCommentReason.trim()}>
                 {isDeletingComment ? (
                   <>
-                    <span className="spinner" style={{ 
-                      display: 'inline-block',
-                      width: '16px',
-                      height: '16px',
-                      border: '2px solid rgba(255,255,255,0.3)',
-                      borderTopColor: 'white',
-                      borderRadius: '50%',
-                      animation: 'spin 0.8s linear infinite'
-                    }}></span>
+                    <span className="spinner"></span>
                     Удаление...
                   </>
                 ) : (
@@ -842,7 +858,77 @@ const AdminPage = () => {
         </div>
       )}
 
-      {/* ========== МОДАЛКА ПОСТА С КОММЕНТАРИЯМИ ========== */}
+      {/* ========== МОДАЛКА ОБРАБОТКИ ЗАПРОСА ========== */}
+      {showRequestModal && selectedRequest && (
+        <div className="modal-overlay" onClick={() => setShowRequestModal(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>
+                <FiMail size={20} />
+                Запрос на разблокировку #{selectedRequest.id}
+              </h3>
+              <button className="modal-close" onClick={() => setShowRequestModal(false)}>✕</button>
+            </div>
+            
+            <div className="modal-body">
+              <p><strong>Пользователь:</strong> {selectedRequest.username}</p>
+              <p><strong>Email:</strong> {selectedRequest.email || 'Не указан'}</p>
+              <p><strong>Дата:</strong> {new Date(selectedRequest.created_at).toLocaleString('ru-RU')}</p>
+              <div className="modal-message-box">
+                <strong>Сообщение:</strong>
+                <p>{selectedRequest.message}</p>
+              </div>
+              {selectedRequest.admin_comment && (
+                <div className="modal-admin-comment">
+                  <strong>Комментарий администратора:</strong>
+                  <p>{selectedRequest.admin_comment}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="modal-field">
+              <label className="modal-label">Новый статус:</label>
+              <select
+                className="modal-select"
+                value={requestStatus}
+                onChange={(e) => setRequestStatus(e.target.value)}
+              >
+                <option value="pending">⏳ Ожидает</option>
+                <option value="in_progress">🔄 В работе</option>
+                <option value="resolved">✅ Разблокировать</option>
+                <option value="rejected">❌ Отклонить</option>
+              </select>
+            </div>
+
+            <div className="modal-field">
+              <label className="modal-label">Комментарий администратора:</label>
+              <textarea
+                className="modal-textarea"
+                value={requestComment}
+                onChange={(e) => setRequestComment(e.target.value)}
+                placeholder="Добавьте комментарий..."
+              />
+            </div>
+
+            <div className="modal-buttons">
+              <button
+                onClick={() => updateRequestStatus(selectedRequest.id, requestStatus, requestComment)}
+                className="admin-btn admin-btn-primary"
+              >
+                <FiCheckCircle size={16} /> Сохранить
+              </button>
+              <button
+                onClick={() => setShowRequestModal(false)}
+                className="admin-btn admin-btn-secondary"
+              >
+                Закрыть
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========== МОДАЛКА ПОСТА ========== */}
       {showPostModal && selectedPost && (
         <div className="modal-overlay" onClick={closePostModal}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -857,56 +943,43 @@ const AdminPage = () => {
             <div className="post-full-text">{selectedPost.content}</div>
             {selectedPost.meditation_duration && (
               <div className="post-meditation-info">
-                <FiClock size={14} style={{ marginRight: '6px' }} />
+                <FiClock size={14} />
                 Медитация {selectedPost.meditation_duration} минут
               </div>
             )}
             <div className="post-stats-info">
               <span>❤️ {selectedPost.likes_count} лайков</span>
-              <span><FiMessageSquare size={14} style={{ marginRight: '4px' }} /> {selectedPost.comments_count} комментариев</span>
-              <span><FiCalendar size={14} style={{ marginRight: '4px' }} /> {new Date(selectedPost.created_at).toLocaleString('ru-RU')}</span>
+              <span><FiMessageSquare size={14} /> {selectedPost.comments_count} комментариев</span>
+              <span><FiCalendar size={14} /> {new Date(selectedPost.created_at).toLocaleString('ru-RU')}</span>
             </div>
 
-            <div style={{ marginTop: '1.5rem', borderTop: '1px solid #e2e8f0', paddingTop: '1rem' }}>
-              <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
+            <div className="post-comments-section">
+              <h4>
                 <FiMessageSquare size={18} />
                 Комментарии ({postComments.length})
               </h4>
               
               {loadingComments ? (
-                <div style={{ textAlign: 'center', padding: '1rem', color: '#718096' }}>
-                  Загрузка комментариев...
-                </div>
+                <div className="loading-comments">Загрузка комментариев...</div>
               ) : postComments.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '1rem', color: '#718096' }}>
-                  Нет комментариев
-                </div>
+                <div className="no-comments">Нет комментариев</div>
               ) : (
-                <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                <div className="comments-list">
                   {postComments.map(comment => (
-                    <div key={comment.id} style={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '12px',
-                      padding: '10px',
-                      background: '#f8fafc',
-                      borderRadius: '12px',
-                      marginBottom: '8px'
-                    }}>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                          <span style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>{comment.username}</span>
-                          <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>
-                            <FiClock size={12} style={{ marginRight: '4px' }} />
+                    <div key={comment.id} className="comment-item">
+                      <div className="comment-content">
+                        <div className="comment-header">
+                          <span className="comment-username">{comment.username}</span>
+                          <span className="comment-date">
+                            <FiClock size={12} />
                             {new Date(comment.created_at).toLocaleString('ru-RU')}
                           </span>
                         </div>
-                        <p style={{ margin: 0, fontSize: '0.9rem', color: '#4a5568' }}>{comment.content}</p>
+                        <p className="comment-text">{comment.content}</p>
                       </div>
                       <button
                         onClick={() => deleteComment(comment.id)}
                         className="admin-btn admin-btn-danger"
-                        style={{ flexShrink: 0 }}
                         title="Удалить комментарий"
                       >
                         <FiTrash2 size={14} />
@@ -917,7 +990,7 @@ const AdminPage = () => {
               )}
             </div>
 
-            <div className="modal-buttons" style={{ marginTop: '1.5rem' }}>
+            <div className="modal-buttons">
               <button onClick={() => deletePost(selectedPost.id)} className="admin-btn admin-btn-danger">
                 <FiTrash2 size={16} /> Удалить пост
               </button>
@@ -959,7 +1032,7 @@ const AdminPage = () => {
               {selectedUser.is_blocked && selectedUser.block_reason && (
                 <p>
                   <strong>Причина блокировки:</strong>{' '}
-                  <span style={{ color: '#e53e3e' }}>{selectedUser.block_reason}</span>
+                  <span className="block-reason-text">{selectedUser.block_reason}</span>
                 </p>
               )}
               <p><strong>Дата регистрации:</strong> {new Date(selectedUser.created_at).toLocaleDateString('ru-RU')}</p>
@@ -974,12 +1047,6 @@ const AdminPage = () => {
           </div>
         </div>
       )}
-
-      <style>{`
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
     </>
   );
 };
