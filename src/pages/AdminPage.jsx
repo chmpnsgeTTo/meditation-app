@@ -14,7 +14,8 @@ import {
   FiMessageSquare,
   FiLock,
   FiUnlock,
-  FiUserCheck
+  FiUserCheck,
+  FiAlertCircle
 } from 'react-icons/fi';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -34,6 +35,12 @@ const AdminPage = () => {
   const [loadingComments, setLoadingComments] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('success');
+
+  // ===== СОСТОЯНИЯ ДЛЯ БЛОКИРОВКИ =====
+  const [showBlockModal, setShowBlockModal] = useState(false);
+  const [blockUser, setBlockUser] = useState(null);
+  const [blockReason, setBlockReason] = useState('');
+  const [isBlocking, setIsBlocking] = useState(false);
 
   useEffect(() => {
     if (user?.role === 'admin') {
@@ -122,22 +129,71 @@ const AdminPage = () => {
     }
   };
 
-  // ========== БЛОКИРОВКА/РАЗБЛОКИРОВКА ==========
-  const toggleUserBlock = async (userId, currentBlocked) => {
-    if (!window.confirm(`⚠️ ${currentBlocked ? 'Разблокировать' : 'Заблокировать'} пользователя?`)) return;
-    
+  // ========== ОТКРЫТИЕ МОДАЛКИ БЛОКИРОВКИ ==========
+  const openBlockModal = (user) => {
+    setBlockUser(user);
+    setBlockReason('');
+    setShowBlockModal(true);
+  };
+
+  // ========== ЗАКРЫТИЕ МОДАЛКИ БЛОКИРОВКИ ==========
+  const closeBlockModal = () => {
+    setShowBlockModal(false);
+    setBlockUser(null);
+    setBlockReason('');
+    setIsBlocking(false);
+  };
+
+  // ========== БЛОКИРОВКА ПОЛЬЗОВАТЕЛЯ С ПРИЧИНОЙ ==========
+  const confirmBlockUser = async () => {
+    if (!blockReason.trim()) {
+      showMessage('Пожалуйста, укажите причину блокировки', 'error');
+      return;
+    }
+
+    setIsBlocking(true);
     try {
-      const response = await axios.post(`${API_URL}/api/admin/users/${userId}/toggle-block`, 
-        { blocked: !currentBlocked },
+      const response = await axios.post(
+        `${API_URL}/api/admin/users/${blockUser.id}/toggle-block`,
+        { 
+          blocked: true,
+          reason: blockReason.trim()
+        },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
+      
       console.log('✅ Ответ сервера:', response.data);
-      showMessage(`Пользователь ${currentBlocked ? 'разблокирован' : 'заблокирован'}`, 'success');
+      showMessage(`Пользователь ${blockUser.username} заблокирован`, 'success');
+      closeBlockModal();
       loadData();
     } catch (err) {
       console.error('❌ Ошибка блокировки:', err);
       console.error('❌ Детали:', err.response?.data);
-      showMessage(err.response?.data?.error || 'Ошибка изменения статуса', 'error');
+      showMessage(err.response?.data?.error || 'Ошибка блокировки пользователя', 'error');
+    } finally {
+      setIsBlocking(false);
+    }
+  };
+
+  // ========== РАЗБЛОКИРОВКА ==========
+  const toggleUserUnblock = async (userId, username) => {
+    if (!window.confirm(`⚠️ Разблокировать пользователя ${username}?`)) return;
+    
+    try {
+      const response = await axios.post(
+        `${API_URL}/api/admin/users/${userId}/toggle-block`,
+        { 
+          blocked: false,
+          reason: null
+        },
+        { headers: { Authorization: `Bearer ${user.token}` } }
+      );
+      console.log('✅ Ответ сервера:', response.data);
+      showMessage(`Пользователь ${username} разблокирован`, 'success');
+      loadData();
+    } catch (err) {
+      console.error('❌ Ошибка разблокировки:', err);
+      showMessage(err.response?.data?.error || 'Ошибка разблокировки', 'error');
     }
   };
 
@@ -317,19 +373,29 @@ const AdminPage = () => {
                                     title={u.role === 'admin' ? 'Лишить прав админа' : 'Назначить админом'}
                                   >
                                     {u.role === 'admin' ? <FiUserX size={12} /> : <FiUserPlus size={12} />}
-                                    {u.role === 'admin' ? 'Лишить админа' : 'Сделать админом'}
+                                    {u.role === 'admin' ? 'Лишить' : 'Сделать админом'}
                                   </button>
-                                  <button
-                                    onClick={() => toggleUserBlock(u.id, u.is_blocked)}
-                                    className={`admin-btn ${u.is_blocked ? 'admin-btn-success' : 'admin-btn-warning'}`}
-                                    title={u.is_blocked ? 'Разблокировать' : 'Заблокировать'}
-                                  >
-                                    {u.is_blocked ? <FiUnlock size={12} /> : <FiLock size={12} />}
-                                    {u.is_blocked ? 'Разблокировать' : 'Заблокировать'}
-                                  </button>
+                                  {u.is_blocked ? (
+                                    <button
+                                      onClick={() => toggleUserUnblock(u.id, u.username)}
+                                      className="admin-btn admin-btn-success"
+                                      title="Разблокировать пользователя"
+                                    >
+                                      <FiUnlock size={12} /> Разблок.
+                                    </button>
+                                  ) : (
+                                    <button
+                                      onClick={() => openBlockModal(u)}
+                                      className="admin-btn admin-btn-warning"
+                                      title="Заблокировать пользователя"
+                                    >
+                                      <FiLock size={12} /> Заблок.
+                                    </button>
+                                  )}
                                   <button
                                     onClick={() => deleteUser(u.id)}
                                     className="admin-btn admin-btn-danger"
+                                    title="Удалить пользователя"
                                   >
                                     <FiTrash2 size={12} /> Удалить
                                   </button>
@@ -338,6 +404,7 @@ const AdminPage = () => {
                               <button
                                 onClick={() => viewUserDetails(u)}
                                 className="admin-btn admin-btn-primary"
+                                title="Просмотр деталей"
                               >
                                 <FiEye size={12} /> Детали
                               </button>
@@ -404,6 +471,118 @@ const AdminPage = () => {
           )}
         </div>
       </div>
+
+      {/* ========== МОДАЛКА БЛОКИРОВКИ ========== */}
+      {showBlockModal && blockUser && (
+        <div className="modal-overlay" onClick={closeBlockModal}>
+          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
+            <div className="modal-header">
+              <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', color: '#e53e3e' }}>
+                <FiLock size={24} />
+                Блокировка пользователя
+              </h3>
+              <button className="modal-close" onClick={closeBlockModal}>✕</button>
+            </div>
+            
+            <div style={{ marginBottom: '20px' }}>
+              <p style={{ fontSize: '16px', marginBottom: '8px' }}>
+                <strong>Пользователь:</strong> {blockUser.username}
+              </p>
+              <p style={{ fontSize: '14px', color: '#718096' }}>
+                <FiAlertCircle size={16} style={{ verticalAlign: 'middle', marginRight: '6px' }} />
+                После блокировки пользователь не сможет входить в систему, 
+                создавать посты и оставлять комментарии.
+              </p>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label htmlFor="blockReason" style={{ 
+                display: 'block', 
+                fontWeight: '500', 
+                marginBottom: '8px',
+                fontSize: '14px'
+              }}>
+                Причина блокировки <span style={{ color: '#e53e3e' }}>*</span>
+              </label>
+              <textarea
+                id="blockReason"
+                value={blockReason}
+                onChange={(e) => setBlockReason(e.target.value)}
+                placeholder="Укажите причину блокировки пользователя..."
+                style={{
+                  width: '100%',
+                  minHeight: '100px',
+                  padding: '12px',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontFamily: 'inherit',
+                  resize: 'vertical',
+                  transition: 'border-color 0.2s'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#667eea'}
+                onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+                disabled={isBlocking}
+                autoFocus
+              />
+              <div style={{ 
+                fontSize: '12px', 
+                color: '#718096', 
+                marginTop: '4px',
+                textAlign: 'right'
+              }}>
+                {blockReason.length}/500 символов
+              </div>
+            </div>
+
+            <div className="modal-buttons" style={{ 
+              display: 'flex', 
+              gap: '10px',
+              justifyContent: 'flex-end',
+              borderTop: '1px solid #e2e8f0',
+              paddingTop: '16px'
+            }}>
+              <button
+                onClick={closeBlockModal}
+                className="admin-btn admin-btn-secondary"
+                disabled={isBlocking}
+              >
+                Отмена
+              </button>
+              <button
+                onClick={confirmBlockUser}
+                className="admin-btn admin-btn-danger"
+                disabled={isBlocking || !blockReason.trim()}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                {isBlocking ? (
+                  <>
+                    <span className="spinner" style={{ 
+                      display: 'inline-block',
+                      width: '16px',
+                      height: '16px',
+                      border: '2px solid rgba(255,255,255,0.3)',
+                      borderTopColor: 'white',
+                      borderRadius: '50%',
+                      animation: 'spin 0.8s linear infinite'
+                    }}></span>
+                    Блокировка...
+                  </>
+                ) : (
+                  <>
+                    <FiLock size={16} />
+                    Заблокировать
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ========== МОДАЛКА ПОСТА С КОММЕНТАРИЯМИ ========== */}
       {showPostModal && selectedPost && (
@@ -518,6 +697,12 @@ const AdminPage = () => {
                   {selectedUser.is_blocked ? 'Заблокирован' : 'Активен'}
                 </span>
               </p>
+              {selectedUser.is_blocked && selectedUser.block_reason && (
+                <p>
+                  <strong>Причина блокировки:</strong>{' '}
+                  <span style={{ color: '#e53e3e' }}>{selectedUser.block_reason}</span>
+                </p>
+              )}
               <p><strong>Дата регистрации:</strong> {new Date(selectedUser.created_at).toLocaleDateString('ru-RU')}</p>
               <p><strong>Сессий медитации:</strong> {selectedUser.total_sessions}</p>
               <p><strong>Постов:</strong> {selectedUser.total_posts}</p>
@@ -530,6 +715,13 @@ const AdminPage = () => {
           </div>
         </div>
       )}
+
+      {/* Стили для спиннера */}
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </>
   );
 };

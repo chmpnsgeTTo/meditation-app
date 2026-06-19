@@ -96,17 +96,37 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // ============================================================
-// 4. РАЗДАЧА СТАТИКИ (ВАЖНО ДЛЯ TIMEWEB)
+// 4. РАЗДАЧА СТАТИКИ (ДОЛЖНА БЫТЬ ПЕРЕД ВСЕМИ МАРШРУТАМИ!)
 // ============================================================
-// Раздаем всю папку public
-app.use(express.static(path.join(appRoot, 'public')));
 
-// Раздаем папку uploads по пути /uploads
-app.use('/uploads', express.static(uploadDir));
-
-// Логируем запросы к аватарам
+// ✅ СНАЧАЛА раздаем папку uploads
 app.use('/uploads', (req, res, next) => {
-  console.log('🖼️ Запрос аватара:', req.url);
+  console.log('🖼️ Запрос к /uploads:', req.url);
+  next();
+});
+
+app.use('/uploads', express.static(uploadDir, {
+  maxAge: 0, // Отключаем кэширование для разработки
+  etag: true,
+  lastModified: true
+}));
+
+// ✅ ПОТОМ раздаем всю папку public (для favicon, index.html и т.д.)
+app.use(express.static(path.join(appRoot, 'public'), {
+  maxAge: 0,
+  etag: true,
+  lastModified: true
+}));
+
+// ✅ Добавляем заголовки для правильной работы
+app.use((req, res, next) => {
+  // Для всех запросов к /uploads устанавливаем правильные заголовки
+  if (req.url.startsWith('/uploads/')) {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
   next();
 });
 
@@ -127,10 +147,10 @@ app.use((err, req, res, next) => {
 });
 
 // ============================================================
-// 6. ЭНДПОИНТЫ АВТОРИЗАЦИИ
+// 6. ВСЕ API-ЭНДПОИНТЫ
 // ============================================================
 
-// Регистрация
+// ---------- АВТОРИЗАЦИЯ ----------
 app.post('/api/register', async (req, res) => {
   const { username, password } = req.body;
   
@@ -160,7 +180,6 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// Логин
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   
@@ -199,7 +218,6 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// Получение пользователя
 app.get('/api/user', authMiddleware, async (req, res) => {
   try {
     const result = await pool.query(
@@ -218,7 +236,6 @@ app.get('/api/user', authMiddleware, async (req, res) => {
   }
 });
 
-// Смена пароля
 app.post('/api/change-password', authMiddleware, async (req, res) => {
   const { oldPassword, newPassword } = req.body;
   
@@ -249,7 +266,6 @@ app.post('/api/change-password', authMiddleware, async (req, res) => {
   }
 });
 
-// Смена имени
 app.post('/api/change-username', authMiddleware, async (req, res) => {
   const { newUsername, password } = req.body;
   
@@ -275,7 +291,6 @@ app.post('/api/change-username', authMiddleware, async (req, res) => {
     
     await pool.query('UPDATE users SET username = $1 WHERE id = $2', [newUsername, req.user.userId]);
     
-    // Обновляем токен с новым именем
     const token = jwt.sign(
       { userId: req.user.userId, username: newUsername, role: user.role || 'user' },
       SECRET_KEY,
@@ -292,9 +307,7 @@ app.post('/api/change-username', authMiddleware, async (req, res) => {
   }
 });
 
-// ============================================================
-// 7. ЗАГРУЗКА АВАТАРА
-// ============================================================
+// ---------- ЗАГРУЗКА АВАТАРА ----------
 app.post('/api/upload-avatar', authMiddleware, upload.single('avatar'), async (req, res) => {
   console.log('📥 Запрос на загрузку аватара от пользователя:', req.user.userId);
   
@@ -317,11 +330,7 @@ app.post('/api/upload-avatar', authMiddleware, upload.single('avatar'), async (r
   }
 });
 
-// ============================================================
-// 8. МЕДИТАЦИИ И СТАТИСТИКА
-// ============================================================
-
-// Сохранение сессии медитации
+// ---------- МЕДИТАЦИИ И СТАТИСТИКА ----------
 app.post('/api/sessions', authMiddleware, async (req, res) => {
   const { duration, completed } = req.body;
   
@@ -344,7 +353,6 @@ app.post('/api/sessions', authMiddleware, async (req, res) => {
   }
 });
 
-// Получение статистики
 app.get('/api/statistics', authMiddleware, async (req, res) => {
   const userId = req.user.userId;
   const { period = 'all' } = req.query;
@@ -391,11 +399,7 @@ app.get('/api/statistics', authMiddleware, async (req, res) => {
   }
 });
 
-// ============================================================
-// 9. КУРСЫ
-// ============================================================
-
-// Получить все курсы
+// ---------- КУРСЫ ----------
 app.get('/api/courses', async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM courses ORDER BY id');
@@ -406,7 +410,6 @@ app.get('/api/courses', async (req, res) => {
   }
 });
 
-// Получить один курс с уроками
 app.get('/api/courses/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
   const userId = req.user.userId;
@@ -456,7 +459,6 @@ app.get('/api/courses/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// Получить достижения пользователя
 app.get('/api/user/courses', authMiddleware, async (req, res) => {
   try {
     const result = await pool.query(`
@@ -475,7 +477,6 @@ app.get('/api/user/courses', authMiddleware, async (req, res) => {
   }
 });
 
-// Получить прогресс по курсу
 app.get('/api/courses/:id/progress', authMiddleware, async (req, res) => {
   const { id } = req.params;
   
@@ -493,7 +494,6 @@ app.get('/api/courses/:id/progress', authMiddleware, async (req, res) => {
   }
 });
 
-// Отметить урок как пройденный
 app.post('/api/courses/:courseId/lessons/:lessonId/complete', authMiddleware, async (req, res) => {
   const { courseId, lessonId } = req.params;
   const userId = req.user.userId;
@@ -579,11 +579,7 @@ app.post('/api/courses/:courseId/lessons/:lessonId/complete', authMiddleware, as
   }
 });
 
-// ============================================================
-// 10. СОЦИАЛЬНАЯ ЛЕНТА
-// ============================================================
-
-// Получить ленту постов
+// ---------- СОЦИАЛЬНАЯ ЛЕНТА ----------
 app.get('/api/feed', authMiddleware, async (req, res) => {
   const { page = 1, limit = 10 } = req.query;
   const offset = (page - 1) * limit;
@@ -612,7 +608,6 @@ app.get('/api/feed', authMiddleware, async (req, res) => {
   }
 });
 
-// Создать пост
 app.post('/api/posts', authMiddleware, async (req, res) => {
   const { content, meditation_duration } = req.body;
   
@@ -632,7 +627,6 @@ app.post('/api/posts', authMiddleware, async (req, res) => {
   }
 });
 
-// Удалить пост
 app.delete('/api/posts/:id', authMiddleware, async (req, res) => {
   const { id } = req.params;
   
@@ -653,7 +647,6 @@ app.delete('/api/posts/:id', authMiddleware, async (req, res) => {
   }
 });
 
-// Лайкнуть/убрать лайк
 app.post('/api/posts/:id/like', authMiddleware, async (req, res) => {
   const { id } = req.params;
   
@@ -678,7 +671,6 @@ app.post('/api/posts/:id/like', authMiddleware, async (req, res) => {
   }
 });
 
-// Получить комментарии
 app.get('/api/posts/:id/comments', authMiddleware, async (req, res) => {
   const { id } = req.params;
   
@@ -697,7 +689,6 @@ app.get('/api/posts/:id/comments', authMiddleware, async (req, res) => {
   }
 });
 
-// Добавить комментарий
 app.post('/api/posts/:id/comments', authMiddleware, async (req, res) => {
   const { id } = req.params;
   const { content } = req.body;
@@ -719,10 +710,7 @@ app.post('/api/posts/:id/comments', authMiddleware, async (req, res) => {
   }
 });
 
-// ============================================================
-// 11. АДМИН ПАНЕЛЬ (РАСШИРЕННАЯ ВЕРСИЯ)
-// ============================================================
-
+// ---------- АДМИН ПАНЕЛЬ ----------
 const adminMiddleware = (req, res, next) => {
   if (req.user.role !== 'admin') {
     return res.status(403).json({ error: 'Доступ запрещён. Требуются права администратора.' });
@@ -730,7 +718,6 @@ const adminMiddleware = (req, res, next) => {
   next();
 };
 
-// ---------- СТАТИСТИКА ----------
 app.get('/api/admin/stats', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const usersCount = await pool.query('SELECT COUNT(*) FROM users');
@@ -750,7 +737,6 @@ app.get('/api/admin/stats', authMiddleware, adminMiddleware, async (req, res) =>
   }
 });
 
-// ---------- СПИСОК ПОЛЬЗОВАТЕЛЕЙ ----------
 app.get('/api/admin/users', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const result = await pool.query(`
@@ -773,7 +759,6 @@ app.get('/api/admin/users', authMiddleware, adminMiddleware, async (req, res) =>
   }
 });
 
-// ---------- БЛОКИРОВКА/РАЗБЛОКИРОВКА ПОЛЬЗОВАТЕЛЯ ----------
 app.post('/api/admin/users/:id/toggle-block', authMiddleware, adminMiddleware, async (req, res) => {
   const { id } = req.params;
   const { blocked } = req.body;
@@ -803,7 +788,6 @@ app.post('/api/admin/users/:id/toggle-block', authMiddleware, adminMiddleware, a
   }
 });
 
-// ---------- НАЗНАЧЕНИЕ/ЛИШЕНИЕ ПРАВ АДМИНИСТРАТОРА ----------
 app.post('/api/admin/users/:id/toggle-role', authMiddleware, adminMiddleware, async (req, res) => {
   const { id } = req.params;
   const { role } = req.body;
@@ -833,7 +817,6 @@ app.post('/api/admin/users/:id/toggle-role', authMiddleware, adminMiddleware, as
   }
 });
 
-// ---------- УДАЛЕНИЕ ПОЛЬЗОВАТЕЛЯ ----------
 app.delete('/api/admin/users/:id', authMiddleware, adminMiddleware, async (req, res) => {
   const { id } = req.params;
   
@@ -856,7 +839,6 @@ app.delete('/api/admin/users/:id', authMiddleware, adminMiddleware, async (req, 
   }
 });
 
-// ---------- СПИСОК ПОСТОВ ----------
 app.get('/api/admin/posts', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const result = await pool.query(`
@@ -876,7 +858,6 @@ app.get('/api/admin/posts', authMiddleware, adminMiddleware, async (req, res) =>
   }
 });
 
-// ---------- УДАЛЕНИЕ ПОСТА ----------
 app.delete('/api/admin/posts/:id', authMiddleware, adminMiddleware, async (req, res) => {
   const { id } = req.params;
   
@@ -894,7 +875,6 @@ app.delete('/api/admin/posts/:id', authMiddleware, adminMiddleware, async (req, 
   }
 });
 
-// ---------- СПИСОК КОММЕНТАРИЕВ К ПОСТУ ----------
 app.get('/api/admin/posts/:id/comments', authMiddleware, adminMiddleware, async (req, res) => {
   const { id } = req.params;
   
@@ -922,7 +902,6 @@ app.get('/api/admin/posts/:id/comments', authMiddleware, adminMiddleware, async 
   }
 });
 
-// ---------- УДАЛЕНИЕ КОММЕНТАРИЯ ----------
 app.delete('/api/admin/comments/:id', authMiddleware, adminMiddleware, async (req, res) => {
   const { id } = req.params;
   
@@ -944,8 +923,60 @@ app.delete('/api/admin/comments/:id', authMiddleware, adminMiddleware, async (re
   }
 });
 
+
+// ---------- БЛОКИРОВКА/РАЗБЛОКИРОВКА ПОЛЬЗОВАТЕЛЯ ----------
+app.post('/api/admin/users/:id/toggle-block', authMiddleware, adminMiddleware, async (req, res) => {
+  const { id } = req.params;
+  const { blocked, reason } = req.body;
+  
+  console.log(`🔄 Блокировка пользователя ${id}:`, blocked, 'Причина:', reason);
+  
+  if (parseInt(id) === req.user.userId) {
+    return res.status(400).json({ error: 'Нельзя заблокировать самого себя' });
+  }
+  
+  try {
+    const userCheck = await pool.query('SELECT id FROM users WHERE id = $1', [id]);
+    if (userCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Пользователь не найден' });
+    }
+    
+    // Сохраняем причину блокировки
+    await pool.query(
+      'UPDATE users SET is_blocked = $1, block_reason = $2, blocked_at = $3 WHERE id = $4',
+      [blocked, blocked ? reason : null, blocked ? new Date() : null, id]
+    );
+    
+    console.log(`✅ Пользователь ${id} ${blocked ? 'заблокирован' : 'разблокирован'}`);
+    res.json({ 
+      message: `Пользователь ${blocked ? 'заблокирован' : 'разблокирован'}`,
+      blocked: blocked,
+      reason: blocked ? reason : null
+    });
+  } catch (err) {
+    console.error('❌ Ошибка блокировки пользователя:', err);
+    res.status(500).json({ error: 'Ошибка изменения статуса блокировки' });
+  }
+});
+
 // ============================================================
-// 12. ГЛОБАЛЬНЫЙ ОБРАБОТЧИК ОШИБОК (должен быть последним)
+// 12. ОБРАБОТКА ЗАПРОСОВ НА ФРОНТЕНД (SPA)
+// ============================================================
+// ВАЖНО: ЭТО ДОЛЖНО БЫТЬ ПОСЛЕ ВСЕХ API-ЭНДПОИНТОВ!
+// Все запросы, которые не являются API и не ведут к существующим файлам,
+// отправляем на index.html React-приложения
+app.get('*', (req, res) => {
+  // Проверяем, не запрос ли это к статическому файлу
+  const staticPath = path.join(appRoot, 'public', req.path);
+  if (fs.existsSync(staticPath) && fs.statSync(staticPath).isFile()) {
+    return res.sendFile(staticPath);
+  }
+  // Иначе отдаем index.html
+  res.sendFile(path.join(appRoot, 'public', 'index.html'));
+});
+
+// ============================================================
+// 13. ГЛОБАЛЬНЫЙ ОБРАБОТЧИК ОШИБОК (должен быть последним)
 // ============================================================
 app.use((err, req, res, next) => {
   console.error('❌ Глобальная ошибка:', err);
@@ -956,7 +987,7 @@ app.use((err, req, res, next) => {
 });
 
 // ============================================================
-// 13. ЗАПУСК СЕРВЕРА
+// 14. ЗАПУСК СЕРВЕРА
 // ============================================================
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Сервер запущен на порту ${PORT}`);

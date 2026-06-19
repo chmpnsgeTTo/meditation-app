@@ -2907,3 +2907,274 @@ body.dark-mode .admin-badge-comments {
     transform: rotate(360deg);
   }
 }
+
+/* ============================================ */
+/* 16. ДОПОЛНИТЕЛЬНЫЕ СТИЛИ ДЛЯ АДМИН-ПАНЕЛИ */
+/* ============================================ */
+
+/* Бейджи */
+.admin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.admin-badge-admin {
+  background: #ebf8ff;
+  color: #2b6cb0;
+}
+
+.admin-badge-user {
+  background: #f0fff4;
+  color: #38a169;
+}
+
+.admin-badge-active {
+  background: #f0fff4;
+  color: #38a169;
+}
+
+.admin-badge-blocked {
+  background: #fff5f5;
+  color: #e53e3e;
+}
+
+.admin-badge-comments {
+  background: #ebf8ff;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #2b6cb0;
+}
+
+/* Кнопки админ-панели */
+.admin-btn {
+  padding: 4px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.admin-btn-primary {
+  background: #667eea;
+  color: white;
+}
+
+.admin-btn-primary:hover {
+  background: #5a67d8;
+  transform: translateY(-1px);
+}
+
+.admin-btn-danger {
+  background: #fc8181;
+  color: white;
+}
+
+.admin-btn-danger:hover {
+  background: #f56565;
+  transform: translateY(-1px);
+}
+
+.admin-btn-success {
+  background: #68d391;
+  color: white;
+}
+
+.admin-btn-success:hover {
+  background: #48bb78;
+  transform: translateY(-1px);
+}
+
+.admin-btn-warning {
+  background: #f6ad55;
+  color: white;
+}
+
+.admin-btn-warning:hover {
+  background: #ed8936;
+  transform: translateY(-1px);
+}
+
+.admin-btn-secondary {
+  background: #e2e8f0;
+  color: #4a5568;
+}
+
+.admin-btn-secondary:hover {
+  background: #cbd5e0;
+  transform: translateY(-1px);
+}
+
+.admin-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.admin-btn-group {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* Кнопка просмотра поста */
+.view-post-btn {
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+}
+
+.view-post-btn:hover {
+  background: #5a67d8;
+  transform: translateY(-1px);
+}
+
+/* Сообщения */
+.admin-message {
+  padding: 12px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-message-success {
+  background: #48bb78;
+  color: white;
+}
+
+.admin-message-error {
+  background: #e53e3e;
+  color: white;
+}
+
+/* Модальное окно - переопределение для админки */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-overlay .modal-content {
+  background: white;
+  border-radius: 20px;
+  max-width: 600px;
+  width: 100%;
+  max-height: 80vh;
+  overflow: auto;
+  padding: 2rem;
+  animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Детали пользователя */
+.user-details-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.user-details-grid p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.user-details-grid strong {
+  min-width: 120px;
+  color: #4a5568;
+}
+
+/* Тёмная тема для админ-панели */
+body.dark-mode .admin-badge-admin {
+  background: #1e293b;
+  color: #818cf8;
+}
+
+body.dark-mode .admin-badge-user {
+  background: #1a2e1a;
+  color: #68d391;
+}
+
+body.dark-mode .admin-badge-active {
+  background: #1a2e1a;
+  color: #68d391;
+}
+
+body.dark-mode .admin-badge-blocked {
+  background: #2e1a1a;
+  color: #fc8181;
+}
+
+body.dark-mode .admin-badge-comments {
+  background: #1e293b;
+  color: #818cf8;
+}
+
+body.dark-mode .admin-btn-secondary {
+  background: #334155;
+  color: #cbd5e0;
+}
+
+body.dark-mode .admin-btn-secondary:hover {
+  background: #475569;
+}
+
+body.dark-mode .modal-overlay .modal-content {
+  background: #1e1e2e;
+  color: #e2e8f0;
+}
+
+body.dark-mode .user-details-grid strong {
+  color: #94a3b8;
+}
+
+body.dark-mode .admin-message-success {
+  background: #276749;
+}
+
+body.dark-mode .admin-message-error {
+  background: #9b2c2c;
+}
+
