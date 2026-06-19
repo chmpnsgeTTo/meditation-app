@@ -23,6 +23,7 @@ const LoginPage = () => {
   const submitLock = useRef(false);
 
   const handleSubmit = async (e) => {
+    console.trace('🔍 Вызов login');
     e.preventDefault();
     
     if (isSubmitting || submitLock.current) {
