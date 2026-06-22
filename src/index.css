@@ -6608,7 +6608,6 @@ body.dark-mode .lessons-empty {
 .lesson-content.collapsed {
   display: -webkit-box;
   -webkit-line-clamp: 2;
-  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
