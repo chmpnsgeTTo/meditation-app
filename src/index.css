@@ -6680,3 +6680,217 @@ body.dark-mode .lesson-expand-btn:hover {
     font-size: 0.85rem;
   }
 }
+
+/* ============================================ */
+/* ЛЕНТА - ИСПРАВЛЕННАЯ */
+/* ============================================ */
+
+.feed-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border-radius: 28px;
+}
+
+/* Заголовок - по центру */
+.feed-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.feed-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0;
+}
+
+.feed-title-icon {
+  color: #667eea;
+}
+
+/* ============================================ */
+/* СТАТИСТИКА + КНОПКА В ОДНОЙ СТРОКЕ */
+/* ============================================ */
+
+.feed-stats-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.feed-stats-wrapper {
+  flex: 1;
+  min-width: 280px;
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid #e2e8f0;
+}
+
+.feed-stats-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 0.4rem;
+}
+
+.feed-stats-label svg {
+  color: #667eea;
+}
+
+.feed-stats {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.feed-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #1a202c;
+  background: #ffffff;
+  padding: 0.2rem 0.8rem;
+  border-radius: 20px;
+  border: 1px solid #e2e8f0;
+}
+
+.feed-stat-item svg {
+  color: #667eea;
+}
+
+.feed-stat-item span {
+  font-weight: 600;
+}
+
+.feed-stat-label {
+  font-weight: 400 !important;
+  color: #718096 !important;
+  font-size: 0.75rem !important;
+  margin-left: 0.1rem;
+}
+
+/* Кнопка "Поделиться результатом" */
+.create-post-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.5rem;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.create-post-btn:hover {
+  background: #5a67d8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+}
+
+/* ============================================ */
+/* ТЁМНАЯ ТЕМА */
+/* ============================================ */
+body.dark-mode .feed-container {
+  background: rgba(30, 30, 46, 0.95) !important;
+}
+
+body.dark-mode .feed-title {
+  color: #e2e8f0;
+}
+
+body.dark-mode .feed-stats-wrapper {
+  background: #1a1a2e;
+  border-color: #334155;
+}
+
+body.dark-mode .feed-stats-label {
+  color: #cbd5e0;
+}
+
+body.dark-mode .feed-stats-label svg {
+  color: #818cf8;
+}
+
+body.dark-mode .feed-stat-item {
+  background: #1e1e2e;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+body.dark-mode .feed-stat-item svg {
+  color: #818cf8;
+}
+
+body.dark-mode .feed-stat-label {
+  color: #94a3b8 !important;
+}
+
+/* ============================================ */
+/* АДАПТАЦИЯ */
+/* ============================================ */
+@media (max-width: 768px) {
+  .feed-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .feed-title {
+    font-size: 1.5rem;
+  }
+
+  .feed-stats-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .feed-stats-wrapper {
+    min-width: unset;
+  }
+
+  .feed-stats {
+    gap: 0.75rem;
+  }
+
+  .feed-stat-item {
+    font-size: 0.8rem;
+    padding: 0.15rem 0.6rem;
+  }
+
+  .create-post-btn {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .feed-stats {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .feed-stat-item {
+    justify-content: center;
+  }
+}

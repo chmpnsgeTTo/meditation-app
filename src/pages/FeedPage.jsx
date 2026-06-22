@@ -6,7 +6,7 @@ import { FaHeart, FaRegHeart, FaComment, FaTrash, FaUserCircle } from 'react-ico
 import { MdSend, MdClose } from 'react-icons/md';
 import { GiMeditation, GiLotus } from 'react-icons/gi';
 import { IoMdMedal } from 'react-icons/io';
-import { FiPlus, FiClock, FiCalendar, FiArrowUp } from 'react-icons/fi';
+import { FiPlus, FiClock, FiCalendar, FiArrowUp, FiBarChart2 } from 'react-icons/fi';
 import { BiTime } from 'react-icons/bi';
 
 const FeedPage = () => {
@@ -155,34 +155,46 @@ const FeedPage = () => {
       <Navbar />
       <div className="container">
         <div className="feed-container">
-          {/* Шапка ленты */}
+          {/* Шапка ленты - заголовок по центру */}
           <div className="feed-header">
-            <h2>
+            <h2 className="feed-title">
+              <GiMeditation size={28} className="feed-title-icon" />
               Лента достижений
             </h2>
+          </div>
+
+          {/* Статистика + кнопка "Поделиться результатом" в одной строке */}
+          <div className="feed-stats-row">
+            <div className="feed-stats-wrapper">
+              <div className="feed-stats-label">
+                <FiBarChart2 size={18} />
+                <span>Общая статистика</span>
+              </div>
+              {statistics && (
+                <div className="feed-stats">
+                  <div className="feed-stat-item">
+                    <BiTime size={18} />
+                    <span>{statistics.total_minutes}</span>
+                    <span className="feed-stat-label">минут</span>
+                  </div>
+                  <div className="feed-stat-item">
+                    <IoMdMedal size={18} />
+                    <span>{statistics.total_sessions}</span>
+                    <span className="feed-stat-label">сессий</span>
+                  </div>
+                  <div className="feed-stat-item">
+                    <FaHeart size={18} />
+                    <span>{posts.reduce((acc, p) => acc + p.likes_count, 0)}</span>
+                    <span className="feed-stat-label">лайков</span>
+                  </div>
+                </div>
+              )}
+            </div>
             <button className="create-post-btn" onClick={() => setShowCreateModal(true)}>
               <FiPlus size={20} />
               Поделиться результатом
             </button>
           </div>
-
-          {/* Статистика пользователя (достижения) */}
-          {statistics && (
-            <div className="user-achievements">
-              <div className="achievement-badge">
-                <BiTime size={22} />
-                <span>Всего минут: {statistics.total_minutes}</span>
-              </div>
-              <div className="achievement-badge">
-                <IoMdMedal size={20} />
-                <span>Сессий: {statistics.total_sessions}</span>
-              </div>
-              <div className="achievement-badge">
-                <FaHeart size={18} />
-                <span>Лайков: {posts.reduce((acc, p) => acc + p.likes_count, 0)}</span>
-              </div>
-            </div>
-          )}
 
           {/* Лента постов */}
           <div className="feed-posts">
@@ -327,6 +339,7 @@ const FeedPage = () => {
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>
+                <GiMeditation size={22} />
                 Поделиться результатом
               </h3>
               <button className="modal-close" onClick={() => setShowCreateModal(false)}>
@@ -343,6 +356,7 @@ const FeedPage = () => {
             <div className="post-options">
               <div className="option-group">
                 <label>
+                  <BiTime size={16} />
                   Длительность медитации (мин):
                 </label>
                 <input
