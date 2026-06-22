@@ -30,7 +30,7 @@ import {
 } from 'react-icons/fa';
 import { IoRibbonOutline, IoTimeOutline } from 'react-icons/io5';
 import { MdCelebration, MdOutlineEmojiEvents } from 'react-icons/md';
-import { FiCheck, FiLoader, FiAlertCircle } from 'react-icons/fi';
+import { FiCheck, FiLoader, FiAlertCircle, FiChevronDown, FiChevronUp } from 'react-icons/fi';
 
 const CourseDetailPage = () => {
   const { id } = useParams();
@@ -40,6 +40,7 @@ const CourseDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [completing, setCompleting] = useState({});
   const [error, setError] = useState(null);
+  const [expandedLessons, setExpandedLessons] = useState({});
 
   useEffect(() => {
     loadCourse();
@@ -114,6 +115,13 @@ const CourseDetailPage = () => {
     }
   };
 
+  const toggleLessonExpand = (lessonId) => {
+    setExpandedLessons(prev => ({
+      ...prev,
+      [lessonId]: !prev[lessonId]
+    }));
+  };
+
   const getDifficultyColor = (difficulty) => {
     switch(difficulty) {
       case 'Начинающий': return '#48bb78';
@@ -134,6 +142,12 @@ const CourseDetailPage = () => {
       <GiFlowerStar size={18} />
     ];
     return icons[index % icons.length];
+  };
+
+  const truncateText = (text, maxLength = 120) => {
+    if (!text) return '';
+    if (text.length <= maxLength) return text;
+    return text.slice(0, maxLength) + '...';
   };
 
   const completedLessons = course?.progress?.completed_lessons ?? 0;
@@ -203,10 +217,10 @@ const CourseDetailPage = () => {
           
           <div className="course-detail-header">
             <h1>
+              <GiLotus size={32} />
               {course.title || 'Курс'}
             </h1>
             
-            {/* МЕТА-ИНФОРМАЦИЯ В РАМКАХ КАК НА СТРАНИЦЕ АСАН */}
             <div className="course-detail-meta">
               {course.difficulty && (
                 <span 
@@ -237,7 +251,6 @@ const CourseDetailPage = () => {
             </p>
           </div>
 
-          {/* ИНФО-КАРТОЧКИ - БЕЗ ИКОНОК */}
           <div className="course-info-grid">
             <div className="info-card">
               <h3>Польза курса</h3>
@@ -253,7 +266,6 @@ const CourseDetailPage = () => {
             </div>
           </div>
 
-          {/* ПРОГРЕСС - В ОТДЕЛЬНОЙ РАМКЕ */}
           <div className="course-progress-section">
             <div className="progress-header">
               <span>
@@ -276,16 +288,15 @@ const CourseDetailPage = () => {
             )}
           </div>
 
-          {/* УРОКИ - С ОБРАМЛЕНИЕМ И ПОДСВЕТКОЙ */}
           <div className="lessons-list">
             <h2>
-              <FaBookOpen size={20} />
               Уроки курса
             </h2>
             
             {course.lessons && course.lessons.length > 0 ? (
               course.lessons.map((lesson, index) => {
                 const isCompleted = course.completedLessonIds?.includes(lesson.id) || false;
+                const isExpanded = expandedLessons[lesson.id] || false;
                 
                 return (
                   <div key={lesson.id} className={`lesson-item ${isCompleted ? 'completed' : ''}`}>
@@ -307,7 +318,30 @@ const CourseDetailPage = () => {
                           </span>
                         )}
                       </h3>
-                      <p className="lesson-content">{lesson.content}</p>
+                      
+                      <p className={`lesson-content ${!isExpanded ? 'collapsed' : ''}`}>
+                        {isExpanded ? lesson.content : truncateText(lesson.content || '', 150)}
+                      </p>
+                      
+                      {lesson.content && lesson.content.length > 150 && (
+                        <button 
+                          className="lesson-expand-btn"
+                          onClick={() => toggleLessonExpand(lesson.id)}
+                        >
+                          {isExpanded ? (
+                            <>
+                              <FiChevronUp size={14} />
+                              Свернуть
+                            </>
+                          ) : (
+                            <>
+                              <FiChevronDown size={14} />
+                              Далее
+                            </>
+                          )}
+                        </button>
+                      )}
+                      
                       <span className="lesson-duration">
                         <IoTimeOutline size={12} /> {lesson.duration_minutes || 0} мин
                       </span>

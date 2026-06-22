@@ -6592,3 +6592,66 @@ body.dark-mode .lessons-empty {
     gap: 0.5rem;
   }
 }
+
+/* ============================================ */
+/* КНОПКА "ДАЛЕЕ" ДЛЯ РАСКРЫТИЯ УРОКОВ */
+/* ============================================ */
+
+.lesson-content {
+  font-size: 0.9rem;
+  color: #4a5568;
+  margin: 0 0 0.3rem 0;
+  line-height: 1.6;
+  transition: all 0.3s ease;
+}
+
+.lesson-content.collapsed {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.lesson-expand-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: none;
+  color: #667eea;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  margin-bottom: 0.3rem;
+}
+
+.lesson-expand-btn:hover {
+  background: rgba(102, 126, 234, 0.08);
+  color: #5a67d8;
+}
+
+.lesson-expand-btn svg {
+  transition: transform 0.3s ease;
+}
+
+/* Тёмная тема */
+body.dark-mode .lesson-expand-btn {
+  color: #818cf8;
+}
+
+body.dark-mode .lesson-expand-btn:hover {
+  background: rgba(129, 140, 248, 0.15);
+  color: #6366f1;
+}
+
+/* Адаптация */
+@media (max-width: 768px) {
+  .lesson-expand-btn {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.4rem;
+  }
+}

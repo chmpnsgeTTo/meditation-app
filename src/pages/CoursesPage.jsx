@@ -120,7 +120,6 @@ const CoursesPage = () => {
         <div className="courses-container">
           <div className="courses-header">
             <h1>
-              <FiBookOpen size={28} style={{ marginRight: '12px', color: '#667eea' }} />
               Выберите курс и начните свое обучение
             </h1>
             <p className="courses-subtitle">
