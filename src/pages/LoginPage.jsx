@@ -107,7 +107,6 @@ const LoginPage = () => {
             </div>
             <h1 className="auth-title">Yoga Practice</h1>
             <p className="auth-subtitle">
-              <GiLotus size={14} />
               Начни свой путь к гармонии
             </p>
           </div>

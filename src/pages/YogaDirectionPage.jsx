@@ -11,18 +11,14 @@ import {
   FiInfo,
   FiAlertCircle,
   FiHeart,
-  FiTarget,
-  FiFeather
+  FiTarget
 } from 'react-icons/fi';
 import { 
   GiLotus, 
   GiMeditation, 
   GiSittingDog, 
   GiSnake, 
-  GiLungs,
-  GiPalm,
-  GiLotusFlower,
-  GiHealing
+  GiLungs
 } from 'react-icons/gi';
 import { WiDaySunny } from 'react-icons/wi';
 import { FaFeatherAlt, FaYinYang, FaOm } from 'react-icons/fa';
@@ -35,18 +31,18 @@ const YogaDirectionPage = () => {
 
   const getDirectionIcon = (id) => {
     const iconMap = {
-      'hatha': <GiMeditation size={28} />,
-      'vinyasa': <WiDaySunny size={28} />,
-      'kundalini': <GiSnake size={28} />,
-      'ashtanga': <GiSittingDog size={28} />,
-      'yoga-nidra': <FaFeatherAlt size={28} />,
-      'iyengar': <GiLotus size={28} />,
-      'bikram': <WiDaySunny size={28} />,
-      'pranayama': <GiLungs size={28} />,
-      'yin': <FaYinYang size={28} />,
-      'restorative': <IoWaterOutline size={28} />
+      'hatha': <GiMeditation size={48} />,
+      'vinyasa': <WiDaySunny size={48} />,
+      'kundalini': <GiSnake size={48} />,
+      'ashtanga': <GiSittingDog size={48} />,
+      'yoga-nidra': <FaFeatherAlt size={48} />,
+      'iyengar': <GiLotus size={48} />,
+      'bikram': <WiDaySunny size={48} />,
+      'pranayama': <GiLungs size={48} />,
+      'yin': <FaYinYang size={48} />,
+      'restorative': <IoWaterOutline size={48} />
     };
-    return iconMap[id] || <GiLotus size={28} />;
+    return iconMap[id] || <GiLotus size={48} />;
   };
 
   const getDirectionColor = (id) => {
@@ -63,15 +59,6 @@ const YogaDirectionPage = () => {
       'restorative': '#68d391'
     };
     return colorMap[id] || '#667eea';
-  };
-
-  const getDifficultyLabel = (difficulty) => {
-    const map = {
-      'beginner': 'Начинающий',
-      'intermediate': 'Средний',
-      'advanced': 'Продвинутый'
-    };
-    return map[difficulty] || difficulty;
   };
 
   if (!direction) {
@@ -105,20 +92,18 @@ const YogaDirectionPage = () => {
             Все направления
           </Link>
 
+          {/* ШАПКА - НАЗВАНИЕ И ИКОНКА ПО ЦЕНТРУ */}
           <div className="direction-detail-header">
             <div 
               className="direction-detail-icon"
               style={{
-                background: color + '15',
-                color: color,
-                borderColor: color + '30'
+                color: color
               }}
             >
               {getDirectionIcon(direction.id)}
             </div>
             <h1 style={{ color }}>{direction.name}</h1>
             <p className="direction-detail-short">
-              <GiMeditation size={16} style={{ opacity: 0.5 }} />  {/* ← ЗАМЕНА: GiYoga → GiMeditation */}
               {direction.shortDescription}
             </p>
           </div>
@@ -127,7 +112,7 @@ const YogaDirectionPage = () => {
             {direction.difficulty && (
               <span className="direction-meta-item">
                 <FiTarget size={16} />
-                {getDifficultyLabel(direction.difficulty)}
+                {direction.difficulty}
               </span>
             )}
             {direction.duration && (
@@ -148,6 +133,7 @@ const YogaDirectionPage = () => {
             </span>
           </div>
 
+          {/* ИСТОРИЧЕСКАЯ СПРАВКА - С ИКОНКОЙ */}
           <div className="direction-detail-section">
             <h2>
               <FiInfo size={20} />
@@ -156,6 +142,7 @@ const YogaDirectionPage = () => {
             <p>{direction.history}</p>
           </div>
 
+          {/* ОСНОВНЫЕ ПРАКТИКИ - С ИКОНКОЙ */}
           <div className="direction-detail-section">
             <h2>
               <FiCheckCircle size={20} />
@@ -163,14 +150,12 @@ const YogaDirectionPage = () => {
             </h2>
             <ul className="direction-practices-list">
               {direction.practices.map((practice, idx) => (
-                <li key={idx}>
-                  <FiCheckCircle size={16} color={color} />
-                  {practice}
-                </li>
+                <li key={idx}>{practice}</li>
               ))}
             </ul>
           </div>
 
+          {/* КЛЮЧЕВЫЕ АСАНЫ - С ИКОНКОЙ */}
           <div className="direction-detail-section">
             <h2>
               <FiBookOpen size={20} />
@@ -178,10 +163,7 @@ const YogaDirectionPage = () => {
             </h2>
             <ul className="direction-asanas-list">
               {direction.asanas.map((asana, idx) => (
-                <li key={idx}>
-                  <GiLotus size={16} color={color} />
-                  {asana}
-                </li>
+                <li key={idx}>{asana}</li>
               ))}
             </ul>
           </div>
@@ -194,10 +176,7 @@ const YogaDirectionPage = () => {
               </h2>
               <ul className="direction-benefits-list">
                 {direction.benefits.map((benefit, idx) => (
-                  <li key={idx}>
-                    <FiCheckCircle size={16} color="#48bb78" />
-                    {benefit}
-                  </li>
+                  <li key={idx}>{benefit}</li>
                 ))}
               </ul>
             </div>

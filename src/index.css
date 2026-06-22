@@ -4195,3 +4195,600 @@ body.dark-mode .home-btn.btn-secondary:hover {
     font-size: 0.95rem;
   }
 }
+
+/* ============================================ */
+/* СТРАНИЦА ОБУЧЕНИЯ - ИСПРАВЛЕННАЯ */
+/* ============================================ */
+
+.learning-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border-radius: 28px;
+}
+
+.learning-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.learning-header h1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 0.5rem 0;
+}
+
+.learning-header-icon {
+  color: #667eea;
+}
+
+.learning-subtitle {
+  font-size: 1.1rem;
+  color: #4a5568;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* ============================================ */
+/* СТАТИСТИКА - ПО ЦЕНТРУ, КАЖДЫЙ В РАМОЧКЕ */
+/* ============================================ */
+
+.learning-stats {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+}
+
+.learning-stat {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1.5rem;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 30px;
+  color: #4a5568;
+  font-size: 0.95rem;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  min-width: 140px;
+}
+
+.learning-stat:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.learning-stat svg {
+  color: #667eea;
+}
+
+/* ============================================ */
+/* КАРТОЧКИ НАПРАВЛЕНИЙ - ОТДЕЛЬНЫЕ РАМКИ */
+/* ============================================ */
+
+.directions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.direction-card {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-decoration: none;
+  color: inherit;
+  border: 2px solid;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.direction-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  border-color: #667eea !important;
+}
+
+/* ИКОНКА - БЕЗ ФОНА, ТОЛЬКО ЦВЕТНАЯ */
+.direction-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+  flex-shrink: 0;
+  background: transparent !important;
+  width: auto;
+  height: auto;
+}
+
+.direction-icon svg {
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.08));
+}
+
+.direction-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0 0 0.5rem 0;
+}
+
+.direction-card p {
+  font-size: 0.95rem;
+  color: #4a5568;
+  line-height: 1.6;
+  margin: 0 0 1.5rem 0;
+  flex: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* КНОПКА "Узнать больше" - ПО ЦЕНТРУ */
+.read-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #667eea;
+  transition: all 0.3s ease;
+  padding: 0.5rem 1.5rem;
+  border-radius: 30px;
+  background: rgba(102, 126, 234, 0.08);
+}
+
+.read-more-arrow {
+  display: inline-block;
+  transition: transform 0.3s ease;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.direction-card:hover .read-more {
+  background: rgba(102, 126, 234, 0.15);
+}
+
+.direction-card:hover .read-more-arrow {
+  transform: translateX(4px);
+}
+
+/* ============================================ */
+/* ТЁМНАЯ ТЕМА */
+/* ============================================ */
+body.dark-mode .learning-container {
+  background: rgba(30, 30, 46, 0.95) !important;
+}
+
+body.dark-mode .learning-header h1 {
+  color: #e2e8f0;
+}
+
+body.dark-mode .learning-subtitle {
+  color: #cbd5e0;
+}
+
+body.dark-mode .learning-stat {
+  background: #1a1a2e;
+  border-color: #334155;
+  color: #cbd5e0;
+}
+
+body.dark-mode .learning-stat:hover {
+  border-color: #818cf8;
+}
+
+body.dark-mode .learning-stat svg {
+  color: #818cf8;
+}
+
+body.dark-mode .direction-card {
+  background: rgba(30, 30, 46, 0.95) !important;
+}
+
+body.dark-mode .direction-card h3 {
+  color: #e2e8f0;
+}
+
+body.dark-mode .direction-card p {
+  color: #cbd5e0;
+}
+
+body.dark-mode .read-more {
+  background: rgba(129, 140, 248, 0.15);
+  color: #818cf8;
+}
+
+body.dark-mode .direction-card:hover .read-more {
+  background: rgba(129, 140, 248, 0.25);
+}
+
+/* ============================================ */
+/* АДАПТАЦИЯ */
+/* ============================================ */
+@media (max-width: 768px) {
+  .learning-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .learning-header h1 {
+    font-size: 1.8rem;
+    flex-wrap: wrap;
+  }
+
+  .learning-stats {
+    gap: 1rem;
+  }
+
+  .learning-stat {
+    padding: 0.4rem 1rem;
+    font-size: 0.85rem;
+    min-width: 120px;
+  }
+
+  .directions-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .direction-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .direction-icon svg {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .direction-card h3 {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .learning-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .learning-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .learning-stats {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .learning-stat {
+    justify-content: center;
+  }
+
+  .directions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .direction-card {
+    padding: 1.25rem;
+  }
+}
+
+/* ============================================ */
+/* СТРАНИЦА ДЕТАЛЕЙ НАПРАВЛЕНИЯ - ИСПРАВЛЕННАЯ */
+/* ============================================ */
+
+.direction-detail-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border-radius: 28px;
+}
+
+/* ШАПКА - ПО ЦЕНТРУ */
+.direction-detail-header {
+  text-align: center;
+  padding: 2rem 0 1.5rem;
+}
+
+.direction-detail-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  background: transparent !important;
+  border: none !important;
+  width: auto;
+  height: auto;
+}
+
+.direction-detail-icon svg {
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.08));
+}
+
+.direction-detail-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.direction-detail-short {
+  font-size: 1.1rem;
+  color: #4a5568;
+  margin: 0;
+}
+
+/* МЕТА-ИНФОРМАЦИЯ */
+.direction-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1rem 1.5rem;
+  background: #f7fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 2rem;
+}
+
+.direction-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.95rem;
+  color: #4a5568;
+}
+
+.direction-meta-item svg {
+  color: #667eea;
+}
+
+/* СЕКЦИИ */
+.direction-detail-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f7fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.direction-detail-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0 0 1rem 0;
+}
+
+.direction-detail-section h2 svg {
+  color: #667eea;
+}
+
+.direction-detail-section p {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: #4a5568;
+  margin: 0;
+}
+
+/* СПИСКИ - БЕЗ ИКОНОК */
+.direction-practices-list,
+.direction-asanas-list,
+.direction-benefits-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.direction-practices-list li,
+.direction-asanas-list li,
+.direction-benefits-list li {
+  padding: 0.5rem 0.75rem;
+  background: #ffffff;
+  border-radius: 8px;
+  color: #4a5568;
+  font-size: 0.95rem;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.direction-practices-list li:hover,
+.direction-asanas-list li:hover,
+.direction-benefits-list li:hover {
+  background: #edf2f7;
+  transform: translateX(4px);
+}
+
+/* СОВЕТ */
+.direction-detail-tips {
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 2px solid;
+  margin-top: 0.5rem;
+}
+
+.direction-detail-tips h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0 0 0.5rem 0;
+}
+
+.direction-detail-tips p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #4a5568;
+  margin: 0;
+}
+
+/* ============================================ */
+/* ТЁМНАЯ ТЕМА */
+/* ============================================ */
+body.dark-mode .direction-detail-container {
+  background: rgba(30, 30, 46, 0.95) !important;
+}
+
+body.dark-mode .direction-detail-short {
+  color: #cbd5e0;
+}
+
+body.dark-mode .direction-detail-meta {
+  background: #1a1a2e;
+  border-color: #334155;
+}
+
+body.dark-mode .direction-meta-item {
+  color: #cbd5e0;
+}
+
+body.dark-mode .direction-meta-item svg {
+  color: #818cf8;
+}
+
+body.dark-mode .direction-detail-section {
+  background: #1a1a2e;
+  border-color: #334155;
+}
+
+body.dark-mode .direction-detail-section h2 {
+  color: #e2e8f0;
+}
+
+body.dark-mode .direction-detail-section h2 svg {
+  color: #818cf8;
+}
+
+body.dark-mode .direction-detail-section p {
+  color: #cbd5e0;
+}
+
+body.dark-mode .direction-practices-list li,
+body.dark-mode .direction-asanas-list li,
+body.dark-mode .direction-benefits-list li {
+  background: #1e1e2e;
+  border-color: #334155;
+  color: #cbd5e0;
+}
+
+body.dark-mode .direction-practices-list li:hover,
+body.dark-mode .direction-asanas-list li:hover,
+body.dark-mode .direction-benefits-list li:hover {
+  background: #2d2d44;
+}
+
+body.dark-mode .direction-detail-tips h3 {
+  color: #e2e8f0;
+}
+
+body.dark-mode .direction-detail-tips p {
+  color: #cbd5e0;
+}
+
+/* ============================================ */
+/* АДАПТАЦИЯ */
+/* ============================================ */
+@media (max-width: 768px) {
+  .direction-detail-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .direction-detail-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .direction-detail-short {
+    font-size: 1rem;
+  }
+
+  .direction-detail-icon svg {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .direction-detail-meta {
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .direction-meta-item {
+    font-size: 0.85rem;
+  }
+
+  .direction-detail-section {
+    padding: 1rem;
+  }
+
+  .direction-detail-section h2 {
+    font-size: 1.1rem;
+  }
+
+  .direction-practices-list,
+  .direction-asanas-list,
+  .direction-benefits-list {
+    grid-template-columns: 1fr;
+  }
+
+  .direction-practices-list li,
+  .direction-asanas-list li,
+  .direction-benefits-list li {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  .direction-detail-tips {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .direction-detail-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .direction-detail-short {
+    font-size: 0.9rem;
+  }
+
+  .direction-detail-icon svg {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .direction-meta-item {
+    font-size: 0.8rem;
+  }
+
+  .direction-detail-section p {
+    font-size: 0.9rem;
+  }
+}

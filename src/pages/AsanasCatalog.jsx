@@ -155,7 +155,6 @@ const AsanasCatalog = () => {
         <div className="catalog-container">
           <div className="catalog-header">
             <h1>
-              <FiBookOpen size={28} />
               Каталог асан
             </h1>
             <p className="catalog-subtitle">

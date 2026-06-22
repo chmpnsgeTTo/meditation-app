@@ -158,7 +158,6 @@ const FeedPage = () => {
           {/* Шапка ленты */}
           <div className="feed-header">
             <h2>
-              <GiMeditation size={28} className="feed-header-icon" />
               Лента достижений
             </h2>
             <button className="create-post-btn" onClick={() => setShowCreateModal(true)}>
@@ -328,7 +327,6 @@ const FeedPage = () => {
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>
-                <GiMeditation size={22} />
                 Поделиться результатом
               </h3>
               <button className="modal-close" onClick={() => setShowCreateModal(false)}>
@@ -345,7 +343,6 @@ const FeedPage = () => {
             <div className="post-options">
               <div className="option-group">
                 <label>
-                  <BiTime size={16} />
                   Длительность медитации (мин):
                 </label>
                 <input

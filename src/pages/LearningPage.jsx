@@ -7,10 +7,6 @@ import {
   GiSnake,
   GiLotus,
   GiLungs,
-  GiPalm,
-  GiLotusFlower,
-  GiHeartPlus,
-  GiSunrise
 } from 'react-icons/gi';
 import { WiDaySunny } from 'react-icons/wi';
 import { FaFeatherAlt, FaYinYang } from 'react-icons/fa';
@@ -57,6 +53,7 @@ const LearningPage = () => {
         <div className="learning-container">
           <div className="learning-header">
             <h1>
+              <GiLotus size={32} className="learning-header-icon" />
               Основные направления йоги
             </h1>
             <p className="learning-subtitle">
@@ -64,14 +61,18 @@ const LearningPage = () => {
             </p>
           </div>
 
+          {/* СТАТИСТИКА - каждый в рамочке, по центру */}
           <div className="learning-stats">
             <div className="learning-stat">
+              <GiLotus size={20} />
               <span>{yogaDirections.length} направлений</span>
             </div>
             <div className="learning-stat">
+              <GiMeditation size={20} />
               <span>Древние практики</span>
             </div>
             <div className="learning-stat">
+              <FaFeatherAlt size={20} />
               <span>Путь к гармонии</span>
             </div>
           </div>
@@ -83,19 +84,21 @@ const LearningPage = () => {
                 key={direction.id}
                 className="direction-card"
                 style={{
-                  borderColor: getDirectionColor(direction.id) + '30'
+                  borderColor: getDirectionColor(direction.id) + '40'
                 }}
               >
+                {/* ИКОНКА - БЕЗ ФОНА, ТОЛЬКО ЦВЕТНАЯ */}
                 <div 
                   className="direction-icon"
                   style={{
-                    background: getDirectionColor(direction.id) + '15',
                     color: getDirectionColor(direction.id)
                   }}
                 >
                   {getDirectionIcon(direction.id)}
                 </div>
-                <h3>{direction.name}</h3>
+                <h3 style={{ color: getDirectionColor(direction.id) }}>
+                  {direction.name}
+                </h3>
                 <p>{direction.shortDescription}</p>
                 <span className="read-more">
                   Узнать больше

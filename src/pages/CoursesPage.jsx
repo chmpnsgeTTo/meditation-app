@@ -133,7 +133,6 @@ const CoursesPage = () => {
           <div className="courses-header">
             <div className="courses-header-content">
               <h1>
-                <FiBookOpen size={28} />
                 Выберите курс и начните свое обучение
               </h1>
               <p className="courses-subtitle">
@@ -189,21 +188,6 @@ const CoursesPage = () => {
               <FiZap size={14} />
               Продвинутый
             </button>
-          </div>
-
-          <div className="courses-stats">
-            <div className="courses-stat">
-              <FiBarChart2 size={18} />
-              <span>Всего курсов: {courses.length}</span>
-            </div>
-            <div className="courses-stat">
-              <FiTrendingUp size={18} />
-              <span>Показано: {filteredCourses.length}</span>
-            </div>
-            <div className="courses-stat">
-              <FaUserGraduate size={18} />
-              <span>Студентов: {courses.reduce((acc, c) => acc + (c.students_count || 0), 0)}</span>
-            </div>
           </div>
 
           {filteredCourses.length === 0 ? (
