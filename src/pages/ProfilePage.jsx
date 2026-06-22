@@ -20,9 +20,11 @@ import {
   FiRefreshCw,
   FiTarget,
   FiUsers,
-  FiHeart
+  FiHeart,
+  FiZap,
+  FiFeather
 } from 'react-icons/fi';
-import { GiMeditation, GiLotus } from 'react-icons/gi';
+import { GiMeditation, GiLotus, GiSittingDog, GiSnake, GiLungs } from 'react-icons/gi';
 import { FaUserCircle, FaChartLine, FaFire } from 'react-icons/fa';
 import { IoMdMedal } from 'react-icons/io';
 import { useAuth } from '../contexts/AuthContext';
@@ -246,26 +248,37 @@ const ProfilePage = () => {
 
   const chartData = prepareChartData();
 
+  // Цвета для иконок статистики
+  const metricColors = ['#667eea', '#48bb78', '#f6ad55', '#fc8181'];
+
   const keyMetrics = [
     { 
       title: 'Всего минут', 
       value: stats?.total_minutes || 0, 
-      icon: <FiTrendingUp size={24} />
+      icon: <FiTrendingUp size={24} />,
+      color: '#667eea',
+      bg: 'rgba(102, 126, 234, 0.1)'
     },
     { 
       title: 'Всего сессий', 
       value: stats?.total_sessions || 0, 
-      icon: <FiActivity size={24} />
+      icon: <FiActivity size={24} />,
+      color: '#48bb78',
+      bg: 'rgba(72, 187, 120, 0.1)'
     },
     { 
       title: 'Средняя длительность', 
       value: `${stats?.avg_duration || 0} мин`, 
-      icon: <FiClock size={24} />
+      icon: <FiClock size={24} />,
+      color: '#f6ad55',
+      bg: 'rgba(246, 173, 85, 0.1)'
     },
     { 
       title: 'Самая длинная', 
       value: `${stats?.longest_session || 0} мин`, 
-      icon: <FiStar size={24} />
+      icon: <FiStar size={24} />,
+      color: '#fc8181',
+      bg: 'rgba(252, 129, 129, 0.1)'
     }
   ];
 
@@ -356,7 +369,7 @@ const ProfilePage = () => {
             </div>
           </div>
 
-          {/* ========== ВКЛАДКИ ========== */}
+          {/* ========== ВКЛАДКИ - ПО ЦЕНТРУ ========== */}
           <div className="profile-tabs">
             <button 
               onClick={() => handleTabChange('stats')} 
@@ -405,10 +418,19 @@ const ProfilePage = () => {
                 </button>
               </div>
 
+              {/* Статистика - отдельные боксы с цветными иконками */}
               <div className="profile-metrics-grid">
                 {keyMetrics.map((metric, idx) => (
                   <div key={idx} className="profile-metric-card">
-                    <div className="profile-metric-icon">{metric.icon}</div>
+                    <div 
+                      className="profile-metric-icon"
+                      style={{
+                        background: metric.bg,
+                        color: metric.color
+                      }}
+                    >
+                      {metric.icon}
+                    </div>
                     <div className="profile-metric-info">
                       <div className="profile-metric-value">{metric.value}</div>
                       <div className="profile-metric-title">{metric.title}</div>
@@ -417,6 +439,7 @@ const ProfilePage = () => {
                 ))}
               </div>
 
+              {/* График - улучшенная стилистика */}
               {chartData.length > 0 && (
                 <div className="profile-chart-card">
                   <h3 className="profile-chart-title">
@@ -425,33 +448,47 @@ const ProfilePage = () => {
                   </h3>
                   <ResponsiveContainer width="100%" height={300}>
                     <LineChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
-                      <XAxis dataKey="day" tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} />
-                      <YAxis tick={{ fontSize: 12, fill: 'var(--text-secondary)' }} />
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" strokeOpacity={0.5} />
+                      <XAxis 
+                        dataKey="day" 
+                        tick={{ fontSize: 12, fill: 'var(--text-secondary)' }}
+                        axisLine={{ stroke: 'var(--border-color)' }}
+                        tickLine={false}
+                      />
+                      <YAxis 
+                        tick={{ fontSize: 12, fill: 'var(--text-secondary)' }}
+                        axisLine={{ stroke: 'var(--border-color)' }}
+                        tickLine={false}
+                      />
                       <Tooltip 
                         contentStyle={{ 
                           background: 'var(--bg-card)', 
                           border: '1px solid var(--border-color)',
-                          borderRadius: '8px'
+                          borderRadius: '12px',
+                          boxShadow: '0 4px 20px rgba(0,0,0,0.08)'
                         }}
                       />
-                      <Legend />
+                      <Legend 
+                        wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }}
+                        iconType="circle"
+                      />
                       <Line 
                         type="monotone" 
                         dataKey="minutes" 
                         stroke="#667eea" 
-                        strokeWidth={2}
+                        strokeWidth={3}
                         name="Минуты"
-                        dot={{ fill: '#667eea', strokeWidth: 2 }}
-                        activeDot={{ r: 6 }}
+                        dot={{ fill: '#667eea', strokeWidth: 2, r: 4 }}
+                        activeDot={{ r: 6, stroke: '#667eea', strokeWidth: 2 }}
                       />
                       <Line 
                         type="monotone" 
                         dataKey="sessions" 
                         stroke="#48bb78" 
-                        strokeWidth={2}
+                        strokeWidth={3}
                         name="Количество сессий"
-                        dot={{ fill: '#48bb78', strokeWidth: 2 }}
+                        dot={{ fill: '#48bb78', strokeWidth: 2, r: 4 }}
+                        activeDot={{ r: 6, stroke: '#48bb78', strokeWidth: 2 }}
                       />
                     </LineChart>
                   </ResponsiveContainer>
@@ -507,9 +544,9 @@ const ProfilePage = () => {
                         </p>
                         <div className="profile-achievement-progress">
                           <div className="progress-bar-small">
-                            <div className="progress-fill-small" style={{ width: `${Math.round(course.progress_percent)}%` }}></div>
+                            <div className="progress-fill-small completed" style={{ width: `${Math.round(course.progress_percent)}%` }}></div>
                           </div>
-                          <span>{Math.round(course.progress_percent)}%</span>
+                          <span className="progress-percent">{Math.round(course.progress_percent)}%</span>
                         </div>
                       </div>
                     </div>

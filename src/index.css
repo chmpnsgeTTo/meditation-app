@@ -6894,3 +6894,380 @@ body.dark-mode .feed-stat-label {
     justify-content: center;
   }
 }
+
+/* ============================================ */
+/* ПРОФИЛЬ - УЛУЧШЕННАЯ СТИЛИСТИКА */
+/* ============================================ */
+
+.profile-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border-radius: 28px;
+}
+
+/* ============================================ */
+/* ВКЛАДКИ - ПО ЦЕНТРУ */
+/* ============================================ */
+
+.profile-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 0.5rem;
+}
+
+.profile-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.5rem;
+  border: none;
+  border-radius: 30px;
+  background: transparent;
+  color: #4a5568;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-tab:hover {
+  background: #f1f5f9;
+  color: #667eea;
+}
+
+.profile-tab.active {
+  background: #667eea;
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* ============================================ */
+/* СТАТИСТИКА - ОТДЕЛЬНЫЕ БОКСЫ С ЦВЕТНЫМИ ИКОНКАМИ */
+/* ============================================ */
+
+.profile-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.profile-metric-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.profile-metric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.profile-metric-icon {
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: transform 0.3s ease;
+}
+
+.profile-metric-card:hover .profile-metric-icon {
+  transform: scale(1.05);
+}
+
+.profile-metric-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-metric-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  line-height: 1.2;
+}
+
+.profile-metric-title {
+  font-size: 0.8rem;
+  color: #718096;
+  font-weight: 500;
+}
+
+/* ============================================ */
+/* ГРАФИК - УЛУЧШЕННАЯ СТИЛИСТИКА */
+/* ============================================ */
+
+.profile-chart-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.profile-chart-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0 0 1rem 0;
+}
+
+.profile-chart-title svg {
+  color: #667eea;
+}
+
+/* ============================================ */
+/* КУРСЫ - КАРТОЧКИ С ЗЕЛЁНОЙ ПОЛОСКОЙ */
+/* ============================================ */
+
+.profile-achievements-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.profile-achievement-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.profile-achievement-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-color: #48bb78;
+}
+
+.profile-achievement-icon {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  border-radius: 14px;
+  background: rgba(102, 126, 234, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #667eea;
+}
+
+.profile-achievement-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-achievement-info h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0 0 0.2rem 0;
+}
+
+.profile-achievement-info p {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: #718096;
+  margin: 0 0 0.4rem 0;
+}
+
+.profile-achievement-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.profile-achievement-progress .progress-bar-small {
+  flex: 1;
+  height: 6px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.profile-achievement-progress .progress-fill-small {
+  height: 100%;
+  background: #667eea;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.profile-achievement-progress .progress-fill-small.completed {
+  background: #48bb78 !important;
+}
+
+.profile-achievement-progress .progress-percent {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #48bb78;
+  min-width: 36px;
+  text-align: right;
+}
+
+/* ============================================ */
+/* ТЁМНАЯ ТЕМА */
+/* ============================================ */
+body.dark-mode .profile-container {
+  background: rgba(30, 30, 46, 0.95) !important;
+}
+
+body.dark-mode .profile-tabs {
+  border-bottom-color: #334155;
+}
+
+body.dark-mode .profile-tab {
+  color: #94a3b8;
+}
+
+body.dark-mode .profile-tab:hover {
+  background: #1e293b;
+  color: #818cf8;
+}
+
+body.dark-mode .profile-tab.active {
+  background: #818cf8;
+  color: white;
+}
+
+body.dark-mode .profile-metric-card {
+  background: #1e1e2e;
+  border-color: #334155;
+}
+
+body.dark-mode .profile-metric-value {
+  color: #e2e8f0;
+}
+
+body.dark-mode .profile-metric-title {
+  color: #94a3b8;
+}
+
+body.dark-mode .profile-chart-card {
+  background: #1e1e2e;
+  border-color: #334155;
+}
+
+body.dark-mode .profile-chart-title {
+  color: #e2e8f0;
+}
+
+body.dark-mode .profile-achievement-card {
+  background: #1e1e2e;
+  border-color: #334155;
+}
+
+body.dark-mode .profile-achievement-card:hover {
+  border-color: #48bb78;
+}
+
+body.dark-mode .profile-achievement-info h4 {
+  color: #e2e8f0;
+}
+
+body.dark-mode .profile-achievement-info p {
+  color: #94a3b8;
+}
+
+body.dark-mode .profile-achievement-progress .progress-bar-small {
+  background: #2d2d44;
+}
+
+body.dark-mode .profile-achievement-progress .progress-percent {
+  color: #48bb78;
+}
+
+/* ============================================ */
+/* АДАПТАЦИЯ */
+/* ============================================ */
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .profile-tabs {
+    gap: 0.3rem;
+  }
+
+  .profile-tab {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .profile-metrics-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .profile-metric-card {
+    padding: 1rem;
+  }
+
+  .profile-metric-icon {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+  }
+
+  .profile-metric-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .profile-metric-value {
+    font-size: 1.2rem;
+  }
+
+  .profile-achievements-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-tabs {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .profile-tab {
+    justify-content: center;
+  }
+
+  .profile-achievement-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .profile-achievement-progress {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
