@@ -53,7 +53,6 @@ const LearningPage = () => {
         <div className="learning-container">
           <div className="learning-header">
             <h1>
-              <GiLotus size={32} className="learning-header-icon" />
               Основные направления йоги
             </h1>
             <p className="learning-subtitle">

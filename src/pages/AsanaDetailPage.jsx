@@ -12,10 +12,9 @@ import {
   FiInfo,
   FiCheckCircle,
   FiXCircle,
-  FiAward,
   FiHeart,
-  FiTag,        // ← ДОБАВЛЕНО
-  FiRefreshCw   // ← ДОБАВЛЕНО для кнопки "Попробовать снова"
+  FiTag,
+  FiRefreshCw
 } from 'react-icons/fi';
 import { GiLotus, GiMeditation } from 'react-icons/gi';
 
@@ -123,6 +122,7 @@ const AsanaDetailPage = () => {
             Каталог асан
           </Link>
 
+          {/* НАЗВАНИЕ ПО ЦЕНТРУ */}
           <div className="asana-detail-header">
             <h1>{asana.name}</h1>
             {asana.sanskrit && (
@@ -130,12 +130,13 @@ const AsanaDetailPage = () => {
             )}
           </div>
 
-          {/* Изображение */}
+          {/* Изображение - адаптивный размер */}
           {asana.image_url && (
-            <div className="asana-detail-image">
+            <div className="asana-detail-image-wrapper">
               <img 
                 src={asana.image_url} 
                 alt={asana.name}
+                className="asana-detail-image"
                 onError={(e) => {
                   e.target.style.display = 'none';
                 }}
@@ -144,61 +145,52 @@ const AsanaDetailPage = () => {
           )}
 
           {/* Мета-информация */}
-          <div className="course-detail-meta">
+          <div className="asana-detail-meta">
             {asana.category && (
-              <span className="difficulty-badge">
-                <FiTag size={14} style={{ marginRight: '4px' }} />
+              <span className="asana-meta-badge">
+                <FiTag size={14} />
                 {asana.category}
               </span>
             )}
             {asana.difficulty && (
               <span 
-                className="difficulty-badge"
+                className="asana-meta-badge"
                 style={{
                   backgroundColor: getDifficultyColor(asana.difficulty) + '20',
                   color: getDifficultyColor(asana.difficulty)
                 }}
               >
-                <FiStar size={14} style={{ marginRight: '4px' }} />
+                <FiStar size={14} />
                 {asana.difficulty}
               </span>
             )}
             {asana.duration && (
-              <span className="duration-badge">
-                <FiClock size={14} style={{ marginRight: '4px' }} />
+              <span className="asana-meta-badge">
+                <FiClock size={14} />
                 {asana.duration} мин
               </span>
             )}
           </div>
 
-          {/* Краткое описание */}
+          {/* Краткое описание - БЕЗ ИКОНКИ */}
           <div className="asana-detail-section">
-            <h2>
-              <FiInfo size={18} style={{ marginRight: '8px' }} />
-              Краткое описание
-            </h2>
+            <h2>Краткое описание</h2>
             <p>{asana.description || 'Описание отсутствует'}</p>
           </div>
 
-          {/* Полное описание */}
+          {/* Полное описание - БЕЗ ИКОНКИ */}
           {asana.full_description && (
             <div className="asana-detail-section">
-              <h2>
-                <FiBookOpen size={18} style={{ marginRight: '8px' }} />
-                Полное описание
-              </h2>
+              <h2>Полное описание</h2>
               <p>{asana.full_description}</p>
             </div>
           )}
 
-          {/* Техника выполнения */}
+          {/* Техника выполнения - БЕЗ ИКОНКИ */}
           {asana.technique && (
             <div className="asana-detail-section">
-              <h2>
-                <GiMeditation size={18} style={{ marginRight: '8px' }} />
-                Техника выполнения
-              </h2>
-              <div style={{ whiteSpace: 'pre-wrap', lineHeight: '1.8' }}>
+              <h2>Техника выполнения</h2>
+              <div className="asana-technique-text">
                 {asana.technique}
               </div>
             </div>

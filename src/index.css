@@ -4792,3 +4792,874 @@ body.dark-mode .direction-detail-tips p {
     font-size: 0.9rem;
   }
 }
+
+/* ============================================ */
+/* КАТАЛОГ АСАН - ИСПРАВЛЕННЫЙ */
+/* ============================================ */
+
+.catalog-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border-radius: 28px;
+}
+
+.catalog-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.catalog-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 0.5rem 0;
+}
+
+.catalog-subtitle {
+  font-size: 1.1rem;
+  color: #4a5568;
+  margin: 0;
+}
+
+/* ============================================ */
+/* ПОИСК И КНОПКИ ВИДА */
+/* ============================================ */
+
+.catalog-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+/* Поиск - по центру */
+.catalog-search {
+  flex: 1;
+  min-width: 250px;
+  position: relative;
+}
+
+.catalog-search input {
+  width: 100%;
+  padding: 0.7rem 2.8rem 0.7rem 2.8rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 30px;
+  font-size: 1rem;
+  background: #ffffff;
+  color: #1a202c;
+  transition: all 0.3s ease;
+}
+
+.catalog-search input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.catalog-search .search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+}
+
+.catalog-search .clear-search {
+  position: absolute;
+  right: 0.8rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.catalog-search .clear-search:hover {
+  background: #f1f5f9;
+  color: #4a5568;
+}
+
+/* Кнопки вида - справа */
+.catalog-view-toggle {
+  display: flex;
+  gap: 0.3rem;
+  background: #f1f5f9;
+  padding: 0.3rem;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.catalog-view-toggle .view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.6rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.catalog-view-toggle .view-btn:hover {
+  color: #4a5568;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.catalog-view-toggle .view-btn.active {
+  background: #667eea;
+  color: white;
+}
+
+/* ============================================ */
+/* КАРТОЧКИ АСАН */
+/* ============================================ */
+
+.catalog-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.catalog-grid.grid {
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+}
+
+.catalog-grid.list {
+  grid-template-columns: 1fr;
+}
+
+.catalog-item {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 1.2rem 1.5rem;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.catalog-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  border-color: #667eea;
+}
+
+.catalog-item-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.catalog-item-icon {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  border-radius: 12px;
+  background: rgba(102, 126, 234, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #667eea;
+}
+
+.catalog-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.catalog-item-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0 0 0.1rem 0;
+}
+
+.catalog-item-sanskrit {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  font-style: italic;
+  margin: 0 0 0.3rem 0;
+}
+
+.catalog-item-description {
+  font-size: 0.9rem;
+  color: #4a5568;
+  line-height: 1.5;
+  margin: 0 0 0.5rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.catalog-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.catalog-item-duration {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.75rem;
+  color: #718096;
+}
+
+.catalog-item-category {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  background: #f1f5f9;
+  color: #4a5568;
+}
+
+.catalog-item-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  margin-top: 0.5rem;
+}
+
+.catalog-item:hover .catalog-item-arrow {
+  color: #667eea;
+  transform: translateX(4px);
+}
+
+/* ============================================ */
+/* ПУСТОЕ СОСТОЯНИЕ */
+/* ============================================ */
+
+.catalog-empty {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: #4a5568;
+}
+
+.catalog-empty svg {
+  color: #94a3b8;
+  opacity: 0.3;
+  margin-bottom: 1rem;
+}
+
+.catalog-empty h3 {
+  font-size: 1.3rem;
+  color: #1a202c;
+  margin: 0 0 0.5rem 0;
+}
+
+.catalog-empty p {
+  margin: 0;
+}
+
+/* ============================================ */
+/* ТЁМНАЯ ТЕМА */
+/* ============================================ */
+body.dark-mode .catalog-container {
+  background: rgba(30, 30, 46, 0.95) !important;
+}
+
+body.dark-mode .catalog-header h1 {
+  color: #e2e8f0;
+}
+
+body.dark-mode .catalog-subtitle {
+  color: #cbd5e0;
+}
+
+body.dark-mode .catalog-search input {
+  background: #1a1a2e;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+body.dark-mode .catalog-search input::placeholder {
+  color: #64748b;
+}
+
+body.dark-mode .catalog-search input:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
+}
+
+body.dark-mode .catalog-search .search-icon {
+  color: #64748b;
+}
+
+body.dark-mode .catalog-search .clear-search {
+  color: #64748b;
+}
+
+body.dark-mode .catalog-search .clear-search:hover {
+  background: #2d2d44;
+  color: #cbd5e0;
+}
+
+body.dark-mode .catalog-view-toggle {
+  background: #1a1a2e;
+}
+
+body.dark-mode .catalog-view-toggle .view-btn {
+  color: #64748b;
+}
+
+body.dark-mode .catalog-view-toggle .view-btn:hover {
+  color: #cbd5e0;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .catalog-view-toggle .view-btn.active {
+  background: #818cf8;
+  color: white;
+}
+
+body.dark-mode .catalog-item {
+  background: #1e1e2e;
+  border-color: #334155;
+}
+
+body.dark-mode .catalog-item:hover {
+  border-color: #818cf8;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode .catalog-item-name {
+  color: #e2e8f0;
+}
+
+body.dark-mode .catalog-item-sanskrit {
+  color: #64748b;
+}
+
+body.dark-mode .catalog-item-description {
+  color: #cbd5e0;
+}
+
+body.dark-mode .catalog-item-duration {
+  color: #94a3b8;
+}
+
+body.dark-mode .catalog-item-category {
+  background: #2d2d44;
+  color: #cbd5e0;
+}
+
+body.dark-mode .catalog-item-icon {
+  background: rgba(129, 140, 248, 0.08);
+  color: #818cf8;
+}
+
+body.dark-mode .catalog-empty h3 {
+  color: #e2e8f0;
+}
+
+body.dark-mode .catalog-empty p {
+  color: #94a3b8;
+}
+
+/* ============================================ */
+/* АДАПТАЦИЯ */
+/* ============================================ */
+@media (max-width: 768px) {
+  .catalog-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .catalog-header h1 {
+    font-size: 2rem;
+  }
+
+  .catalog-controls {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .catalog-search {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .catalog-view-toggle {
+    align-self: flex-end;
+  }
+
+  .catalog-grid.grid {
+    grid-template-columns: 1fr;
+  }
+
+  .catalog-item {
+    padding: 1rem;
+  }
+
+  .catalog-item-icon {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+  }
+
+  .catalog-item-icon svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  .catalog-item-name {
+    font-size: 1rem;
+  }
+
+  .catalog-item-description {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .catalog-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .catalog-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .catalog-item-content {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .catalog-item-arrow {
+    display: none;
+  }
+
+  .catalog-item-meta {
+    gap: 0.3rem;
+  }
+}
+
+/* ============================================ */
+/* ФИЛЬТР КАТЕГОРИЙ */
+/* ============================================ */
+
+.catalog-categories {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding: 0.75rem 1rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+}
+
+.catalog-categories-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #4a5568;
+  flex-shrink: 0;
+}
+
+.catalog-categories-header svg {
+  color: #667eea;
+}
+
+.catalog-categories-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.catalog-category-btn {
+  padding: 0.3rem 0.8rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  background: #ffffff;
+  color: #4a5568;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.catalog-category-btn:hover {
+  border-color: #667eea;
+  color: #667eea;
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.catalog-category-btn.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+/* Тёмная тема */
+body.dark-mode .catalog-categories {
+  background: #1a1a2e;
+  border-color: #334155;
+}
+
+body.dark-mode .catalog-categories-header {
+  color: #cbd5e0;
+}
+
+body.dark-mode .catalog-categories-header svg {
+  color: #818cf8;
+}
+
+body.dark-mode .catalog-category-btn {
+  background: #1e1e2e;
+  border-color: #334155;
+  color: #cbd5e0;
+}
+
+body.dark-mode .catalog-category-btn:hover {
+  border-color: #818cf8;
+  color: #818cf8;
+  background: rgba(129, 140, 248, 0.05);
+}
+
+body.dark-mode .catalog-category-btn.active {
+  background: #818cf8;
+  color: white;
+  border-color: #818cf8;
+}
+
+/* ============================================ */
+/* АДАПТАЦИЯ ДЛЯ ФИЛЬТРА */
+/* ============================================ */
+@media (max-width: 768px) {
+  .catalog-categories {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .catalog-categories-header {
+    font-size: 0.85rem;
+  }
+
+  .catalog-category-btn {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
+  }
+}
+/* ============================================ */
+/* СТРАНИЦА ДЕТАЛЕЙ АСАНЫ - ИСПРАВЛЕННАЯ */
+/* ============================================ */
+
+.asana-detail-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border-radius: 28px;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
+  transition: color 0.2s;
+}
+
+.back-link:hover {
+  color: #5a67d8;
+  text-decoration: underline;
+}
+
+/* ============================================ */
+/* НАЗВАНИЕ - ПО ЦЕНТРУ */
+/* ============================================ */
+
+.asana-detail-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.asana-detail-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin: 0 0 0.3rem 0;
+}
+
+.asana-sanskrit {
+  font-size: 1.2rem;
+  color: #94a3b8;
+  font-style: italic;
+  margin: 0;
+}
+
+/* ============================================ */
+/* ИЗОБРАЖЕНИЕ - АДАПТИВНЫЙ РАЗМЕР */
+/* ============================================ */
+
+.asana-detail-image-wrapper {
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto 2rem;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  background: #f7fafc;
+}
+
+.asana-detail-image {
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: cover;
+  display: block;
+}
+
+/* ============================================ */
+/* МЕТА-ИНФОРМАЦИЯ */
+/* ============================================ */
+
+.asana-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.asana-meta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  background: #ffffff;
+  color: #4a5568;
+  border: 1px solid #e2e8f0;
+}
+
+.asana-meta-badge svg {
+  color: #667eea;
+}
+
+/* ============================================ */
+/* СЕКЦИИ - БЕЗ ИКОНОК В ЗАГОЛОВКАХ */
+/* ============================================ */
+
+.asana-detail-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.asana-detail-section h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0 0 0.8rem 0;
+}
+
+.asana-detail-section p {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: #4a5568;
+  margin: 0;
+}
+
+/* Текст техники выполнения */
+.asana-technique-text {
+  white-space: pre-wrap;
+  line-height: 1.8;
+  color: #4a5568;
+}
+
+/* ============================================ */
+/* ТЕГИ */
+/* ============================================ */
+
+.asana-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.asana-tag {
+  padding: 0.2rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  background: #edf2f7;
+  color: #4a5568;
+}
+
+/* ============================================ */
+/* ТЁМНАЯ ТЕМА */
+/* ============================================ */
+body.dark-mode .asana-detail-container {
+  background: rgba(30, 30, 46, 0.95) !important;
+}
+
+body.dark-mode .asana-detail-header h1 {
+  color: #e2e8f0;
+}
+
+body.dark-mode .asana-sanskrit {
+  color: #64748b;
+}
+
+body.dark-mode .asana-detail-meta {
+  background: #1a1a2e;
+  border-color: #334155;
+}
+
+body.dark-mode .asana-meta-badge {
+  background: #1e1e2e;
+  border-color: #334155;
+  color: #cbd5e0;
+}
+
+body.dark-mode .asana-meta-badge svg {
+  color: #818cf8;
+}
+
+body.dark-mode .asana-detail-section {
+  background: #1a1a2e;
+  border-color: #334155;
+}
+
+body.dark-mode .asana-detail-section h2 {
+  color: #e2e8f0;
+}
+
+body.dark-mode .asana-detail-section p {
+  color: #cbd5e0;
+}
+
+body.dark-mode .asana-technique-text {
+  color: #cbd5e0;
+}
+
+body.dark-mode .asana-detail-tags {
+  border-top-color: #334155;
+}
+
+body.dark-mode .asana-tag {
+  background: #2d2d44;
+  color: #cbd5e0;
+}
+
+body.dark-mode .asana-detail-image-wrapper {
+  background: #1a1a2e;
+}
+
+/* ============================================ */
+/* АДАПТАЦИЯ */
+/* ============================================ */
+@media (max-width: 768px) {
+  .asana-detail-container {
+    padding: 1.5rem 1rem;
+  }
+
+  .asana-detail-header h1 {
+    font-size: 2rem;
+  }
+
+  .asana-sanskrit {
+    font-size: 1rem;
+  }
+
+  .asana-detail-image-wrapper {
+    max-width: 100%;
+  }
+
+  .asana-detail-image {
+    max-height: 300px;
+  }
+
+  .asana-detail-meta {
+    gap: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .asana-meta-badge {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.8rem;
+  }
+
+  .asana-detail-section {
+    padding: 1rem;
+  }
+
+  .asana-detail-section h2 {
+    font-size: 1.1rem;
+  }
+
+  .asana-detail-section p {
+    font-size: 0.95rem;
+  }
+
+  .asana-technique-text {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .asana-detail-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .asana-sanskrit {
+    font-size: 0.9rem;
+  }
+
+  .asana-detail-image {
+    max-height: 200px;
+  }
+
+  .asana-detail-meta {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .asana-detail-section {
+    padding: 0.75rem;
+  }
+
+  .asana-detail-section h2 {
+    font-size: 1rem;
+  }
+}

@@ -108,31 +108,6 @@ const YogaDirectionPage = () => {
             </p>
           </div>
 
-          <div className="direction-detail-meta">
-            {direction.difficulty && (
-              <span className="direction-meta-item">
-                <FiTarget size={16} />
-                {direction.difficulty}
-              </span>
-            )}
-            {direction.duration && (
-              <span className="direction-meta-item">
-                <FiClock size={16} />
-                {direction.duration} мин
-              </span>
-            )}
-            {direction.practitioners && (
-              <span className="direction-meta-item">
-                <FiUsers size={16} />
-                {direction.practitioners}
-              </span>
-            )}
-            <span className="direction-meta-item">
-              <FiStar size={16} />
-              {direction.asanas?.length || 0} асан
-            </span>
-          </div>
-
           {/* ИСТОРИЧЕСКАЯ СПРАВКА - С ИКОНКОЙ */}
           <div className="direction-detail-section">
             <h2>
