@@ -200,7 +200,7 @@ const AsanasCatalog = () => {
             <div className={`catalog-grid ${viewMode}`}>
               {filteredAsanas.map((asana) => (
                 <Link 
-                  to={`/asanas/${asana.id}`} 
+                  to={`/catalog/${asana.id}`}   // ← ИСПРАВЛЕНО: /asanas → /catalog
                   key={asana.id}
                   className="catalog-item"
                 >
