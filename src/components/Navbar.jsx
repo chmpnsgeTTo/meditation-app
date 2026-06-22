@@ -19,10 +19,10 @@ const Navbar = () => {
 
   return (
     <nav className="navbar">
-      <Link to="/" className="nav-brand" onClick={closeMenu}>
+      <span className="nav-brand" onClick={closeMenu}>
         <GiMeditation size={24} />
         Yoga Practice
-      </Link>
+      </span>
 
       <button className="mobile-menu-btn" onClick={toggleMenu}>
         {mobileOpen ? <FiX size={24} /> : <FiMenu size={24} />}

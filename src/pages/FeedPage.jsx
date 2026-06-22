@@ -158,7 +158,6 @@ const FeedPage = () => {
           {/* Шапка ленты - заголовок по центру */}
           <div className="feed-header">
             <h2 className="feed-title">
-              <GiMeditation size={28} className="feed-title-icon" />
               Лента достижений
             </h2>
           </div>
@@ -173,17 +172,14 @@ const FeedPage = () => {
               {statistics && (
                 <div className="feed-stats">
                   <div className="feed-stat-item">
-                    <BiTime size={18} />
                     <span>{statistics.total_minutes}</span>
                     <span className="feed-stat-label">минут</span>
                   </div>
                   <div className="feed-stat-item">
-                    <IoMdMedal size={18} />
                     <span>{statistics.total_sessions}</span>
                     <span className="feed-stat-label">сессий</span>
                   </div>
                   <div className="feed-stat-item">
-                    <FaHeart size={18} />
                     <span>{posts.reduce((acc, p) => acc + p.likes_count, 0)}</span>
                     <span className="feed-stat-label">лайков</span>
                   </div>
@@ -339,7 +335,6 @@ const FeedPage = () => {
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>
-                <GiMeditation size={22} />
                 Поделиться результатом
               </h3>
               <button className="modal-close" onClick={() => setShowCreateModal(false)}>
