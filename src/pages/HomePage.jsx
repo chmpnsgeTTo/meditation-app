@@ -15,7 +15,6 @@ const HomePage = () => {
           <h1 className="home-title">Yoga Practice</h1>
           <p className="home-tagline">
             Твой маленький помощник в мире медитаций
-            <GiLotus size={18} className="home-tagline-icon" />
           </p>
         </div>
         

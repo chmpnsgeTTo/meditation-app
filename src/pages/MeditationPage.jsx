@@ -253,11 +253,9 @@ const MeditationPage = () => {
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h3>
-                <FiXCircle size={20} color="#e53e3e" />
                 Завершить медитацию?
               </h3>
               <button className="modal-close" onClick={() => setShowConfirm(false)}>
-                <FiXCircle size={24} />
               </button>
             </div>
             <div className="modal-body">
@@ -265,11 +263,9 @@ const MeditationPage = () => {
             </div>
             <div className="modal-buttons">
               <button onClick={stopMeditation} className="btn-danger">
-                <FaStop size={14} />
                 Да, завершить
               </button>
               <button onClick={() => setShowConfirm(false)} className="btn-secondary">
-                <FiClock size={14} />
                 Продолжить
               </button>
             </div>
