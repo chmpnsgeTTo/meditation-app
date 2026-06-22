@@ -114,15 +114,6 @@ const CourseDetailPage = () => {
     }
   };
 
-  const getDifficultyIcon = (difficulty) => {
-    switch(difficulty) {
-      case 'Начинающий': return <FaLeaf size={16} />;
-      case 'Средний': return <FaStar size={16} />;
-      case 'Продвинутый': return <FaFire size={16} />;
-      default: return <GiLotus size={16} />;
-    }
-  };
-
   const getDifficultyColor = (difficulty) => {
     switch(difficulty) {
       case 'Начинающий': return '#48bb78';
@@ -212,31 +203,31 @@ const CourseDetailPage = () => {
           
           <div className="course-detail-header">
             <h1>
-              <GiLotus size={32} />
               {course.title || 'Курс'}
             </h1>
             
+            {/* МЕТА-ИНФОРМАЦИЯ В РАМКАХ КАК НА СТРАНИЦЕ АСАН */}
             <div className="course-detail-meta">
               {course.difficulty && (
                 <span 
-                  className="course-detail-difficulty-badge"
+                  className="course-detail-meta-badge"
                   style={{
-                    background: getDifficultyColor(course.difficulty) + '20',
+                    backgroundColor: getDifficultyColor(course.difficulty) + '20',
                     color: getDifficultyColor(course.difficulty)
                   }}
                 >
-                  {getDifficultyIcon(course.difficulty)} {course.difficulty}
+                  {course.difficulty}
                 </span>
               )}
-              <span className="course-detail-meta-item">
-                <FaClock size={14} /> {course.duration_minutes || 0} мин
+              <span className="course-detail-meta-badge">
+                {course.duration_minutes || 0} мин
               </span>
-              <span className="course-detail-meta-item">
-                <GiDuration size={14} /> {course.total_lessons || 0} уроков
+              <span className="course-detail-meta-badge">
+                {course.total_lessons || 0} уроков
               </span>
               {course.students_count !== undefined && (
-                <span className="course-detail-meta-item">
-                  <FaUserGraduate size={14} /> {course.students_count} студентов
+                <span className="course-detail-meta-badge">
+                  {course.students_count} студентов
                 </span>
               )}
             </div>
@@ -246,30 +237,23 @@ const CourseDetailPage = () => {
             </p>
           </div>
 
+          {/* ИНФО-КАРТОЧКИ - БЕЗ ИКОНОК */}
           <div className="course-info-grid">
             <div className="info-card">
-              <h3>
-                <FaInfoCircle size={16} />
-                Польза курса
-              </h3>
+              <h3>Польза курса</h3>
               <p>{course.benefits}</p>
             </div>
             <div className="info-card">
-              <h3>
-                <FaExclamationTriangle size={16} />
-                Противопоказания
-              </h3>
+              <h3>Противопоказания</h3>
               <p>{course.contraindications}</p>
             </div>
             <div className="info-card">
-              <h3>
-                <FaLightbulb size={16} />
-                Советы
-              </h3>
+              <h3>Советы</h3>
               <p>{course.tips}</p>
             </div>
           </div>
 
+          {/* ПРОГРЕСС - В ОТДЕЛЬНОЙ РАМКЕ */}
           <div className="course-progress-section">
             <div className="progress-header">
               <span>
@@ -292,6 +276,7 @@ const CourseDetailPage = () => {
             )}
           </div>
 
+          {/* УРОКИ - С ОБРАМЛЕНИЕМ И ПОДСВЕТКОЙ */}
           <div className="lessons-list">
             <h2>
               <FaBookOpen size={20} />

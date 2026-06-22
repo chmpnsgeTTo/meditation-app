@@ -19,7 +19,7 @@ import {
   FiAlertCircle,
   FiRefreshCw
 } from 'react-icons/fi';
-import { GiMeditation, GiLotus, GiSittingDog } from 'react-icons/gi';
+import { GiMeditation, GiLotus, GiSittingDog, GiSnake, GiLungs, GiYogaPose } from 'react-icons/gi';
 
 const CoursesPage = () => {
   const { user } = useAuth();
@@ -28,8 +28,17 @@ const CoursesPage = () => {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('Все');
 
-  // Список уровней сложности для фильтрации
   const difficultyLevels = ['Все', 'Начинающий', 'Средний', 'Продвинутый'];
+
+  // Массив цветов для карточек
+  const cardColors = [
+    { bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', icon: <GiMeditation size={48} /> },
+    { bg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', icon: <GiLotus size={48} /> },
+    { bg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', icon: <GiSittingDog size={48} /> },
+    { bg: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', icon: <GiSnake size={48} /> },
+    { bg: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', icon: <GiLungs size={48} /> },
+    { bg: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)', icon: <GiYogaPose size={48} /> },
+  ];
 
   useEffect(() => {
     fetchCourses();
@@ -110,6 +119,7 @@ const CoursesPage = () => {
         <div className="courses-container">
           <div className="courses-header">
             <h1>
+              <FiBookOpen size={28} style={{ marginRight: '12px', color: '#667eea' }} />
               Выберите курс и начните свое обучение
             </h1>
             <p className="courses-subtitle">
@@ -117,7 +127,7 @@ const CoursesPage = () => {
             </p>
           </div>
 
-          {/* Фильтр категорий - как на странице асан */}
+          {/* Фильтр категорий */}
           <div className="courses-filters">
             <div className="courses-filters-header">
               <FiFilter size={16} />
@@ -139,6 +149,7 @@ const CoursesPage = () => {
           {/* Результаты */}
           {filteredCourses.length === 0 ? (
             <div className="courses-empty">
+              <FiBookOpen size={48} />
               <h3>Курсы не найдены</h3>
               <p>Попробуйте выбрать другой фильтр</p>
               <button 
@@ -151,49 +162,63 @@ const CoursesPage = () => {
             </div>
           ) : (
             <div className="courses-grid">
-              {filteredCourses.map(course => (
-                <Link
-                  to={`/courses/${course.id}`}
-                  key={course.id}
-                  className="course-card"
-                >
-                  <div className="course-card-image">
-                  </div>
-                  <div className="course-card-content">
-                    <h3>{course.title}</h3>
-                    <p>{course.description}</p>
-                    
-                    {/* Мета-информация - без иконок */}
-                    <div className="course-card-meta">
-                      <span 
-                        className="course-card-difficulty"
+              {filteredCourses.map((course, index) => {
+                const colorIndex = index % cardColors.length;
+                return (
+                  <Link
+                    to={`/courses/${course.id}`}
+                    key={course.id}
+                    className="course-card"
+                  >
+                    <div className="course-card-image-wrapper">
+                      <div 
+                        className="course-card-image"
                         style={{
-                          backgroundColor: getDifficultyColor(course.difficulty) + '20',
-                          color: getDifficultyColor(course.difficulty)
+                          background: cardColors[colorIndex].bg,
                         }}
                       >
-                        {course.difficulty || 'Не указан'}
-                      </span>
-                      <span className="course-card-lessons">
-                        {course.total_lessons || 0} уроков
-                      </span>
-                      {course.duration && (
-                        <span className="course-card-duration">
-                          {course.duration} мин
+                        <div className="course-card-image-icon">
+                          {cardColors[colorIndex].icon}
+                        </div>
+                        <div className="course-card-image-overlay">
+                          <span className="course-card-badge">{course.difficulty || 'Общий'}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="course-card-content">
+                      <h3>{course.title}</h3>
+                      <p>{course.description}</p>
+                      
+                      <div className="course-card-meta">
+                        <span 
+                          className="course-card-difficulty"
+                          style={{
+                            backgroundColor: getDifficultyColor(course.difficulty) + '20',
+                            color: getDifficultyColor(course.difficulty)
+                          }}
+                        >
+                          {course.difficulty || 'Не указан'}
                         </span>
-                      )}
+                        <span className="course-card-lessons">
+                          {course.total_lessons || 0} уроков
+                        </span>
+                        {course.duration && (
+                          <span className="course-card-duration">
+                            {course.duration} мин
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div className="course-card-footer">
+                        <span className="course-card-read-more">
+                          Начать обучение
+                          <FiChevronRight size={16} />
+                        </span>
+                      </div>
                     </div>
-                    
-                    {/* Кнопка "Начать обучение" - по центру внизу */}
-                    <div className="course-card-footer">
-                      <span className="course-card-read-more">
-                        Начать обучение
-                        <FiChevronRight size={16} />
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>
