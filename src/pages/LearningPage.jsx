@@ -57,7 +57,6 @@ const LearningPage = () => {
         <div className="learning-container">
           <div className="learning-header">
             <h1>
-              <GiLotus size={32} className="learning-header-icon" />
               Основные направления йоги
             </h1>
             <p className="learning-subtitle">
@@ -67,15 +66,12 @@ const LearningPage = () => {
 
           <div className="learning-stats">
             <div className="learning-stat">
-              <GiLotus size={20} />
               <span>{yogaDirections.length} направлений</span>
             </div>
             <div className="learning-stat">
-              <GiMeditation size={20} />
               <span>Древние практики</span>
             </div>
             <div className="learning-stat">
-              <FaFeatherAlt size={20} />
               <span>Путь к гармонии</span>
             </div>
           </div>

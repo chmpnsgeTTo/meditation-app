@@ -13,7 +13,9 @@ import {
   FiCheckCircle,
   FiXCircle,
   FiAward,
-  FiHeart
+  FiHeart,
+  FiTag,        // ← ДОБАВЛЕНО
+  FiRefreshCw   // ← ДОБАВЛЕНО для кнопки "Попробовать снова"
 } from 'react-icons/fi';
 import { GiLotus, GiMeditation } from 'react-icons/gi';
 
@@ -81,6 +83,7 @@ const AsanaDetailPage = () => {
               <h3>Ошибка загрузки</h3>
               <p>{error}</p>
               <button onClick={fetchAsana} className="btn-primary">
+                <FiRefreshCw size={16} />
                 Попробовать снова
               </button>
             </div>
@@ -122,7 +125,9 @@ const AsanaDetailPage = () => {
 
           <div className="asana-detail-header">
             <h1>{asana.name}</h1>
-            <p className="asana-sanskrit">{asana.sanskrit}</p>
+            {asana.sanskrit && (
+              <p className="asana-sanskrit">{asana.sanskrit}</p>
+            )}
           </div>
 
           {/* Изображение */}
@@ -168,14 +173,20 @@ const AsanaDetailPage = () => {
 
           {/* Краткое описание */}
           <div className="asana-detail-section">
-            <h2>Краткое описание</h2>
+            <h2>
+              <FiInfo size={18} style={{ marginRight: '8px' }} />
+              Краткое описание
+            </h2>
             <p>{asana.description || 'Описание отсутствует'}</p>
           </div>
 
           {/* Полное описание */}
           {asana.full_description && (
             <div className="asana-detail-section">
-              <h2>Полное описание</h2>
+              <h2>
+                <FiBookOpen size={18} style={{ marginRight: '8px' }} />
+                Полное описание
+              </h2>
               <p>{asana.full_description}</p>
             </div>
           )}
@@ -183,7 +194,10 @@ const AsanaDetailPage = () => {
           {/* Техника выполнения */}
           {asana.technique && (
             <div className="asana-detail-section">
-              <h2>Техника выполнения</h2>
+              <h2>
+                <GiMeditation size={18} style={{ marginRight: '8px' }} />
+                Техника выполнения
+              </h2>
               <div style={{ whiteSpace: 'pre-wrap', lineHeight: '1.8' }}>
                 {asana.technique}
               </div>

@@ -99,11 +99,9 @@ const MeditationPage = () => {
         <div className="meditation-container">
           <div className="meditation-header">
             <h2 className="meditation-title">
-              <GiMeditation size={28} />
               Начни свою практику
             </h2>
             <p className="meditation-subtitle">
-              <FiWind size={16} />
               Погрузись в мир спокойствия и гармонии
             </p>
           </div>
@@ -233,19 +231,15 @@ const MeditationPage = () => {
             </h3>
             <ul>
               <li>
-                <FiTarget size={14} />
                 Найди тихое место
               </li>
               <li>
-                <GiLotus size={14} />
                 Сядь удобно, держи спину прямой
               </li>
               <li>
-                <FiWind size={14} />
                 Сосредоточься на дыхании
               </li>
               <li>
-                <FiClock size={14} />
                 Не осуждай отвлекающие мысли
               </li>
             </ul>
