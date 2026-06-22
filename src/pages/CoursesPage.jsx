@@ -28,16 +28,17 @@ const CoursesPage = () => {
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState('Все');
 
+  // Список уровней сложности для фильтрации
   const difficultyLevels = ['Все', 'Начинающий', 'Средний', 'Продвинутый'];
 
-  // Массив цветов для карточек
+  // Массив цветов и иконок для карточек
   const cardColors = [
     { bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', icon: <GiMeditation size={48} /> },
     { bg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', icon: <GiLotus size={48} /> },
     { bg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', icon: <GiSittingDog size={48} /> },
     { bg: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', icon: <GiSnake size={48} /> },
     { bg: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', icon: <GiLungs size={48} /> },
-    { bg: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)', icon: <GiHealing size={48} /> },
+    { bg: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)', icon: <GiMeditation size={48} /> },
   ];
 
   useEffect(() => {
