@@ -19,7 +19,7 @@ import {
   FiAlertCircle,
   FiRefreshCw
 } from 'react-icons/fi';
-import { GiMeditation, GiLotus, GiSittingDog, GiSnake, GiLungs, GiYogaPose } from 'react-icons/gi';
+import { GiMeditation, GiLotus, GiSittingDog, GiSnake, GiLungs } from 'react-icons/gi';
 
 const CoursesPage = () => {
   const { user } = useAuth();
@@ -37,7 +37,7 @@ const CoursesPage = () => {
     { bg: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)', icon: <GiSittingDog size={48} /> },
     { bg: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)', icon: <GiSnake size={48} /> },
     { bg: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)', icon: <GiLungs size={48} /> },
-    { bg: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)', icon: <GiYogaPose size={48} /> },
+    { bg: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)', icon: <GiHealing size={48} /> },
   ];
 
   useEffect(() => {
