@@ -22,9 +22,7 @@ import {
   GiLungs,
   GiPalm,
   GiLotusFlower,
-  GiHealing,
-  GiYogaPose,
-  GiBreath
+  GiHealing
 } from 'react-icons/gi';
 import { WiDaySunny } from 'react-icons/wi';
 import { FaFeatherAlt, FaYinYang, FaOm } from 'react-icons/fa';
@@ -120,7 +118,7 @@ const YogaDirectionPage = () => {
             </div>
             <h1 style={{ color }}>{direction.name}</h1>
             <p className="direction-detail-short">
-              <GiYoga size={16} style={{ opacity: 0.5 }} />
+              <GiMeditation size={16} style={{ opacity: 0.5 }} />  {/* ← ЗАМЕНА: GiYoga → GiMeditation */}
               {direction.shortDescription}
             </p>
           </div>
