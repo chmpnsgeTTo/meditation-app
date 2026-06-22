@@ -1,73 +1,61 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../api/axios';
 import { 
-  FiSearch, 
-  FiGrid, 
-  FiList, 
-  FiClock,
-  FiChevronRight,
+  FiArrowLeft, 
+  FiClock, 
+  FiStar, 
   FiAlertCircle,
+  FiBookOpen,
+  FiInfo,
+  FiCheckCircle,
+  FiXCircle,
+  FiHeart,
   FiTag,
-  FiFilter
+  FiRefreshCw
 } from 'react-icons/fi';
-import { GiMeditation } from 'react-icons/gi';
+import { GiLotus, GiMeditation } from 'react-icons/gi';
 
-const AsanasCatalog = () => {
+const AsanaDetailPage = () => {
+  const { id } = useParams();
   const { user } = useAuth();
-  const [asanas, setAsanas] = useState([]);
+  const navigate = useNavigate();
+  const [asana, setAsana] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('Все'); // ← ИСПРАВЛЕНО: 'all' → 'Все'
-  const [viewMode, setViewMode] = useState('grid');
-
-  // Список категорий (уникальные из данных)
-  const [categories, setCategories] = useState(['Все']);
 
   useEffect(() => {
-    fetchAsanas();
-  }, []);
+    fetchAsana();
+  }, [id]);
 
-  useEffect(() => {
-    // Извлекаем уникальные категории из данных
-    if (asanas.length > 0) {
-      const uniqueCategories = [...new Set(asanas.map(a => a.category).filter(Boolean))];
-      setCategories(['Все', ...uniqueCategories]);
-    }
-  }, [asanas]);
-
-  const fetchAsanas = async () => {
+  const fetchAsana = async () => {
     setLoading(true);
     setError(null);
     try {
-      const { data } = await api.get('/api/asanas', {
+      const { data } = await api.get(`/api/asanas/${id}`, {
         headers: { Authorization: `Bearer ${user.token}` }
       });
-      console.log('✅ Загружено асан:', data.length);
-      setAsanas(data);
+      console.log('✅ Загружена асана:', data);
+      setAsana(data);
     } catch (err) {
-      console.error('❌ Ошибка загрузки асан:', err);
-      setError(err.response?.data?.error || 'Ошибка загрузки асан. Попробуйте позже.');
+      console.error('❌ Ошибка загрузки асаны:', err);
+      setError(err.response?.data?.error || 'Ошибка загрузки асаны');
+      if (err.response?.status === 404) navigate('/catalog');
     } finally {
       setLoading(false);
     }
   };
 
-  // Фильтрация по поиску и категории
-  const filteredAsanas = asanas.filter(asana => {
-    const matchesSearch = searchTerm === '' || 
-      asana.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asana.sanskrit?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      asana.description?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesCategory = selectedCategory === 'Все' || 
-      asana.category === selectedCategory;
-    
-    return matchesSearch && matchesCategory;
-  });
+  const getDifficultyColor = (difficulty) => {
+    const colorMap = {
+      'Начинающий': '#48bb78',
+      'Средний': '#f6ad55',
+      'Продвинутый': '#fc8181'
+    };
+    return colorMap[difficulty] || '#667eea';
+  };
 
   if (loading) {
     return (
@@ -76,7 +64,7 @@ const AsanasCatalog = () => {
         <div className="container">
           <div className="loading-container">
             <div className="loading-spinner"></div>
-            <p>Загрузка асан...</p>
+            <p>Загрузка асаны...</p>
           </div>
         </div>
       </>
@@ -88,18 +76,35 @@ const AsanasCatalog = () => {
       <>
         <Navbar />
         <div className="container">
-          <div className="catalog-container">
+          <div className="asana-detail-container">
             <div className="catalog-error">
               <FiAlertCircle size={48} color="#e53e3e" />
               <h3>Ошибка загрузки</h3>
               <p>{error}</p>
-              <button 
-                onClick={fetchAsanas}
-                className="btn-primary"
-                style={{ marginTop: '1rem' }}
-              >
+              <button onClick={fetchAsana} className="btn-primary">
+                <FiRefreshCw size={16} />
                 Попробовать снова
               </button>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (!asana) {
+    return (
+      <>
+        <Navbar />
+        <div className="container">
+          <div className="asana-detail-container">
+            <div className="course-detail-not-found">
+              <FiBookOpen size={48} color="#94a3b8" />
+              <h2>Асана не найдена</h2>
+              <Link to="/catalog" className="course-detail-back-link">
+                <FiArrowLeft size={14} />
+                Вернуться к каталогу
+              </Link>
             </div>
           </div>
         </div>
@@ -111,132 +116,121 @@ const AsanasCatalog = () => {
     <>
       <Navbar />
       <div className="container">
-        <div className="catalog-container">
-          <div className="catalog-header">
-            <h1>
-              <GiMeditation size={28} style={{ marginRight: '12px', color: '#667eea' }} />
-              Каталог асан
-            </h1>
-            <p className="catalog-subtitle">
-              Выбери категорию, чтобы найти подходящую позу
-            </p>
+        <div className="asana-detail-container">
+          <Link to="/catalog" className="back-link">
+            Каталог асан
+          </Link>
+
+          {/* НАЗВАНИЕ ПО ЦЕНТРУ */}
+          <div className="asana-detail-header">
+            <h1>{asana.name}</h1>
+            {asana.sanskrit && (
+              <p className="asana-sanskrit">{asana.sanskrit}</p>
+            )}
           </div>
 
-          {/* Поиск + кнопки вида */}
-          <div className="catalog-controls">
-            <div className="catalog-search">
-              <FiSearch className="search-icon" />
-              <input
-                type="text"
-                placeholder="Поиск асан по названию..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              {searchTerm && (
-                <button 
-                  className="clear-search" 
-                  onClick={() => setSearchTerm('')}
-                >
-                  ×
-                </button>
-              )}
-            </div>
-
-            <div className="catalog-view-toggle">
-              <button
-                className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                onClick={() => setViewMode('grid')}
-                aria-label="Сетка"
-              >
-                <FiGrid size={18} />
-              </button>
-              <button
-                className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
-                onClick={() => setViewMode('list')}
-                aria-label="Список"
-              >
-                <FiList size={18} />
-              </button>
-            </div>
-          </div>
-
-          {/* Фильтр категорий */}
-          <div className="catalog-categories">
-            <div className="catalog-categories-header">
-              <FiFilter size={16} />
-              <span>Категории:</span>
-            </div>
-            <div className="catalog-categories-list">
-              {categories.map(category => (
-                <button
-                  key={category}
-                  className={`catalog-category-btn ${selectedCategory === category ? 'active' : ''}`}
-                  onClick={() => setSelectedCategory(category)}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Результаты */}
-          {filteredAsanas.length === 0 ? (
-            <div className="catalog-empty">
-              <GiMeditation size={48} />
-              <h3>Асаны не найдены</h3>
-              <p>Попробуйте изменить поисковый запрос или выберите другую категорию</p>
-              <button 
-                className="btn-secondary" 
-                onClick={() => {
-                  setSearchTerm('');
-                  setSelectedCategory('Все');
+          {/* Изображение - адаптивный размер */}
+          {asana.image_url && (
+            <div className="asana-detail-image-wrapper">
+              <img 
+                src={asana.image_url} 
+                alt={asana.name}
+                className="asana-detail-image"
+                onError={(e) => {
+                  e.target.style.display = 'none';
                 }}
-                style={{ marginTop: '1rem' }}
-              >
-                Сбросить фильтры
-              </button>
+              />
             </div>
-          ) : (
-            <div className={`catalog-grid ${viewMode}`}>
-              {filteredAsanas.map((asana) => (
-                <Link 
-                  to={`/catalog/${asana.id}`}
-                  key={asana.id}
-                  className="catalog-item"
-                >
-                  <div className="catalog-item-content">
-                    <div className="catalog-item-icon">
-                      <GiMeditation size={28} />
-                    </div>
-                    <div className="catalog-item-info">
-                      <h3 className="catalog-item-name">{asana.name}</h3>
-                      {asana.sanskrit && (
-                        <p className="catalog-item-sanskrit">{asana.sanskrit}</p>
-                      )}
-                      <p className="catalog-item-description">
-                        {asana.description || 'Описание асаны'}
-                      </p>
-                      <div className="catalog-item-meta">
-                        {asana.duration && (
-                          <span className="catalog-item-duration">
-                            <FiClock size={14} />
-                            {asana.duration} мин
-                          </span>
-                        )}
-                        {asana.category && (
-                          <span className="catalog-item-category">
-                            <FiTag size={12} />
-                            {asana.category}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="catalog-item-arrow">
-                      <FiChevronRight size={20} />
-                    </div>
-                  </div>
-                </Link>
-              ))}
+          )}
+
+          {/* Мета-информация */}
+          <div className="asana-detail-meta">
+            {asana.category && (
+              <span className="asana-meta-badge">
+                <FiTag size={14} />
+                {asana.category}
+              </span>
+            )}
+            {asana.difficulty && (
+              <span 
+                className="asana-meta-badge"
+                style={{
+                  backgroundColor: getDifficultyColor(asana.difficulty) + '20',
+                  color: getDifficultyColor(asana.difficulty)
+                }}
+              >
+                <FiStar size={14} />
+                {asana.difficulty}
+              </span>
+            )}
+            {asana.duration && (
+              <span className="asana-meta-badge">
+                <FiClock size={14} />
+                {asana.duration} мин
+              </span>
+            )}
+          </div>
+
+          {/* Краткое описание - БЕЗ ИКОНКИ */}
+          <div className="asana-detail-section">
+            <h2>Краткое описание</h2>
+            <p>{asana.description || 'Описание отсутствует'}</p>
+          </div>
+
+          {/* Полное описание - БЕЗ ИКОНКИ */}
+          {asana.full_description && (
+            <div className="asana-detail-section">
+              <h2>Полное описание</h2>
+              <p>{asana.full_description}</p>
+            </div>
+          )}
+
+          {/* ТЕХНИКА ВЫПОЛНЕНИЯ - С ПРАВИЛЬНЫМИ ПЕРЕНОСАМИ СТРОК */}
+          {asana.technique && (
+            <div className="asana-detail-section">
+              <h2>Техника выполнения</h2>
+              <div className="asana-technique-text">
+                {asana.technique.split('\n').map((line, index) => (
+                  <React.Fragment key={index}>
+                    {line}
+                    {index < asana.technique.split('\n').length - 1 && <br />}
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Польза */}
+          {asana.benefits && (
+            <div className="asana-detail-section">
+              <h2>
+                <FiHeart size={18} color="#e53e3e" style={{ marginRight: '8px' }} />
+                Польза
+              </h2>
+              <p>{asana.benefits}</p>
+            </div>
+          )}
+
+          {/* Противопоказания */}
+          {asana.contraindications && (
+            <div className="asana-detail-section">
+              <h2>
+                <FiXCircle size={18} color="#e53e3e" style={{ marginRight: '8px' }} />
+                Противопоказания
+              </h2>
+              <p>{asana.contraindications}</p>
+            </div>
+          )}
+
+          {/* Теги */}
+          {(asana.category || asana.difficulty) && (
+            <div className="asana-detail-tags">
+              {asana.category && (
+                <span className="asana-tag">#{asana.category}</span>
+              )}
+              {asana.difficulty && (
+                <span className="asana-tag">#{asana.difficulty}</span>
+              )}
             </div>
           )}
         </div>
@@ -245,4 +239,4 @@ const AsanasCatalog = () => {
   );
 };
 
-export default AsanasCatalog;
+export default AsanaDetailPage;
