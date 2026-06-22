@@ -6594,7 +6594,7 @@ body.dark-mode .lessons-empty {
 }
 
 /* ============================================ */
-/* РАСКРЫТИЕ ТЕКСТА УРОКА */
+/* РАСКРЫТИЕ ТЕКСТА УРОКА - ИСПРАВЛЕННОЕ */
 /* ============================================ */
 
 .lesson-content-wrapper {
@@ -6609,6 +6609,24 @@ body.dark-mode .lessons-empty {
   margin: 0;
   white-space: pre-wrap;
   word-break: break-word;
+  transition: all 0.3s ease;
+}
+
+/* СКРЫТЫЙ ТЕКСТ - обрезаем через CSS */
+.lesson-content.collapsed {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  max-height: 3.2em;
+}
+
+/* РАЗВЁРНУТЫЙ ТЕКСТ - показываем полностью */
+.lesson-content.expanded {
+  display: block;
+  max-height: none;
+  -webkit-line-clamp: unset;
+  overflow: visible;
 }
 
 /* Кнопка "Далее" / "Свернуть" */

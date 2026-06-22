@@ -54,6 +54,8 @@ const CourseDetailPage = () => {
         headers: { Authorization: `Bearer ${user.token}` }
       });
       
+      console.log('📦 Данные курса:', data);
+      
       const normalizedCourse = {
         ...data,
         lessons: data.lessons || [],
@@ -205,6 +207,12 @@ const CourseDetailPage = () => {
     );
   }
 
+  // Проверяем длину текста каждого урока
+  console.log('📝 Длина текстов уроков:');
+  course.lessons?.forEach(lesson => {
+    console.log(`- ${lesson.title}: ${lesson.content?.length || 0} символов`);
+  });
+
   return (
     <>
       <Navbar />
@@ -320,14 +328,12 @@ const CourseDetailPage = () => {
                         )}
                       </h3>
                       
-                      {/* ТЕКСТ УРОКА - полный или обрезанный */}
-                      <div className={`lesson-content-wrapper ${isExpanded ? 'expanded' : ''}`}>
-                        <p className="lesson-content">
-                          {isExpanded ? content : truncateText(content)}
+                      <div className="lesson-content-wrapper">
+                        <p className={`lesson-content ${isExpanded ? 'expanded' : 'collapsed'}`}>
+                          {content}
                         </p>
                       </div>
                       
-                      {/* КНОПКА "ДАЛЕЕ" / "СВЕРНУТЬ" */}
                       {needsTruncation && (
                         <button 
                           className="lesson-expand-btn"
