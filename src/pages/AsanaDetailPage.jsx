@@ -186,12 +186,17 @@ const AsanaDetailPage = () => {
             </div>
           )}
 
-          {/* Техника выполнения - БЕЗ ИКОНКИ */}
+          {/* Техника выполнения - БЕЗ ИКОНКИ, С ПРАВИЛЬНЫМИ ПЕРЕНОСАМИ */}
           {asana.technique && (
             <div className="asana-detail-section">
               <h2>Техника выполнения</h2>
               <div className="asana-technique-text">
-                {asana.technique}
+                {asana.technique.split('\n').map((line, index) => (
+                  <React.Fragment key={index}>
+                    {line}
+                    {index < asana.technique.split('\n').length - 1 && <br />}
+                  </React.Fragment>
+                ))}
               </div>
             </div>
           )}

@@ -21,7 +21,7 @@ const AsanasCatalog = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedCategory, setSelectedCategory] = useState('Все'); // ← ИСПРАВЛЕНО: 'all' → 'Все'
   const [viewMode, setViewMode] = useState('grid');
 
   // Список категорий (уникальные из данных)
@@ -200,7 +200,7 @@ const AsanasCatalog = () => {
             <div className={`catalog-grid ${viewMode}`}>
               {filteredAsanas.map((asana) => (
                 <Link 
-                  to={`/catalog/${asana.id}`}   // ← ИСПРАВЛЕНО: /asanas → /catalog
+                  to={`/catalog/${asana.id}`}
                   key={asana.id}
                   className="catalog-item"
                 >
