@@ -144,7 +144,7 @@ const CourseDetailPage = () => {
     return icons[index % icons.length];
   };
 
-  const truncateText = (text, maxLength = 120) => {
+  const truncateText = (text, maxLength = 150) => {
     if (!text) return '';
     if (text.length <= maxLength) return text;
     return text.slice(0, maxLength) + '...';
@@ -217,7 +217,6 @@ const CourseDetailPage = () => {
           
           <div className="course-detail-header">
             <h1>
-              <GiLotus size={32} />
               {course.title || 'Курс'}
             </h1>
             
@@ -290,6 +289,7 @@ const CourseDetailPage = () => {
 
           <div className="lessons-list">
             <h2>
+              <FaBookOpen size={20} />
               Уроки курса
             </h2>
             
@@ -297,6 +297,9 @@ const CourseDetailPage = () => {
               course.lessons.map((lesson, index) => {
                 const isCompleted = course.completedLessonIds?.includes(lesson.id) || false;
                 const isExpanded = expandedLessons[lesson.id] || false;
+                const content = lesson.content || '';
+                const needsTruncation = content.length > 150;
+                const displayContent = isExpanded ? content : truncateText(content);
                 
                 return (
                   <div key={lesson.id} className={`lesson-item ${isCompleted ? 'completed' : ''}`}>
@@ -319,11 +322,11 @@ const CourseDetailPage = () => {
                         )}
                       </h3>
                       
-                      <p className={`lesson-content ${!isExpanded ? 'collapsed' : ''}`}>
-                        {isExpanded ? lesson.content : truncateText(lesson.content || '', 150)}
+                      <p className="lesson-content">
+                        {displayContent}
                       </p>
                       
-                      {lesson.content && lesson.content.length > 150 && (
+                      {needsTruncation && (
                         <button 
                           className="lesson-expand-btn"
                           onClick={() => toggleLessonExpand(lesson.id)}
