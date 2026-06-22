@@ -144,7 +144,7 @@ const CourseDetailPage = () => {
     return icons[index % icons.length];
   };
 
-  const truncateText = (text, maxLength = 150) => {
+  const truncateText = (text, maxLength = 120) => {
     if (!text) return '';
     if (text.length <= maxLength) return text;
     return text.slice(0, maxLength) + '...';
@@ -289,7 +289,6 @@ const CourseDetailPage = () => {
 
           <div className="lessons-list">
             <h2>
-              <FaBookOpen size={20} />
               Уроки курса
             </h2>
             
@@ -298,8 +297,7 @@ const CourseDetailPage = () => {
                 const isCompleted = course.completedLessonIds?.includes(lesson.id) || false;
                 const isExpanded = expandedLessons[lesson.id] || false;
                 const content = lesson.content || '';
-                const needsTruncation = content.length > 150;
-                const displayContent = isExpanded ? content : truncateText(content);
+                const needsTruncation = content.length > 120;
                 
                 return (
                   <div key={lesson.id} className={`lesson-item ${isCompleted ? 'completed' : ''}`}>
@@ -322,10 +320,14 @@ const CourseDetailPage = () => {
                         )}
                       </h3>
                       
-                      <p className="lesson-content">
-                        {displayContent}
-                      </p>
+                      {/* ТЕКСТ УРОКА - полный или обрезанный */}
+                      <div className={`lesson-content-wrapper ${isExpanded ? 'expanded' : ''}`}>
+                        <p className="lesson-content">
+                          {isExpanded ? content : truncateText(content)}
+                        </p>
+                      </div>
                       
+                      {/* КНОПКА "ДАЛЕЕ" / "СВЕРНУТЬ" */}
                       {needsTruncation && (
                         <button 
                           className="lesson-expand-btn"
