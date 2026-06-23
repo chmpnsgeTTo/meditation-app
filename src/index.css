@@ -7271,3 +7271,480 @@ body.dark-mode .profile-achievement-progress .progress-percent {
     align-items: stretch;
   }
 }
+
+/* ============================================ */
+/* ПРОФИЛЬ - НАСТРОЙКИ АДАПТИВ */
+/* ============================================ */
+
+.profile-settings {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.profile-settings-section {
+  padding: 1.5rem;
+  background: #f8fafc;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s ease;
+}
+
+.profile-settings-section:hover {
+  border-color: #667eea;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.profile-settings-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1a202c;
+  margin: 0 0 1rem 0;
+}
+
+.profile-settings-section h3 svg {
+  color: #667eea;
+}
+
+.profile-settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.profile-settings-form input {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  background: #ffffff;
+  color: #1a202c;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.profile-settings-form input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.profile-settings-form input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f1f5f9;
+}
+
+.profile-settings-form input::placeholder {
+  color: #94a3b8;
+}
+
+.profile-settings-form .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.7rem 1.5rem;
+  border: none;
+  border-radius: 10px;
+  background: #667eea;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+.profile-settings-form .btn-primary:hover:not(:disabled) {
+  background: #5a67d8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+}
+
+.profile-settings-form .btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.profile-settings-form .btn-primary .spinner-small {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* ============================================ */
+/* ТЁМНАЯ ТЕМА ДЛЯ НАСТРОЕК */
+/* ============================================ */
+body.dark-mode .profile-settings-section {
+  background: #1a1a2e;
+  border-color: #334155;
+}
+
+body.dark-mode .profile-settings-section:hover {
+  border-color: #818cf8;
+}
+
+body.dark-mode .profile-settings-section h3 {
+  color: #e2e8f0;
+}
+
+body.dark-mode .profile-settings-section h3 svg {
+  color: #818cf8;
+}
+
+body.dark-mode .profile-settings-form input {
+  background: #1e1e2e;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+body.dark-mode .profile-settings-form input:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
+}
+
+body.dark-mode .profile-settings-form input:disabled {
+  background: #2d2d44;
+  color: #64748b;
+}
+
+body.dark-mode .profile-settings-form input::placeholder {
+  color: #64748b;
+}
+
+body.dark-mode .profile-settings-form .btn-primary {
+  background: #818cf8;
+}
+
+body.dark-mode .profile-settings-form .btn-primary:hover:not(:disabled) {
+  background: #6366f1;
+}
+
+/* ============================================ */
+/* АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ */
+/* ============================================ */
+
+@media (max-width: 768px) {
+  .profile-settings {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .profile-settings-section {
+    padding: 1.25rem;
+  }
+
+  .profile-settings-section h3 {
+    font-size: 0.95rem;
+  }
+
+  .profile-settings-form input {
+    padding: 0.6rem 0.9rem;
+    font-size: 0.85rem;
+  }
+
+  .profile-settings-form .btn-primary {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-settings-section {
+    padding: 1rem;
+  }
+
+  .profile-settings-section h3 {
+    font-size: 0.9rem;
+    flex-wrap: wrap;
+  }
+
+  .profile-settings-form input {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+    border-radius: 8px;
+  }
+
+  .profile-settings-form .btn-primary {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+    border-radius: 8px;
+  }
+}
+
+/* ============================================ */
+/* ДОПОЛНИТЕЛЬНЫЕ ИСПРАВЛЕНИЯ ДЛЯ ПРОФИЛЯ */
+/* ============================================ */
+
+/* Сообщения */
+.profile-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 10px;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.profile-message-success {
+  background: rgba(72, 187, 120, 0.1);
+  color: #48bb78;
+  border: 1px solid rgba(72, 187, 120, 0.2);
+}
+
+.profile-message-error {
+  background: rgba(229, 62, 62, 0.1);
+  color: #e53e3e;
+  border: 1px solid rgba(229, 62, 62, 0.2);
+}
+
+/* Шапка профиля */
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .profile-user-info {
+    text-align: center;
+  }
+
+  .profile-username {
+    justify-content: center;
+  }
+
+  .profile-joined {
+    justify-content: center;
+  }
+
+  .profile-badges {
+    justify-content: center;
+  }
+
+  .profile-avatar-wrapper {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto;
+  }
+
+  .profile-avatar-placeholder svg {
+    width: 60px !important;
+    height: 60px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-avatar-wrapper {
+    width: 80px;
+    height: 80px;
+  }
+
+  .profile-username {
+    font-size: 1.2rem;
+  }
+
+  .profile-joined {
+    font-size: 0.8rem;
+  }
+
+  .profile-badge {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.5rem;
+  }
+}
+
+/* ============================================ */
+/* ВКЛАДКИ ПРОФИЛЯ - ПО ЦЕНТРУ */
+/* ============================================ */
+
+.profile-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e2e8f0;
+  padding-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.profile-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.5rem;
+  border: none;
+  border-radius: 30px;
+  background: transparent;
+  color: #4a5568;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.profile-tab:hover {
+  background: #f1f5f9;
+  color: #667eea;
+}
+
+.profile-tab.active {
+  background: #667eea;
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+@media (max-width: 768px) {
+  .profile-tabs {
+    gap: 0.3rem;
+    padding-bottom: 0.3rem;
+  }
+
+  .profile-tab {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+    border-radius: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-tabs {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.3rem;
+  }
+
+  .profile-tab {
+    justify-content: center;
+    padding: 0.5rem 0.8rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* ============================================ */
+/* СТРАНИЦА МЕДИТАЦИИ - УЛУЧШЕННАЯ ВИДИМОСТЬ */
+/* ============================================ */
+
+.meditation-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding: 1.5rem 2rem;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+  max-width: 500px;
+}
+
+.meditation-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffffff !important;
+  margin: 0 0 0.3rem 0;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+}
+
+.meditation-title svg {
+  color: #667eea;
+  filter: drop-shadow(0 2px 8px rgba(102, 126, 234, 0.4));
+}
+
+.meditation-subtitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9) !important;
+  margin: 0;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.2);
+}
+
+.meditation-subtitle svg {
+  color: #667eea;
+}
+
+/* ============================================ */
+/* ТЁМНАЯ ТЕМА */
+/* ============================================ */
+body.dark-mode .meditation-header {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .meditation-title {
+  color: #ffffff !important;
+}
+
+body.dark-mode .meditation-subtitle {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* ============================================ */
+/* АДАПТАЦИЯ */
+/* ============================================ */
+@media (max-width: 768px) {
+  .meditation-header {
+    padding: 1rem 1.5rem;
+    max-width: 100%;
+  }
+
+  .meditation-title {
+    font-size: 1.5rem;
+  }
+
+  .meditation-subtitle {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .meditation-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .meditation-title {
+    font-size: 1.2rem;
+  }
+
+  .meditation-title svg {
+    width: 22px !important;
+    height: 22px !important;
+  }
+
+  .meditation-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .meditation-subtitle svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}
